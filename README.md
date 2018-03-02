@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/IBM/watson-discovery-food-reviews.svg?branch=master)](https://travis-ci.org/IBM/watson-discovery-food-reviews)
+![IBM Cloud Deployments](https://metrics-tracker.mybluemix.net/stats/c612c58fcbb9552f348a4e0e5e148846/badge.svg)
 
 # Discovery customer sentiment from product reviews
 
@@ -45,7 +46,7 @@ Use the ``Deploy to IBM Cloud`` button **OR** create the services and run locall
 
 ## Deploy to IBM Cloud
 
-[![Deploy to Bluemix](https://bluemix.net/deploy/button.png)](https://bluemix.net/deploy?branch=readme&repository=https://github.com/IBM/watson-discovery-food-reviews)
+[![Deploy to IBM Cloud](https://metrics-tracker.mybluemix.net/stats/c612c58fcbb9552f348a4e0e5e148846/button.svg)](https://bluemix.net/deploy?repository=https://github.com/IBM/watson-discovery-food-reviews)
 
 1. Press the above ``Deploy to IBM Cloud`` button and then click on ``Deploy``.
 
@@ -163,7 +164,7 @@ If using the `Deploy to IBM Cloud` button some metrics are tracked, the followin
 * Labels of bound services
 * Number of instances for each bound service and associated plan information
 
-This data is collected from the `package.json` file in the sample application and the ``VCAP_APPLICATION`` and ``VCAP_SERVICES`` environment variables in IBM Cloud and other Cloud Foundry platforms. This data is used by IBM to track metrics around deployments of sample applications to IBM Cloud to measure the usefulness of our examples, so that we can continuously improve the content we offer to you. Only deployments of sample applications that include code to ping the Deployment Tracker service will be tracked.
+This data is collected from the `package.json` and `repository.yaml` file in the sample application and the ``VCAP_APPLICATION`` and ``VCAP_SERVICES`` environment variables in IBM Cloud and other Cloud Foundry platforms. This data is used by IBM to track metrics around deployments of sample applications to IBM Cloud to measure the usefulness of our examples, so that we can continuously improve the content we offer to you. Only deployments of sample applications that include code to ping the Deployment Tracker service will be tracked.
 
 ## Disabling Deployment Tracking
 
