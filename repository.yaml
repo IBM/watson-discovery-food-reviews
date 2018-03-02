@@ -1,0 +1,7 @@
+id: watson-discovery-food-reviews
+runtimes: 
+  - Cloud Foundry
+services: 
+  - Discovery
+event_id: web
+language: nodejs
