@@ -45,7 +45,7 @@ Use the ``Deploy to IBM Cloud`` button **OR** create the services and run locall
 
 ## Deploy to IBM Cloud
 
-[![Deploy to Bluemix](https://bluemix.net/deploy/button.png)](https://bluemix.net/deploy?branch=d2b&repository=https://github.com/IBM/watson-discovery-food-reviews)
+[![Deploy to Bluemix](https://bluemix.net/deploy/button.png)](https://bluemix.net/deploy?branch=readme&repository=https://github.com/IBM/watson-discovery-food-reviews)
 
 1. Press the above ``Deploy to IBM Cloud`` button and then click on ``Deploy``.
 
