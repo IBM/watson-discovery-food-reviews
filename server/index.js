@@ -71,7 +71,7 @@ const WatsonDiscoServer = new Promise((resolve) => {
     if (err) {
       discoverySetup.handleSetupError(err);
     } else {
-      console.log('Dicovery is ready!');
+      console.log('Discovery is ready!');
       // now load data into discovery service collection
       var collectionParams = data;
     

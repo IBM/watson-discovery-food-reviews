@@ -58,6 +58,7 @@
     "ignore": "node_modules"
   },
   "devDependencies": {
+    "csvtojson": "^1.1.9",
     "dezalgo": "~1.0",
     "enzyme": "^3.2.0",
     "eslint": "^4.13.1",
