@@ -129,7 +129,7 @@ const getScore = item => {
   var score = 0.0;
 
   if (item.score) {
-    score = (item.score).toFixed(4);
+    score = Number(item.score).toFixed(4);
   }
   return score;
 };
