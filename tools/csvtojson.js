@@ -31,7 +31,7 @@ csv({
   headers:['Id','ProductId','UserId','ProfileName','HelpfulnessNumerator','HelpfulnessDenominator','Score','date','Summary','Text'],
   noheader:false,
   colParser:{
-    'date':function(item, head, resultRow, row, colIdx) {
+    'date':function(item) {
       return new Date(Number(item) * 1000).toISOString().substring(0, 10);
     }
   },
