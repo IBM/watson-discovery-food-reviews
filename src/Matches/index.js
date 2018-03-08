@@ -39,10 +39,13 @@ const Match = props => (
       </List.Description>
     </List.Content>
     <List.Content>
-      Score: { props.score }
+      Rating: { props.score }
     </List.Content>
     <List.Content>
       Date: { props.date }
+    </List.Content>
+    <List.Content>
+      Helpfulness Rating: { props.helpRating }%
     </List.Content>
     <List.Content>
       Sentiment: { props.sentiment }
@@ -72,6 +75,7 @@ const Matches = props => (
               highlightText={ item.highlightText }
               score={ getScore(item) }
               date={ item.date }
+              helpRating = { item.helpRating }
               sentiment={ getSentiment(item) }
             />)
           }
