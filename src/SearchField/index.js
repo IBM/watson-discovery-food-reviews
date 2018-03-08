@@ -81,40 +81,10 @@ export default class SearchField extends React.Component {
 
     return (
       <Grid className='search-field-grid'>
-        <Grid.Column width={12} verticalAlign='middle' textAlign='center'>
+        <Grid.Column width={16} verticalAlign='middle' textAlign='center'>
           <Header as='h1' textAlign='center'>
             Food Review Data
           </Header>
-          <Input
-            className='searchinput'
-            icon='search'
-            placeholder='Enter search string...'
-            onKeyPress={this.handleKeyPress.bind(this)}
-            defaultValue={this.state.searchQuery}
-          />
-        </Grid.Column>
-        <Grid.Column width={4} verticalAlign='top' textAlign='left'>
-          <Grid.Row>
-            <Checkbox 
-              label='Natural Language Query' 
-              checked={ queryType === utils.QUERY_NATURAL_LANGUAGE }
-              onChange={this.toggleCheckbox.bind(this, 'queryType')}
-            />
-          </Grid.Row>
-          <Grid.Row>
-            <Checkbox 
-              label='Passage Search'
-              checked={ returnPassages }
-              onChange={this.toggleCheckbox.bind(this, 'returnPassages')}
-            />
-          </Grid.Row>
-          <Grid.Row>
-            <Checkbox 
-              label='Limit to 100 Results'
-              checked={ limitResults }
-              onChange={this.toggleCheckbox.bind(this, 'limitResults')}
-            />
-          </Grid.Row>
         </Grid.Column>
       </Grid>
     );

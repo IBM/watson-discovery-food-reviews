@@ -65,6 +65,8 @@ class Main extends React.Component {
       returnPassages,
       limitResults,
       sentimentFilter,
+      productIdFilter,
+      reviewerIdFilter,
       sortOrder,
       // for filters
       selectedProducts,
@@ -109,7 +111,9 @@ class Main extends React.Component {
       returnPassages: returnPassages || false,
       limitResults: limitResults || false,
       sortOrder: sortOrder || utils.sortKeys[0].sortBy,
-      sentimentFilter: sentimentFilter || 'all',
+      sentimentFilter: sentimentFilter || 'ALL',
+      productIdFilter: productIdFilter || 'ALL',
+      reviewerIdFilter: reviewerIdFilter || 'ALL',
       // used by filters
       selectedProducts: selectedProducts || new Set(),
       selectedReviewers: selectedReviewers || new Set(),
@@ -207,14 +211,26 @@ class Main extends React.Component {
     this.fetchData(searchQuery, true);
   }
 
-  applySentimentFilter(value) {
+  applySentimentFilter(event, data) {
     const { searchQuery, sentimentFilter } = this.state;
-    this.setState({ sentimentFilter: value.sentimentFilter });
+    this.setState({ sentimentFilter: data.value });
   }
   
+  applyProductIdFilter(event, data) {
+    const { searchQuery, productIdFilter } = this.state;
+    this.setState({ productIdFilter: data.value });
+  }
+
+  applyReviewerIdFilter(event, data) {
+    const { searchQuery, reviewerIdFilter } = this.state;
+    this.setState({ reviewerIdFilter: data.value });
+  }
+
   componentDidUpdate(prevProps, prevState) {
-    const { searchQuery, sentimentFilter } = this.state;
-    if (sentimentFilter != prevState.sentimentFilter) {
+    const { searchQuery, sentimentFilter, productIdFilter, reviewerIdFilter } = this.state;
+    if ((sentimentFilter != prevState.sentimentFilter) || 
+        (productIdFilter != prevState.productIdFilter) ||
+        (reviewerIdFilter != prevState.reviewerIdFilter)) {
       // true = clear all filters for new search
       this.fetchData(searchQuery, true);
     }
@@ -227,7 +243,6 @@ class Main extends React.Component {
    */
   sentimentTermChanged(data) {
     const { term } = data;
-    const util = require('util');
     this.setState({ sentimentTerm: term });
   }
 
@@ -599,7 +614,9 @@ class Main extends React.Component {
       selectedConcepts,
       selectedKeywords,
       selectedEntityTypes,
-      sentimentFilter
+      sentimentFilter,
+      productIdFilter,
+      reviewerIdFilter
     } = this.state;
     var filterString = '';
     
@@ -629,19 +646,10 @@ class Main extends React.Component {
       'enriched_text.entities.type::', filterString === '');
     filterString = filterString + entityTypesString;
 
-    // add any product ID filters, if selected
-    var productsString = this.buildFilterStringForFacet(selectedProducts,
-      'ProductId::', filterString === '');
-    filterString = filterString + productsString;
-
-    // add any reviewers filters, if selected
-    var reviewersString = this.buildFilterStringForFacet(selectedReviewers,
-      'UserId::', filterString === '');
-    filterString = filterString + reviewersString;
-
     // and sentiment filter, if selected
+    console.log('sentimentFilter:' + sentimentFilter);
     if (typeof sentimentFilter !== 'undefined' && sentimentFilter.length > 1) {
-      if (sentimentFilter !== 'all') {
+      if (sentimentFilter !== 'ALL') {
         if (filterString != '') {
           filterString = filterString + ',';
         }
@@ -649,6 +657,28 @@ class Main extends React.Component {
       }
     }
 
+    // add any product ID filter, if selected
+    console.log('productIdFilter:' + productIdFilter);
+    if (typeof productIdFilter !== 'undefined' && productIdFilter.length > 1) {
+      if (productIdFilter !== 'ALL') {
+        if (filterString != '') {
+          filterString = filterString + ',';
+        }
+        filterString = filterString + 'ProductId::' + productIdFilter;
+      }
+    }
+    
+    // add any reviewer ID filter, if selected
+    console.log('reviewerIdFilter:' + reviewerIdFilter);
+    if (typeof reviewerIdFilter !== 'undefined' && reviewerIdFilter.length > 1) {
+      if (reviewerIdFilter !== 'ALL') {
+        if (filterString != '') {
+          filterString = filterString + ',';
+        }
+        filterString = filterString + 'UserId::' + reviewerIdFilter;
+      }
+    }
+    
     console.log('FilterString: ' + filterString);
     return filterString;
   }
@@ -715,36 +745,86 @@ class Main extends React.Component {
     }
   }
 
-  /**
-   * getProductsFilter - return products filter object to be rendered.
-   */
-  getProductsFilter() {
-    const { products, selectedProducts } = this.state;
-    if (!products) {
-      return null;
-    }
+
+  getSentimentFilter() {
+    const { sentimentFilter } = this.state;
+    
+    const reviewSentimentOptions = [
+      { key: 'ALL', value: 'ALL', text: 'Show All Reviews' },
+      { key: 'POS', value: 'positive', text: 'Show Positive Reviews' },
+      { key: 'NEG', value: 'negative', text: 'Show Negative Reviews' }
+    ];
+
     return (
-      <ProductsFilter 
-        onFilterItemsChange={this.filtersChanged.bind(this)}
-        products={products.results}
-        selectedProducts={selectedProducts}
+      <Dropdown 
+        className='top-filter-class'
+        defaultValue={ sentimentFilter }
+        search
+        selection
+        scrolling
+        options={ reviewSentimentOptions }
+        onChange={ this.applySentimentFilter.bind(this) }
+      />
+    );
+  }
+
+  /**
+   * getProductFilter - return products filter object to be rendered.
+   */
+  getProductFilter() {
+    const { products, productIdFilter } = this.state;
+
+    var showProductOptions = [
+      { key: 'ALL', value: 'ALL', text: 'For All Products' }
+    ];
+
+    products.results.forEach(function(entry) {
+      showProductOptions.push({
+        key: entry.key,
+        value: entry.key,
+        text: 'For Product: ' + entry.key + ' (' + entry.matching_results + ')'
+      })
+    });
+
+    return (
+      <Dropdown 
+        className='top-filter-class'
+        defaultValue={ productIdFilter }
+        search
+        selection
+        scrolling
+        options={ showProductOptions }
+        onChange={ this.applyProductIdFilter.bind(this) }
       />
     );
   }
   
   /**
-   * getReviewersFilter - return reviewers filter object to be rendered.
+   * getReviewerFilter - return reviewers filter object to be rendered.
    */
-  getReviewersFilter() {
-    const { reviewers, selectedReviewers } = this.state;
-    if (!reviewers) {
-      return null;
-    }
+  getReviewerFilter() {
+    const { reviewers, reviewerIdFilter } = this.state;
+    var showReviewersOptions = [
+      { key: 'ALL', value: 'ALL', text: 'For All Reviewers' }
+    ];
+
+    reviewers.results.forEach(function(entry) {
+      showReviewersOptions.push({
+        key: entry.key,
+        value: entry.key,
+        text: 'For Reviewer: ' + entry.key  + ' (' + entry.matching_results + ')'
+      })
+    });
+
+
     return (
-      <ReviewersFilter 
-        onFilterItemsChange={this.filtersChanged.bind(this)}
-        reviewers={reviewers.results}
-        selectedReviewers={selectedReviewers}
+      <Dropdown 
+        defaultValue={ reviewerIdFilter }
+        search
+        selection
+        scrolling
+        options={ showReviewersOptions }
+        onChange={ this.applyReviewerIdFilter.bind(this) }
       />
     );
   }
@@ -864,17 +944,26 @@ class Main extends React.Component {
     // console.log(util.inspect(selectedSentiments, false, null));
     // console.log('sentimentFilter: ' + sentimentFilter);
     var filtersOn = false;
-    if (sentimentFilter != '' ||
-      selectedProducts.size > 0 ||
-      selectedReviewers.size > 0 ||
-      selectedEntities.size > 0 ||
+    if (selectedEntities.size > 0 ||
       selectedCategories.size > 0 ||
       selectedConcepts.size > 0 ||
       selectedKeywords.size > 0 ||
       selectedEntityTypes.size > 0) {
       filtersOn = true;
     }
-    
+
+   const showProductOptions = [
+      { key: 'ALL', value: 'ALL', text: 'All Products' },
+      { key: 'POS', value: 'POS', text: 'Only Reviews for Product: Fritos' },
+      { key: 'NEG', value: 'NEG', text: 'Only Reviews for Product: Nabisco' }
+    ];
+
+    const showReviewerOptions = [
+      { key: 'ALL', value: 'ALL', text: 'All Reviewers' },
+      { key: 'POS', value: 'POS', text: 'Only Reviews by: Fred' },
+      { key: 'NEG', value: 'NEG', text: 'Only Reviews by: Mary' }
+    ];
+
     return (
       <Grid celled className='search-grid'>
 
@@ -893,6 +982,14 @@ class Main extends React.Component {
           </Grid.Column>
         </Grid.Row>
 
+        <Grid.Row color={'teal'}>
+          <Grid.Column width={16} textAlign='center'>
+            { this.getSentimentFilter() }
+            { this.getProductFilter() }
+            { this.getReviewerFilter() }
+          </Grid.Column>
+        </Grid.Row>
+
         {/* Results Panel */}
 
         <Grid.Row className='matches-grid-row'>
@@ -900,64 +997,6 @@ class Main extends React.Component {
           {/* Drop-Down Filters */}
 
           <Grid.Column width={3}>
-            {filtersOn ? (
-              <Button
-                compact
-                basic
-                color='red'
-                content='clear all'
-                icon='remove'
-                onClick={this.handleClearAllFiltersClick.bind(this)}
-              />
-            ) : null}
-            <Header as='h2' block inverted textAlign='left'>
-              <Icon name='filter' />
-              <Header.Content>
-                Filter
-                <Header.Subheader>
-                  By List
-                </Header.Subheader>
-              </Header.Content>
-            </Header>
-            <Accordion styled>
-              <Accordion.Title 
-                active={activeFilterIndex == utils.SENTIMENT_DATA_INDEX}
-                index={utils.SENTIMENT_DATA_INDEX}
-                onClick={this.handleAccordionClick.bind(this)}>
-                <Icon name='dropdown' />
-                Sentiment
-              </Accordion.Title>
-              <Accordion.Content active={activeFilterIndex == utils.SENTIMENT_DATA_INDEX}>
-                <SentimentTypesFilter
-                  sentimentFilter={sentimentFilter}
-                  onSentimentFilterChange={this.applySentimentFilter.bind(this)}
-                />
-              </Accordion.Content>
-            </Accordion>
-            <Accordion styled>
-              <Accordion.Title 
-                active={activeFilterIndex == utils.PRODUCT_DATA_INDEX}
-                index={utils.PRODUCT_DATA_INDEX}
-                onClick={this.handleAccordionClick.bind(this)}>
-                <Icon name='dropdown' />
-                Products
-              </Accordion.Title>
-              <Accordion.Content active={activeFilterIndex == utils.PRODUCT_DATA_INDEX}>
-                {this.getProductsFilter()}
-              </Accordion.Content>
-            </Accordion>
-            <Accordion styled>
-              <Accordion.Title 
-                active={activeFilterIndex == utils.REVIEWER_DATA_INDEX}
-                index={utils.REVIEWER_DATA_INDEX}
-                onClick={this.handleAccordionClick.bind(this)}>
-                <Icon name='dropdown' />
-                Reviewers
-              </Accordion.Title>
-              <Accordion.Content active={activeFilterIndex == utils.REVIEWER_DATA_INDEX}>
-                {this.getReviewersFilter()}
-              </Accordion.Content>
-            </Accordion>
 
             <Header as='h2' block inverted textAlign='left'>
               <Icon name='filter' />
@@ -968,6 +1007,19 @@ class Main extends React.Component {
                 </Header.Subheader>
               </Header.Content>
             </Header>
+
+            {filtersOn ? (
+              <Button
+                compact
+                size='tiny'
+                fluid
+                basic
+                color='red'
+                content='clear all'
+                icon='remove'
+                onClick={this.handleClearAllFiltersClick.bind(this)}
+              />
+            ) : null}
 
             <Accordion styled>
               <Accordion.Title 

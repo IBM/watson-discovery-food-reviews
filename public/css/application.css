@@ -670,3 +670,15 @@ div.ui.mini.statistics {
 div.ui.compact.sort-dropdown.menu {
   float: right;
 }
+
+div.ui.search.selection.scrolling.dropdown {
+  min-width: 22em;
+}
+
+div.ui.search.selection.scrolling.dropdown.top-filter-class {
+  margin-right: 10px;
+}
+
+button.ui.red.tiny.basic.compact.fluid.button {
+  margin-bottom: 15px;
+}
