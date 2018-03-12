@@ -33,7 +33,8 @@ module.exports = {
         'term(enriched_text.categories.label).term(enriched_text.sentiment.document.label),' +
         'term(enriched_text.concepts.text).term(enriched_text.sentiment.document.label),' +
         'term(enriched_text.keywords.text).term(enriched_text.sentiment.document.label),' +
-        'term(enriched_text.entities.type).term(enriched_text.sentiment.document.label)]'
+        'term(enriched_text.entities.type).term(enriched_text.sentiment.document.label),' +
+        'term(ProductId,count:100),term(UserId,count:100)]'
     }, queryOpts);
 
     console.log('Discovery Search Query Params: ');

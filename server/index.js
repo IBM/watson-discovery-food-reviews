@@ -203,6 +203,8 @@ function createServer() {
         res.render('index',
           {
             data: matches,
+            products: json,
+            reviewers: json,
             entities: json,
             categories: json,
             concepts: json,
@@ -233,6 +235,7 @@ function createServer() {
     const params = queryBuilder.search({ 
       natural_language_query: '',
       count: 1000,
+      sort: '-Score',
       passages: false
     });
     return new Promise((resolve, reject) => {
@@ -249,7 +252,9 @@ function createServer() {
           // console.log(util.inspect(results, false, null));
       
           res.render('index', { 
-            data: matches, 
+            data: matches,
+            products: results,
+            reviewers: results,
             entities: results,
             categories: results,
             concepts: results,

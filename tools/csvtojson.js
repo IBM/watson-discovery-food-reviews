@@ -22,7 +22,7 @@ const fs=require('fs');
 let everyNth = 10;  // Keep every Nth row
 let rowLimit = 1000;  // Max number of rows to parse
 let padding = '000';  // to Line up the numbers and slice(-4).
-let fileLimit = 100;  // Max number of files to write
+let fileLimit = 2000;  // Max number of files to write
 
 let files = 0;
 let lines = -1;

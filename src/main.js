@@ -20,17 +20,16 @@ import PropTypes from 'prop-types';
 import queryString from 'query-string';
 import Matches from './Matches';
 import PaginationMenu from './PaginationMenu';
-import SearchField from './SearchField';
 import EntitiesFilter from './EntitiesFilter';
 import CategoriesFilter from './CategoriesFilter';
 import ConceptsFilter from './ConceptsFilter';
 import KeywordsFilter from './KeywordsFilter';
 import EntityTypesFilter from './EntityTypesFilter';
-import TagCloudRegion from './TagCloudRegion';
 import TrendChart from './TrendChart';
 import SentimentChart from './SentimentChart';
 import { Grid, Dimmer, Button, Menu, Dropdown, Divider, Loader, Accordion, Icon, Header, Statistic } from 'semantic-ui-react';
 const utils = require('../lib/utils');
+//const util = require('util');
 
 /**
  * Main React object that contains all objects on the web page.
@@ -42,6 +41,8 @@ class Main extends React.Component {
     super(...props);
     const { 
       // query data
+      products,
+      reviewers,
       entities, 
       categories, 
       concepts, 
@@ -55,9 +56,9 @@ class Main extends React.Component {
       error,
       // query params
       searchQuery,
-      queryType,
-      returnPassages,
-      limitResults,
+      sentimentFilter,
+      productIdFilter,
+      reviewerIdFilter,
       sortOrder,
       // for filters
       selectedEntities,
@@ -67,8 +68,6 @@ class Main extends React.Component {
       selectedEntityTypes,
       // matches panel
       currentPage,
-      // tag cloud
-      tagCloudType,
       // trending chart
       trendData,
       trendError,
@@ -80,6 +79,8 @@ class Main extends React.Component {
     // change in state fires re-render of components
     this.state = {
       // query data
+      products: products && parseProducts(products),
+      reviewers: reviewers && parseReviewers(reviewers),
       entities: entities && parseEntities(entities),
       categories: categories && parseCategories(categories),
       concepts: concepts && parseConcepts(concepts),
@@ -94,18 +95,16 @@ class Main extends React.Component {
       error: error,
       // query params
       searchQuery: searchQuery || '',
-      queryType: queryType || utils.QUERY_NATURAL_LANGUAGE,
-      returnPassages: returnPassages || false,
-      limitResults: limitResults || false,
       sortOrder: sortOrder || utils.sortKeys[0].sortBy,
+      sentimentFilter: sentimentFilter || 'ALL',
+      productIdFilter: productIdFilter || 'ALL',
+      reviewerIdFilter: reviewerIdFilter || 'ALL',
       // used by filters
       selectedEntities: selectedEntities || new Set(),
       selectedCategories: selectedCategories || new Set(),
       selectedConcepts: selectedConcepts || new Set(),
       selectedKeywords: selectedKeywords || new Set(),
       selectedEntityTypes: selectedEntityTypes || new Set(),
-      // tag cloud
-      tagCloudType: tagCloudType || utils.ENTITY_FILTER,
       // trending chart
       trendData: trendData || null,
       trendError: trendError,
@@ -115,7 +114,7 @@ class Main extends React.Component {
       sentimentTerm: sentimentTerm || utils.SENTIMENT_TERM_ITEM,
       // misc panel
       currentPage: currentPage || '1',  // which page of matches are we showing
-      activeFilterIndex: 0,             // which filter index is expanded/active
+      activeFilterIndex: utils.SENTIMENT_DATA_INDEX, // which filter index is expanded/active
     };
   }
 
@@ -154,25 +153,6 @@ class Main extends React.Component {
   }
 
   /**
-   * searchParamsChanged - (callback function)
-   * User has toggled one of the optional params listed in the
-   * search bar. Set state so that searchField checkboxes get
-   * set accordingly.
-   */
-  searchParamsChanged(data) {
-    const { queryType, returnPassages, limitResults} = this.state;
-    if (data.label === 'queryType') {
-      var newQueryType = queryType === utils.QUERY_DISCO_LANGUAGE ?
-        utils.QUERY_NATURAL_LANGUAGE : utils.QUERY_DISCO_LANGUAGE;
-      this.setState({ queryType: newQueryType });
-    } else if (data.label === 'returnPassages') {
-      this.setState({ returnPassages: !returnPassages });
-    } else if (data.label === 'limitResults') {
-      this.setState({ limitResults: !limitResults });
-    }
-  }
-
-  /**
    * pageChanged - (callback function)
    * User has selected a new page of results to display.
    */
@@ -193,6 +173,28 @@ class Main extends React.Component {
     this.fetchData(searchQuery, true);
   }
 
+  applySentimentFilter(event, data) {
+    this.setState({ sentimentFilter: data.value });
+  }
+  
+  applyProductIdFilter(event, data) {
+    this.setState({ productIdFilter: data.value });
+  }
+
+  applyReviewerIdFilter(event, data) {
+    this.setState({ reviewerIdFilter: data.value });
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const { searchQuery, sentimentFilter, productIdFilter, reviewerIdFilter } = this.state;
+    if ((sentimentFilter != prevState.sentimentFilter) || 
+        (productIdFilter != prevState.productIdFilter) ||
+        (reviewerIdFilter != prevState.reviewerIdFilter)) {
+      // true = clear all filters for new search
+      this.fetchData(searchQuery, true);
+    }
+  }
+
   /**
    * sentimentTermChanged - (callback function)
    * User has selected a new term to use in the sentiment
@@ -210,23 +212,19 @@ class Main extends React.Component {
    * all subsequent queries to discovery.
    */
   sortOrderChange(event, selection) {
-    const { sortOrder, data } = this.state;
+    const { data, sortOrder } = this.state;
+    console.log('sortOrder: ' + sortOrder);
     if (sortOrder != selection.value) {
-      var sortBy = require('sort-by');
-      var sortedData = data.results.slice();
 
       // get internal version of the sort key
-      var internalSortKey = '';
+      var sortKey = '';
       for (var i=0; i<utils.sortKeys.length; i++) {
         if (utils.sortKeys[i].sortBy === selection.value) {
-          internalSortKey = utils.sortKeys[i].sortByInt;
+          sortKey = utils.sortKeys[i].sortBy;
           break;
         }
       }
-
-      // sort by internal key
-      sortedData.sort(sortBy(internalSortKey));
-      data.results = sortedData;
+      data.results = this.sortData(data, sortKey);
 
       // save off external key in case we do another query to Discovery
       this.setState({
@@ -234,6 +232,14 @@ class Main extends React.Component {
         sortOrder: selection.value
       });
     }
+  }
+
+  sortData(data, sortKey) {
+    var sortedData = data.results.slice();
+    var sortBy = require('sort-by');
+    
+    sortedData.sort(sortBy(sortKey));
+    return sortedData;
   }
 
   /**
@@ -328,7 +334,6 @@ class Main extends React.Component {
    * display a default graph.
    */
   getTrendData(data) {
-    var { limitResults } = this.state;
     var { chartType, term } = data;
 
     // we don't have any data to show for "all" items, so just clear chart
@@ -365,7 +370,7 @@ class Main extends React.Component {
     const qs = queryString.stringify({
       query: trendQuery,
       filters: this.buildFilterStringForQuery(),
-      count: (limitResults == true ? 100 : 1000)
+      count: 2000
     });
 
     // send request
@@ -408,16 +413,13 @@ class Main extends React.Component {
    */
   fetchData(query, clearFilters) {
     const searchQuery = query;
-    var { 
+    var {
       selectedEntities, 
       selectedCategories, 
       selectedConcepts,
       selectedKeywords,
       selectedEntityTypes,
-      queryType,
-      returnPassages,
-      limitResults,
-      sortOrder
+      sortOrder,
     } = this.state;
 
     // clear filters if this a new text search
@@ -448,11 +450,9 @@ class Main extends React.Component {
     const qs = queryString.stringify({
       query: searchQuery,
       filters: filterString,
-      count: (limitResults == true ? 100 : 1000),
-      sort: sortOrder,
-      returnPassages: returnPassages,
-      queryType: (queryType === utils.QUERY_NATURAL_LANGUAGE ? 
-        'natural_language_query' : 'query:'),
+      count: 2000,
+      // sort: sortOrder,
+      queryType: 'natural_language_query'
     });
 
     // send request
@@ -466,17 +466,10 @@ class Main extends React.Component {
       })
       .then(json => {
         var data = utils.parseData(json);
-        var passages = [];
 
-        if (returnPassages) {
-          passages = parsePassages(json);
-          // console.log('+++ PASSAGES RESULTS +++');
-          // const util = require('util');
-          // console.log(util.inspect(passages.results, false, null));
-        }
+        data = utils.formatData(data, filterString);
+        data.results = this.sortData(data, sortOrder);
 
-        data = utils.formatData(data, passages, filterString);
-        
         console.log('+++ DISCO RESULTS +++');
         // const util = require('util');
         // console.log(util.inspect(data.results, false, null));
@@ -487,6 +480,8 @@ class Main extends React.Component {
 
         this.setState({ 
           data: data,
+          products: parseProducts(json),
+          reviewers: parseReviewers(json),
           entities: parseEntities(json),
           categories: parseCategories(json),
           concepts: parseConcepts(json),
@@ -547,12 +542,15 @@ class Main extends React.Component {
    * to be added to the search query sent to the discovery service
    */
   buildFilterStringForQuery() {
-    var { 
+    var {
       selectedEntities, 
       selectedCategories, 
       selectedConcepts,
       selectedKeywords,
-      selectedEntityTypes
+      selectedEntityTypes,
+      sentimentFilter,
+      productIdFilter,
+      reviewerIdFilter
     } = this.state;
     var filterString = '';
     
@@ -581,6 +579,40 @@ class Main extends React.Component {
       'enriched_text.entities.type::', filterString === '');
     filterString = filterString + entityTypesString;
 
+    // and sentiment filter, if selected
+    console.log('sentimentFilter:' + sentimentFilter);
+    if (typeof sentimentFilter !== 'undefined' && sentimentFilter.length > 1) {
+      if (sentimentFilter !== 'ALL') {
+        if (filterString != '') {
+          filterString = filterString + ',';
+        }
+        filterString = filterString + 'enriched_text.sentiment.document.label::' + sentimentFilter;
+      }
+    }
+
+    // add any product ID filter, if selected
+    console.log('productIdFilter:' + productIdFilter);
+    if (typeof productIdFilter !== 'undefined' && productIdFilter.length > 1) {
+      if (productIdFilter !== 'ALL') {
+        if (filterString != '') {
+          filterString = filterString + ',';
+        }
+        filterString = filterString + 'ProductId::' + productIdFilter;
+      }
+    }
+    
+    // add any reviewer ID filter, if selected
+    console.log('reviewerIdFilter:' + reviewerIdFilter);
+    if (typeof reviewerIdFilter !== 'undefined' && reviewerIdFilter.length > 1) {
+      if (reviewerIdFilter !== 'ALL') {
+        if (filterString != '') {
+          filterString = filterString + ',';
+        }
+        filterString = filterString + 'UserId::' + reviewerIdFilter;
+      }
+    }
+    
+    console.log('FilterString: ' + filterString);
     return filterString;
   }
 
@@ -646,6 +678,90 @@ class Main extends React.Component {
     }
   }
 
+
+  getSentimentFilter() {
+    const { sentimentFilter } = this.state;
+    
+    const reviewSentimentOptions = [
+      { key: 'ALL', value: 'ALL', text: 'Show All Reviews' },
+      { key: 'POS', value: 'positive', text: 'Show Positive Reviews' },
+      { key: 'NEG', value: 'negative', text: 'Show Negative Reviews' }
+    ];
+
+    return (
+      <Dropdown 
+        className='top-filter-class'
+        defaultValue={ sentimentFilter }
+        search
+        selection
+        scrolling
+        options={ reviewSentimentOptions }
+        onChange={ this.applySentimentFilter.bind(this) }
+      />
+    );
+  }
+
+  /**
+   * getProductFilter - return products filter object to be rendered.
+   */
+  getProductFilter() {
+    const { products, productIdFilter } = this.state;
+
+    var showProductOptions = [
+      { key: 'ALL', value: 'ALL', text: 'For All Products' }
+    ];
+
+    products.results.forEach(function(entry) {
+      showProductOptions.push({
+        key: entry.key,
+        value: entry.key,
+        text: 'For Product: ' + entry.key + ' (' + entry.matching_results + ')'
+      });
+    });
+
+    return (
+      <Dropdown 
+        className='top-filter-class'
+        defaultValue={ productIdFilter }
+        search
+        selection
+        scrolling
+        options={ showProductOptions }
+        onChange={ this.applyProductIdFilter.bind(this) }
+      />
+    );
+  }
+  
+  /**
+   * getReviewerFilter - return reviewers filter object to be rendered.
+   */
+  getReviewerFilter() {
+    const { reviewers, reviewerIdFilter } = this.state;
+    var showReviewersOptions = [
+      { key: 'ALL', value: 'ALL', text: 'For All Reviewers' }
+    ];
+
+    reviewers.results.forEach(function(entry) {
+      showReviewersOptions.push({
+        key: entry.key,
+        value: entry.key,
+        text: 'For Reviewer: ' + entry.key  + ' (' + entry.matching_results + ')'
+      });
+    });
+
+
+    return (
+      <Dropdown 
+        defaultValue={ reviewerIdFilter }
+        search
+        selection
+        scrolling
+        options={ showReviewersOptions }
+        onChange={ this.applyReviewerIdFilter.bind(this) }
+      />
+    );
+  }
+
   /**
    * getEntitiesFilter - return entities filter object to be rendered.
    */
@@ -662,7 +778,7 @@ class Main extends React.Component {
       />
     );
   }
-  
+
   /**
    * getCategoriesFilter - return categories filter object to be rendered.
    */
@@ -735,13 +851,13 @@ class Main extends React.Component {
    * render - return all the home page object to be rendered.
    */
   render() {
-    const { loading, data, error, searchQuery,
+    const { loading, data, error,
       entities, categories, concepts, keywords, entityTypes,
-      selectedEntities, selectedCategories, selectedConcepts, selectedKeywords, selectedEntityTypes,
+      selectedEntities, selectedCategories, 
+      selectedConcepts,selectedKeywords, selectedEntityTypes,
       numMatches, numPositive, numNeutral, numNegative,
-      tagCloudType, trendData, trendLoading, trendError, trendTerm,
-      queryType, returnPassages, limitResults, sortOrder,
-      sentimentTerm } = this.state;
+      trendData, trendLoading, trendError, trendTerm,
+      sortOrder, sentimentTerm } = this.state;
 
     // used for filter accordions
     const { activeFilterIndex } = this.state;
@@ -753,6 +869,12 @@ class Main extends React.Component {
       { key: 'negative', label: 'NEGATIVE', value: numNegative }
     ];
 
+    // const util = require('util');
+    // console.log("PRODUCTS: ");
+    // console.log(util.inspect(products, false, null));
+    // console.log("SELECTED SENTIMENTS: ");
+    // console.log(util.inspect(selectedSentiments, false, null));
+    // console.log('sentimentFilter: ' + sentimentFilter);
     var filtersOn = false;
     if (selectedEntities.size > 0 ||
       selectedCategories.size > 0 ||
@@ -761,7 +883,7 @@ class Main extends React.Component {
       selectedEntityTypes.size > 0) {
       filtersOn = true;
     }
-    
+
     return (
       <Grid celled className='search-grid'>
 
@@ -769,14 +891,21 @@ class Main extends React.Component {
 
         <Grid.Row color={'blue'}>
           <Grid.Column width={16} textAlign='center'>
-            <SearchField
-              onSearchQueryChange={this.searchQueryChanged.bind(this)}
-              onSearchParamsChange={this.searchParamsChanged.bind(this)}
-              searchQuery={searchQuery}
-              queryType={queryType}
-              returnPassages={returnPassages}
-              limitResults={limitResults}
-            />
+            <Grid className='search-field-grid'>
+              <Grid.Column width={16} verticalAlign='middle' textAlign='center'>
+                <Header as='h1' textAlign='center'>
+                  Food Review Data
+                </Header>
+              </Grid.Column>
+            </Grid>
+          </Grid.Column>
+        </Grid.Row>
+
+        <Grid.Row color={'teal'}>
+          <Grid.Column width={16} textAlign='center'>
+            { this.getSentimentFilter() }
+            { this.getProductFilter() }
+            { this.getReviewerFilter() }
           </Grid.Column>
         </Grid.Row>
 
@@ -787,9 +916,22 @@ class Main extends React.Component {
           {/* Drop-Down Filters */}
 
           <Grid.Column width={3}>
+
+            <Header as='h2' block inverted textAlign='left'>
+              <Icon name='filter' />
+              <Header.Content>
+                Filter
+                <Header.Subheader>
+                  By Enrichments
+                </Header.Subheader>
+              </Header.Content>
+            </Header>
+
             {filtersOn ? (
               <Button
                 compact
+                size='tiny'
+                fluid
                 basic
                 color='red'
                 content='clear all'
@@ -797,15 +939,7 @@ class Main extends React.Component {
                 onClick={this.handleClearAllFiltersClick.bind(this)}
               />
             ) : null}
-            <Header as='h2' block inverted textAlign='left'>
-              <Icon name='filter' />
-              <Header.Content>
-                Filter
-                <Header.Subheader>
-                  By List
-                </Header.Subheader>
-              </Header.Content>
-            </Header>
+
             <Accordion styled>
               <Accordion.Title 
                 active={activeFilterIndex == utils.ENTITY_DATA_INDEX}
@@ -866,23 +1000,6 @@ class Main extends React.Component {
                 {this.getEntityTypesFilter()}
               </Accordion.Content>
             </Accordion>
-            <Divider hidden/>
-            <Divider/>
-            <Divider hidden/>
-
-            {/* Tag Cloud Region */}
-    
-            <Grid.Row>
-              <TagCloudRegion
-                entities={entities}
-                categories={categories}
-                concepts={concepts}
-                keywords={keywords}
-                entityTypes={entityTypes}
-                tagCloudType={tagCloudType}
-                onTagItemSelected={this.tagItemSelected.bind(this)}
-              />
-            </Grid.Row>
             
           </Grid.Column>
 
@@ -994,11 +1111,20 @@ class Main extends React.Component {
   }
 }
 
-const parsePassages = data => ({
+/**
+ * parseProducts - convert raw search results into collection of product IDs.
+ */
+const parseProducts = data => ({
   rawResponse: Object.assign({}, data),
-  // sentiment: data.aggregations[0].results.reduce((accumulator, result) =>
-  //   Object.assign(accumulator, { [result.key]: result.matching_results }), {}),
-  results: data.passages
+  results: data.aggregations[utils.PRODUCT_DATA_INDEX].results
+});
+
+/**
+ * parseReviewers - convert raw search results into collection of reviewers.
+ */
+const parseReviewers = data => ({
+  rawResponse: Object.assign({}, data),
+  results: data.aggregations[utils.REVIEWER_DATA_INDEX].results
 });
 
 /**
@@ -1054,12 +1180,19 @@ function scrollToMain() {
 // type check to ensure we are called correctly
 Main.propTypes = {
   data: PropTypes.object,
+  sentiments: PropTypes.object,
+  properties: PropTypes.object,
+  products: PropTypes.object,
+  reviewers: PropTypes.object,
   entities: PropTypes.object,
   categories: PropTypes.object,
   concepts: PropTypes.object,
   keywords: PropTypes.object,
   entityTypes: PropTypes.object,
   searchQuery: PropTypes.string,
+  selectedSentiments: PropTypes.object,
+  selectedProperties: PropTypes.object,
+  selectedReviewers: PropTypes.object,
   selectedEntities: PropTypes.object,
   selectedCategories: PropTypes.object,
   selectedConcepts: PropTypes.object,
@@ -1069,12 +1202,11 @@ Main.propTypes = {
   numPositive: PropTypes.number,
   numNeutral: PropTypes.number,
   numNegative: PropTypes.number,
-  tagCloudType: PropTypes.string,
   currentPage: PropTypes.string,
-  queryType: PropTypes.string,
-  returnPassages: PropTypes.bool,
-  limitResults: PropTypes.bool,
   sortOrder: PropTypes.string,
+  sentimentFilter: PropTypes.string,
+  productIdFilter: PropTypes.string,
+  reviewerIdFilter: PropTypes.string,
   trendData: PropTypes.object,
   trendError: PropTypes.object,
   trendTerm: PropTypes.string,

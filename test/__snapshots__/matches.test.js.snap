@@ -55,7 +55,7 @@ exports[`renders correctly 1`] = `
           <div
             className="content"
           >
-            Score: 
+            Rating: 
             1.0000
           </div>
           <div
@@ -63,6 +63,12 @@ exports[`renders correctly 1`] = `
           >
             Date: 
             2014-11-01
+          </div>
+          <div
+            className="content"
+          >
+            Helpfulness Rating: 
+            %
           </div>
           <div
             className="content"
