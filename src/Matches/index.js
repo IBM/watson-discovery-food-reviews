@@ -59,6 +59,7 @@ Match.propTypes = {
   text: PropTypes.string.isRequired,
   date: PropTypes.string.isRequired,
   score: PropTypes.string.isRequired,
+  helpRating: PropTypes.number.isRequired,
   sentiment: PropTypes.object.isRequired
 };
 

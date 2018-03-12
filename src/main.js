@@ -20,9 +20,6 @@ import PropTypes from 'prop-types';
 import queryString from 'query-string';
 import Matches from './Matches';
 import PaginationMenu from './PaginationMenu';
-import SentimentTypesFilter from './SentimentTypesFilter';
-import ProductsFilter from './ProductsFilter';
-import ReviewersFilter from './ReviewersFilter';
 import EntitiesFilter from './EntitiesFilter';
 import CategoriesFilter from './CategoriesFilter';
 import ConceptsFilter from './ConceptsFilter';
@@ -32,7 +29,7 @@ import TrendChart from './TrendChart';
 import SentimentChart from './SentimentChart';
 import { Grid, Dimmer, Button, Menu, Dropdown, Divider, Loader, Accordion, Icon, Header, Statistic } from 'semantic-ui-react';
 const utils = require('../lib/utils');
-const util = require('util');
+//const util = require('util');
 
 /**
  * Main React object that contains all objects on the web page.
@@ -64,8 +61,6 @@ class Main extends React.Component {
       reviewerIdFilter,
       sortOrder,
       // for filters
-      selectedProducts,
-      selectedReviewers,
       selectedEntities,
       selectedCategories,
       selectedConcepts,
@@ -105,8 +100,6 @@ class Main extends React.Component {
       productIdFilter: productIdFilter || 'ALL',
       reviewerIdFilter: reviewerIdFilter || 'ALL',
       // used by filters
-      selectedProducts: selectedProducts || new Set(),
-      selectedReviewers: selectedReviewers || new Set(),
       selectedEntities: selectedEntities || new Set(),
       selectedCategories: selectedCategories || new Set(),
       selectedConcepts: selectedConcepts || new Set(),
@@ -181,17 +174,14 @@ class Main extends React.Component {
   }
 
   applySentimentFilter(event, data) {
-    const { searchQuery, sentimentFilter } = this.state;
     this.setState({ sentimentFilter: data.value });
   }
   
   applyProductIdFilter(event, data) {
-    const { searchQuery, productIdFilter } = this.state;
     this.setState({ productIdFilter: data.value });
   }
 
   applyReviewerIdFilter(event, data) {
-    const { searchQuery, reviewerIdFilter } = this.state;
     this.setState({ reviewerIdFilter: data.value });
   }
 
@@ -245,7 +235,6 @@ class Main extends React.Component {
   }
 
   sortData(data, sortKey) {
-    console.log("!!!! SORT ON: " + sortKey);
     var sortedData = data.results.slice();
     var sortBy = require('sort-by');
     
@@ -425,24 +414,16 @@ class Main extends React.Component {
   fetchData(query, clearFilters) {
     const searchQuery = query;
     var {
-      selectedProducts,
-      selectedReviewers,
       selectedEntities, 
       selectedCategories, 
       selectedConcepts,
       selectedKeywords,
       selectedEntityTypes,
       sortOrder,
-      sentimentFilter
     } = this.state;
 
-    console.log("Sentiment Filter for query is 55: " + sentimentFilter);
-    
     // clear filters if this a new text search
     if (clearFilters) {
-      sentimentFilter = '';
-      selectedProducts.clear();
-      selectedReviewers.clear();
       selectedEntities.clear();
       selectedCategories.clear();
       selectedConcepts.clear();
@@ -562,8 +543,6 @@ class Main extends React.Component {
    */
   buildFilterStringForQuery() {
     var {
-      selectedProducts,
-      selectedReviewers,
       selectedEntities, 
       selectedCategories, 
       selectedConcepts,
@@ -575,7 +554,6 @@ class Main extends React.Component {
     } = this.state;
     var filterString = '';
     
-    console.log("Sentiment Filter for query is: " + sentimentFilter);
     // add any entities filters, if selected
     var entitiesString = this.buildFilterStringForFacet(selectedEntities,
       'enriched_text.entities.text::', true);
@@ -738,7 +716,7 @@ class Main extends React.Component {
         key: entry.key,
         value: entry.key,
         text: 'For Product: ' + entry.key + ' (' + entry.matching_results + ')'
-      })
+      });
     });
 
     return (
@@ -768,7 +746,7 @@ class Main extends React.Component {
         key: entry.key,
         value: entry.key,
         text: 'For Reviewer: ' + entry.key  + ' (' + entry.matching_results + ')'
-      })
+      });
     });
 
 
@@ -873,9 +851,9 @@ class Main extends React.Component {
    * render - return all the home page object to be rendered.
    */
   render() {
-    const { loading, data, error, searchQuery, sentimentFilter,
-      products, reviewers, entities, categories, concepts, keywords, entityTypes,
-      selectedProducts, selectedReviewers, selectedEntities, selectedCategories, 
+    const { loading, data, error,
+      entities, categories, concepts, keywords, entityTypes,
+      selectedEntities, selectedCategories, 
       selectedConcepts,selectedKeywords, selectedEntityTypes,
       numMatches, numPositive, numNeutral, numNegative,
       trendData, trendLoading, trendError, trendTerm,
@@ -905,18 +883,6 @@ class Main extends React.Component {
       selectedEntityTypes.size > 0) {
       filtersOn = true;
     }
-
-   const showProductOptions = [
-      { key: 'ALL', value: 'ALL', text: 'All Products' },
-      { key: 'POS', value: 'POS', text: 'Only Reviews for Product: Fritos' },
-      { key: 'NEG', value: 'NEG', text: 'Only Reviews for Product: Nabisco' }
-    ];
-
-    const showReviewerOptions = [
-      { key: 'ALL', value: 'ALL', text: 'All Reviewers' },
-      { key: 'POS', value: 'POS', text: 'Only Reviews by: Fred' },
-      { key: 'NEG', value: 'NEG', text: 'Only Reviews by: Mary' }
-    ];
 
     return (
       <Grid celled className='search-grid'>
@@ -1216,6 +1182,7 @@ Main.propTypes = {
   data: PropTypes.object,
   sentiments: PropTypes.object,
   properties: PropTypes.object,
+  products: PropTypes.object,
   reviewers: PropTypes.object,
   entities: PropTypes.object,
   categories: PropTypes.object,
@@ -1238,6 +1205,8 @@ Main.propTypes = {
   currentPage: PropTypes.string,
   sortOrder: PropTypes.string,
   sentimentFilter: PropTypes.string,
+  productIdFilter: PropTypes.string,
+  reviewerIdFilter: PropTypes.string,
   trendData: PropTypes.object,
   trendError: PropTypes.object,
   trendTerm: PropTypes.string,
