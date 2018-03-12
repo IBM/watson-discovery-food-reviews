@@ -20,7 +20,6 @@ import PropTypes from 'prop-types';
 import queryString from 'query-string';
 import Matches from './Matches';
 import PaginationMenu from './PaginationMenu';
-import SearchField from './SearchField';
 import SentimentTypesFilter from './SentimentTypesFilter';
 import ProductsFilter from './ProductsFilter';
 import ReviewersFilter from './ReviewersFilter';
@@ -29,7 +28,6 @@ import CategoriesFilter from './CategoriesFilter';
 import ConceptsFilter from './ConceptsFilter';
 import KeywordsFilter from './KeywordsFilter';
 import EntityTypesFilter from './EntityTypesFilter';
-import TagCloudRegion from './TagCloudRegion';
 import TrendChart from './TrendChart';
 import SentimentChart from './SentimentChart';
 import { Grid, Dimmer, Button, Menu, Dropdown, Divider, Loader, Accordion, Icon, Header, Statistic } from 'semantic-ui-react';
@@ -61,9 +59,6 @@ class Main extends React.Component {
       error,
       // query params
       searchQuery,
-      queryType,
-      returnPassages,
-      limitResults,
       sentimentFilter,
       productIdFilter,
       reviewerIdFilter,
@@ -78,8 +73,6 @@ class Main extends React.Component {
       selectedEntityTypes,
       // matches panel
       currentPage,
-      // tag cloud
-      tagCloudType,
       // trending chart
       trendData,
       trendError,
@@ -107,9 +100,6 @@ class Main extends React.Component {
       error: error,
       // query params
       searchQuery: searchQuery || '',
-      queryType: queryType || utils.QUERY_NATURAL_LANGUAGE,
-      returnPassages: returnPassages || false,
-      limitResults: limitResults || false,
       sortOrder: sortOrder || utils.sortKeys[0].sortBy,
       sentimentFilter: sentimentFilter || 'ALL',
       productIdFilter: productIdFilter || 'ALL',
@@ -122,8 +112,6 @@ class Main extends React.Component {
       selectedConcepts: selectedConcepts || new Set(),
       selectedKeywords: selectedKeywords || new Set(),
       selectedEntityTypes: selectedEntityTypes || new Set(),
-      // tag cloud
-      tagCloudType: tagCloudType || utils.ENTITY_FILTER,
       // trending chart
       trendData: trendData || null,
       trendError: trendError,
@@ -169,25 +157,6 @@ class Main extends React.Component {
   handleClearAllFiltersClick() {
     const { searchQuery  } = this.state;
     this.fetchData(searchQuery, true);
-  }
-
-  /**
-   * searchParamsChanged - (callback function)
-   * User has toggled one of the optional params listed in the
-   * search bar. Set state so that searchField checkboxes get
-   * set accordingly.
-   */
-  searchParamsChanged(data) {
-    const { queryType, returnPassages, limitResults} = this.state;
-    if (data.label === 'queryType') {
-      var newQueryType = queryType === utils.QUERY_DISCO_LANGUAGE ?
-        utils.QUERY_NATURAL_LANGUAGE : utils.QUERY_DISCO_LANGUAGE;
-      this.setState({ queryType: newQueryType });
-    } else if (data.label === 'returnPassages') {
-      this.setState({ returnPassages: !returnPassages });
-    } else if (data.label === 'limitResults') {
-      this.setState({ limitResults: !limitResults });
-    }
   }
 
   /**
@@ -376,7 +345,6 @@ class Main extends React.Component {
    * display a default graph.
    */
   getTrendData(data) {
-    var { limitResults } = this.state;
     var { chartType, term } = data;
 
     // we don't have any data to show for "all" items, so just clear chart
@@ -413,7 +381,7 @@ class Main extends React.Component {
     const qs = queryString.stringify({
       query: trendQuery,
       filters: this.buildFilterStringForQuery(),
-      count: (limitResults == true ? 100 : 1000)
+      count: 2000
     });
 
     // send request
@@ -464,9 +432,6 @@ class Main extends React.Component {
       selectedConcepts,
       selectedKeywords,
       selectedEntityTypes,
-      queryType,
-      returnPassages,
-      limitResults,
       sortOrder,
       sentimentFilter
     } = this.state;
@@ -504,11 +469,9 @@ class Main extends React.Component {
     const qs = queryString.stringify({
       query: searchQuery,
       filters: filterString,
-      count: (limitResults == true ? 100 : 1000),
+      count: 2000,
       // sort: sortOrder,
-      returnPassages: returnPassages,
-      queryType: (queryType === utils.QUERY_NATURAL_LANGUAGE ? 
-        'natural_language_query' : 'query:'),
+      queryType: 'natural_language_query'
     });
 
     // send request
@@ -522,16 +485,8 @@ class Main extends React.Component {
       })
       .then(json => {
         var data = utils.parseData(json);
-        var passages = [];
 
-        if (returnPassages) {
-          passages = parsePassages(json);
-          // console.log('+++ PASSAGES RESULTS +++');
-          // const util = require('util');
-          // console.log(util.inspect(passages.results, false, null));
-        }
-
-        data = utils.formatData(data, passages, filterString);
+        data = utils.formatData(data, filterString);
         data.results = this.sortData(data, sortOrder);
 
         console.log('+++ DISCO RESULTS +++');
@@ -923,9 +878,8 @@ class Main extends React.Component {
       selectedProducts, selectedReviewers, selectedEntities, selectedCategories, 
       selectedConcepts,selectedKeywords, selectedEntityTypes,
       numMatches, numPositive, numNeutral, numNegative,
-      tagCloudType, trendData, trendLoading, trendError, trendTerm,
-      queryType, returnPassages, limitResults, sortOrder,
-      sentimentTerm } = this.state;
+      trendData, trendLoading, trendError, trendTerm,
+      sortOrder, sentimentTerm } = this.state;
 
     // used for filter accordions
     const { activeFilterIndex } = this.state;
@@ -971,14 +925,13 @@ class Main extends React.Component {
 
         <Grid.Row color={'blue'}>
           <Grid.Column width={16} textAlign='center'>
-            <SearchField
-              onSearchQueryChange={this.searchQueryChanged.bind(this)}
-              onSearchParamsChange={this.searchParamsChanged.bind(this)}
-              searchQuery={searchQuery}
-              queryType={queryType}
-              returnPassages={returnPassages}
-              limitResults={limitResults}
-            />
+            <Grid className='search-field-grid'>
+              <Grid.Column width={16} verticalAlign='middle' textAlign='center'>
+                <Header as='h1' textAlign='center'>
+                  Food Review Data
+                </Header>
+              </Grid.Column>
+            </Grid>
           </Grid.Column>
         </Grid.Row>
 
@@ -1081,23 +1034,6 @@ class Main extends React.Component {
                 {this.getEntityTypesFilter()}
               </Accordion.Content>
             </Accordion>
-            <Divider hidden/>
-            <Divider/>
-            <Divider hidden/>
-
-            {/* Tag Cloud Region */}
-    
-            {/* <Grid.Row>
-              <TagCloudRegion
-                entities={entities}
-                categories={categories}
-                concepts={concepts}
-                keywords={keywords}
-                entityTypes={entityTypes}
-                tagCloudType={tagCloudType}
-                onTagItemSelected={this.tagItemSelected.bind(this)}
-              />
-            </Grid.Row> */}
             
           </Grid.Column>
 
@@ -1209,13 +1145,6 @@ class Main extends React.Component {
   }
 }
 
-const parsePassages = data => ({
-  rawResponse: Object.assign({}, data),
-  // sentiment: data.aggregations[0].results.reduce((accumulator, result) =>
-  //   Object.assign(accumulator, { [result.key]: result.matching_results }), {}),
-  results: data.passages
-});
-
 /**
  * parseProducts - convert raw search results into collection of product IDs.
  */
@@ -1306,11 +1235,7 @@ Main.propTypes = {
   numPositive: PropTypes.number,
   numNeutral: PropTypes.number,
   numNegative: PropTypes.number,
-  tagCloudType: PropTypes.string,
   currentPage: PropTypes.string,
-  queryType: PropTypes.string,
-  returnPassages: PropTypes.bool,
-  limitResults: PropTypes.bool,
   sortOrder: PropTypes.string,
   sentimentFilter: PropTypes.string,
   trendData: PropTypes.object,
