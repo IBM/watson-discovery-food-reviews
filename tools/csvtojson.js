@@ -14,13 +14,20 @@
  * the License.
  */
 
+/**
+ * To Run:
+ * copy Reviews.csv to /data directory
+ * cd tools
+ * node csvtojson.js
+ */
+
 const csvFilePath='../data/Reviews.csv';
 const csv=require('csvtojson');
 const fs=require('fs');
 
 // Filters
 let everyNth = 10;  // Keep every Nth row
-let rowLimit = 1000;  // Max number of rows to parse
+let rowLimit = 2000;  // Max number of rows to parse
 let padding = '000';  // to Line up the numbers and slice(-4).
 let fileLimit = 2000;  // Max number of files to write
 
@@ -31,6 +38,9 @@ csv({
   headers:['Id','ProductId','UserId','ProfileName','HelpfulnessNumerator','HelpfulnessDenominator','Score','date','Summary','Text'],
   noheader:false,
   colParser:{
+    'HelpfulnessNumerator':'number',
+    'HelpfulnessDenominator':'number',
+    'Score':'number',
     'date':function(item) {
       return new Date(Number(item) * 1000).toISOString().substring(0, 10);
     }

@@ -45,7 +45,7 @@ export default class TrendChart extends React.Component {
       keywords: this.props.keywords,
       entityTypes: this.props.entityTypes,
       chartType: utils.ENTITY_FILTER,
-      termValue: utils.TRENDING_TERM_ITEM
+      termValue: utils.NO_TERM_ITEM
     };
   }
 
@@ -56,13 +56,13 @@ export default class TrendChart extends React.Component {
   filterTypeChange(event, selection) {
     this.setState({
       chartType: selection.value,
-      termValue: utils.TRENDING_TERM_ITEM,
+      termValue: utils.NO_TERM_ITEM,
       trendData: null
     });
 
     this.props.onGetTrendDataRequest({
       chartType: selection.value,
-      term: utils.TRENDING_TERM_ITEM
+      term: utils.NO_TERM_ITEM
     });
   }
 
@@ -119,7 +119,7 @@ export default class TrendChart extends React.Component {
    */
   getTermOptions() {
     const { chartType, entities, categories, concepts, keywords, entityTypes } = this.state;
-    var options = [{ key: -1, value: utils.TRENDING_TERM_ITEM, text: utils.TRENDING_TERM_ITEM }];
+    var options = [{ key: -1, value: utils.NO_TERM_ITEM, text: utils.NO_TERM_ITEM }];
     var collection;
 
     // select based on the filter type
@@ -175,7 +175,7 @@ export default class TrendChart extends React.Component {
 
     return (
       <div className="trend-chart">
-        <Header as='h2' block inverted textAlign='left'>
+        {/* <Header as='h2' block inverted textAlign='left'>
           <Icon name='line chart' />
           <Header.Content>
             Trending Graph
@@ -183,7 +183,7 @@ export default class TrendChart extends React.Component {
               Avg review scores per month for selected term
             </Header.Subheader>
           </Header.Content>
-        </Header>
+        </Header> */}
         <Menu compact floated={true}>
           <Dropdown 
             item

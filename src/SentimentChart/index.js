@@ -42,7 +42,7 @@ export default class SentimentChart extends React.Component {
       keywords: this.props.keywords,
       entityTypes: this.props.entityTypes,
       chartType: utils.ENTITY_FILTER,
-      termValue: utils.SENTIMENT_TERM_ITEM
+      termValue: utils.ALL_TERM_ITEM
     };
 
     this.totals = {
@@ -60,7 +60,7 @@ export default class SentimentChart extends React.Component {
   filterTypeChange(event, selection) {
     this.setState({
       chartType: selection.value,
-      termValue: utils.SENTIMENT_TERM_ITEM
+      termValue: utils.ALL_TERM_ITEM
     });
   }
 
@@ -76,7 +76,7 @@ export default class SentimentChart extends React.Component {
 
     if (collection.results) {
       for (var item of collection.results) {
-        if (termValue === '' || termValue === utils.SENTIMENT_TERM_ITEM || termValue === item.key) {
+        if (termValue === '' || termValue === utils.ALL_TERM_ITEM || termValue === item.key) {
           this.totals.matches = this.totals.matches + item.matching_results;
           for (var sentiment of item.aggregations[0].results) {
             if (sentiment.key === 'positive') {
@@ -177,7 +177,7 @@ export default class SentimentChart extends React.Component {
    */
   getTermOptions() {
     const { chartType, entities, categories, concepts, keywords, entityTypes } = this.state;
-    var options = [{ key: -1, value: utils.SENTIMENT_TERM_ITEM, text: utils.SENTIMENT_TERM_ITEM }];
+    var options = [{ key: -1, value: utils.ALL_TERM_ITEM, text: utils.ALL_TERM_ITEM }];
     var collection;
 
     // select based on the filter type
@@ -248,7 +248,7 @@ export default class SentimentChart extends React.Component {
 
     return (
       <div>
-        <Header as='h2' block inverted textAlign='left'>
+        {/* <Header as='h2' block inverted textAlign='left'>
           <Icon name='pie chart' />
           <Header.Content>
             Sentiment Chart
@@ -256,7 +256,7 @@ export default class SentimentChart extends React.Component {
               Sentiment scores by percentage
             </Header.Subheader>
           </Header.Content>
-        </Header>
+        </Header> */}
         <Menu compact floated={true}>
           <Dropdown 
             item
