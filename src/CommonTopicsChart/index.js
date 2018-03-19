@@ -55,7 +55,7 @@ export default class CommonTopicsChart extends React.Component {
   parseCollection(collection) {
 
     var collectionData = {
-      topicName: new Array(10).fill(""),
+      topicName: new Array(10).fill(''),
       topicMatches: new Array(10).fill(0)
     };
 

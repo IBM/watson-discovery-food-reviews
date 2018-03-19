@@ -18,7 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Grid } from 'semantic-ui-react';
 import RC2 from 'react-chartjs-2';
-const utils = require('../../lib/utils');
+//const utils = require('../../lib/utils');
 
 /**
  * This object renders a bar chart object that appears at the bottom

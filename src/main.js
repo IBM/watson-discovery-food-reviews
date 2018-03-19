@@ -26,6 +26,7 @@ import ConceptsFilter from './ConceptsFilter';
 import KeywordsFilter from './KeywordsFilter';
 import EntityTypesFilter from './EntityTypesFilter';
 import TopRatedChart from './TopRatedChart';
+import ProductTrendChart from './ProductTrendChart';
 import TrendChart from './TrendChart';
 import SentimentChart from './SentimentChart';
 import CommonTopicsChart from './CommonTopicsChart';
@@ -69,6 +70,10 @@ class Main extends React.Component {
       selectedEntityTypes,
       // matches panel
       currentPage,
+      // product trending chart
+      productTrendData,
+      productTrendError,
+      productTrendProductId,
       // trending chart
       trendData,
       trendError,
@@ -106,6 +111,11 @@ class Main extends React.Component {
       selectedConcepts: selectedConcepts || new Set(),
       selectedKeywords: selectedKeywords || new Set(),
       selectedEntityTypes: selectedEntityTypes || new Set(),
+      // product trending chart
+      productTrendData: productTrendData || null,
+      productTrendError: productTrendError,
+      productTrendProductId: productTrendProductId || utils.NO_PRODUCT_ITEM,
+      productTrendLoading: false,
       // trending chart
       trendData: trendData || null,
       trendError: trendError,
@@ -258,88 +268,7 @@ class Main extends React.Component {
   }
 
   /**
-   * tagItemSelected - (callback function)
-   * User has selected an item from the tag cloud object
-   * to filter on. This results in making a new qeury to the 
-   * disco service.
-   */
-  tagItemSelected(tag) {
-    var { selectedTagValue, cloudType } = tag;
-    console.log('tagValue [FROM TAG CLOUD]: ' + selectedTagValue);
-
-    // manually add this item to the list of selected items
-    // based on filter type. This is needed so that both the 
-    // tag cloud and the filter objects stay in sync (both 
-    // reflect what items have been selected).
-    const { entities, selectedEntities, 
-      categories, selectedCategories, 
-      concepts, selectedConcepts,
-      keywords, selectedKeywords,
-      entityTypes, selectedEntityTypes,
-      searchQuery  } = this.state;
-
-    if (cloudType === utils.CATEGORY_FILTER) {
-      var fullName = this.buildFullTagName(selectedTagValue, categories.results);
-      if (selectedCategories.has(fullName)) {
-        selectedCategories.delete(fullName);
-      } else {
-        selectedCategories.add(fullName);
-      }
-      this.setState({
-        selectedCategories: selectedCategories
-      });
-
-    } else if (cloudType == utils.CONCEPT_FILTER) {
-      fullName = this.buildFullTagName(selectedTagValue, concepts.results);
-      if (selectedConcepts.has(fullName)) {
-        selectedConcepts.delete(fullName);
-      } else {
-        selectedConcepts.add(fullName);
-      }
-      this.setState({
-        selectedConcepts: selectedConcepts
-      });
-
-    } else if (cloudType == utils.KEYWORD_FILTER) {
-      fullName = this.buildFullTagName(selectedTagValue, keywords.results);
-      if (selectedKeywords.has(fullName)) {
-        selectedKeywords.delete(fullName);
-      } else {
-        selectedKeywords.add(fullName);
-      }
-      this.setState({
-        selectedKeywords: selectedKeywords
-      });
-
-    } else if (cloudType == utils.ENTITIY_FILTER) {
-      fullName = this.buildFullTagName(selectedTagValue, entities.results);
-      if (selectedEntities.has(fullName)) {
-        selectedEntities.delete(fullName);
-      } else {
-        selectedEntities.add(fullName);
-      }
-      this.setState({
-        selectedEntities: selectedEntities
-      });
-
-    } else if (cloudType == utils.ENTITY_TYPE_FILTER) {
-      fullName = this.buildFullTagName(selectedTagValue, entityTypes.results);
-      if (selectedEntityTypes.has(fullName)) {
-        selectedEntityTypes.delete(fullName);
-      } else {
-        selectedEntityTypes.add(fullName);
-      }
-      this.setState({
-        selectedEntityTypes: selectedEntityTypes
-      });
-    }
-
-    // execute new search w/ filters
-    this.fetchData(searchQuery, false);
-  }
-
-  /**
-   * getTrendData - (callback function)
+   * fetchTrendData - (callback function)
    * User has entered a new search string to query on. 
    * This results in making a new qeury to the disco service.
    * Keep track of the current term value so that main stays
@@ -348,11 +277,11 @@ class Main extends React.Component {
    * NOTE: This function is also called at startup to 
    * display a default graph.
    */
-  getTrendData(data) {
+  fetchTrendData(data) {
     var { chartType, term } = data;
 
     // we don't have any data to show for "all" items, so just clear chart
-    if (term === utils.TRENDING_TERM_ITEM) {
+    if (term === utils.NO_TERM_ITEM) {
       this.setState(
         { 
           trendData: null,
@@ -423,14 +352,82 @@ class Main extends React.Component {
   }
   
   /**
-   * fetchData - build the query that will be passed to the 
+   * fetchProductTrendData - (callback function)
+   * User has entered a new search string to query on.
+   * This results in making a new qeury to the disco service.
+   * Keep track of the current term value so that main stays
+   * in sync with the trending chart component.
+   *
+   * NOTE: This function is also called at startup to
+   * display a default graph.
+   */
+  fetchProductTrendData(data) {
+    var { productId } = data;
+
+    // we don't have any data to show if no product selected, so just clear chart
+    if (productId === utils.NO_PRODUCT_ITEM) {
+      this.setState({
+        productTrendData: null,
+        productTrendLoading: false,
+        productTrendError: null,
+        productTrendProductId: productId
+      });
+      return;
+    }
+
+    this.setState({
+      productTrendLoading: true,
+      productTrendProductId: productId
+    });
+
+    const qs = queryString.stringify({
+      filters: 'ProductId::' + '"' + productId + '"',
+      count: 2000
+    });
+
+    // send request
+    fetch(`/api/trending?${qs}`)
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw response;
+        }
+      })
+      .then(json => {
+        // const util = require('util');
+        console.log('+++ DISCO PRODUCT TREND RESULTS +++');
+        // console.log(util.inspect(json.aggregations[0].results, false, null));
+        console.log('numMatches: ' + json.matching_results);
+
+        this.setState({
+          productTrendData: json,
+          productTrendLoading: false,
+          productTrendError: null,
+          productTrendProductId: productId
+        });
+      })
+      .catch(response => {
+        this.setState({
+          productTrendError: (response.status === 429) ? 'Number of free queries per month exceeded' : 'Error fetching results',
+          productTrendLoading: false,
+          productTrendData: null,
+          productTrendProductId: utils.NO_PRODUCT_ITEM
+        });
+        // eslint-disable-next-line no-console
+        console.error(response);
+      });
+  }
+
+  /**
+   * fetchData - build the query that will be passed to the
    * discovery service.
    */
   fetchData(query, clearFilters) {
     const searchQuery = query;
     var {
-      selectedEntities, 
-      selectedCategories, 
+      selectedEntities,
+      selectedCategories,
       selectedConcepts,
       selectedKeywords,
       selectedEntityTypes,
@@ -494,7 +491,7 @@ class Main extends React.Component {
         // console.log(util.inspect(data.results, false, null));
         console.log('numMatches: ' + data.results.length);
 
-        this.setState({ 
+        this.setState({
           data: data,
           products: parseProducts(json),
           reviewers: parseReviewers(json),
@@ -630,26 +627,6 @@ class Main extends React.Component {
     
     console.log('FilterString: ' + filterString);
     return filterString;
-  }
-
-  /**
-   * buildFullTagName - this matches the selected tag cloud item with
-   * the item in the filter collection. This is needed to keep them in 
-   * sync with each other. This takes care of the issue where the tag
-   * cloud item is formatted differently than the collection item (the
-   * collection item name has a count appended to it).
-   */
-  buildFullTagName(tag, collection) {
-    // find the tag in collection
-    for (var i=0; i<collection.length; i++) {
-      console.log('compare tag: ' + tag + ' with: ' + collection[i].key);
-      if (collection[i].key === tag) {
-        // return the full tag so we can match the entries
-        // listed in the filters (which also show num of matches)
-        return collection[i].key + ' (' + collection[i].matching_results + ')';
-      }
-    }
-    return tag;
   }
 
   /**
@@ -872,6 +849,7 @@ class Main extends React.Component {
       selectedEntities, selectedCategories, 
       selectedConcepts,selectedKeywords, selectedEntityTypes,
       numMatches, numPositive, numNeutral, numNegative,
+      productTrendData, productTrendLoading, productTrendError, productTrendProductId,
       trendData, trendLoading, trendError, trendTerm,
       sortOrder, sentimentTerm } = this.state;
 
@@ -961,13 +939,13 @@ class Main extends React.Component {
                 active={activeFilterIndex == utils.ENTITY_DATA_INDEX}
                 index={utils.ENTITY_DATA_INDEX}
                 onClick={this.handleAccordionClick.bind(this)}>
-                  <Icon name='dropdown' />
+                <Icon name='dropdown' />
                   Entities
               </Accordion.Title>
               <Accordion.Content
                 active={activeFilterIndex == utils.ENTITY_DATA_INDEX}
                 style={{height: 350, overflow: 'auto'}}>
-                  {this.getEntitiesFilter()}
+                {this.getEntitiesFilter()}
               </Accordion.Content>
             </Accordion>
             <Accordion styled>
@@ -975,13 +953,13 @@ class Main extends React.Component {
                 active={activeFilterIndex == utils.CATEGORY_DATA_INDEX}
                 index={utils.CATEGORY_DATA_INDEX}
                 onClick={this.handleAccordionClick.bind(this)}>
-                  <Icon name='dropdown' />
+                <Icon name='dropdown' />
                   Categories
               </Accordion.Title>
               <Accordion.Content
                 active={activeFilterIndex == utils.CATEGORY_DATA_INDEX}
                 style={{height: 350, overflow: 'auto'}}>
-                  {this.getCategoriesFilter()}
+                {this.getCategoriesFilter()}
               </Accordion.Content>
             </Accordion>
             <Accordion styled>
@@ -989,13 +967,13 @@ class Main extends React.Component {
                 active={activeFilterIndex == utils.CONCEPT_DATA_INDEX}
                 index={utils.CONCEPT_DATA_INDEX}
                 onClick={this.handleAccordionClick.bind(this)}>
-                  <Icon name='dropdown' />
+                <Icon name='dropdown' />
                   Concepts
               </Accordion.Title>
               <Accordion.Content
                 active={activeFilterIndex == utils.CONCEPT_DATA_INDEX}
                 style={{height: 350, overflow: 'auto'}}>
-                  {this.getConceptsFilter()}
+                {this.getConceptsFilter()}
               </Accordion.Content>
             </Accordion>
             <Accordion styled>
@@ -1003,13 +981,13 @@ class Main extends React.Component {
                 active={activeFilterIndex == utils.KEYWORD_DATA_INDEX}
                 index={utils.KEYWORD_DATA_INDEX}
                 onClick={this.handleAccordionClick.bind(this)}>
-                  <Icon name='dropdown' />
+                <Icon name='dropdown' />
                   Keywords
               </Accordion.Title>
               <Accordion.Content
                 active={activeFilterIndex == utils.KEYWORD_DATA_INDEX}
                 style={{height: 350, overflow: 'auto'}}>
-                  {this.getKeywordsFilter()}
+                {this.getKeywordsFilter()}
               </Accordion.Content>
             </Accordion>
             <Accordion styled>
@@ -1017,13 +995,13 @@ class Main extends React.Component {
                 active={activeFilterIndex == utils.ENTITY_TYPE_DATA_INDEX}
                 index={utils.ENTITY_TYPE_DATA_INDEX}
                 onClick={this.handleAccordionClick.bind(this)}>
-                  <Icon name='dropdown' />
+                <Icon name='dropdown' />
                   Entity Types
               </Accordion.Title>
               <Accordion.Content
                 active={activeFilterIndex == utils.ENTITY_TYPE_DATA_INDEX}
                 style={{height: 350, overflow: 'auto'}}>
-                  {this.getEntityTypesFilter()}
+                {this.getEntityTypesFilter()}
               </Accordion.Content>
             </Accordion>
             
@@ -1049,26 +1027,24 @@ class Main extends React.Component {
                 </div>
               ) : data ? (
                 <div className="results">
-                  <div className="_container _container_large">
-                    <div className="row">
-                      <div>
-                        <Statistic.Group
-                          size='mini'
-                          items={ stat_items }
+                  <div className="row">
+                    <div>
+                      <Statistic.Group
+                        size='mini'
+                        items={ stat_items }
+                      />
+                      <Menu compact className="sort-dropdown">
+                        <Icon name='sort' size='large' bordered inverted />
+                        <Dropdown 
+                          item
+                          onChange={ this.sortOrderChange.bind(this) }
+                          value={ sortOrder }
+                          options={ utils.sortTypes }
                         />
-                        <Menu compact className="sort-dropdown">
-                          <Icon name='sort' size='large' bordered inverted />
-                          <Dropdown 
-                            item
-                            onChange={ this.sortOrderChange.bind(this) }
-                            value={ sortOrder }
-                            options={ utils.sortTypes }
-                          />
-                        </Menu>
-                      </div>
-                      <div>
-                        {this.getMatches()}
-                      </div>
+                      </Menu>
+                    </div>
+                    <div>
+                      {this.getMatches()}
                     </div>
                   </div>
                 </div>
@@ -1096,55 +1072,55 @@ class Main extends React.Component {
           <Grid.Column width={8} textAlign='center'>
             <Grid.Row className='rrr'>
 
-            {/* Top Rated Products Chart */}
-            <Accordion fluid styled>
-              <Accordion.Title
-                active={activeGraphIndex[utils.TOP_RATED_GRAPH_ID] == 0}
-                index={0}
-                onClick={this.handleAccordionGraphClick.bind(this, utils.TOP_RATED_GRAPH_ID)}>
-                <Header as='h2' block inverted textAlign='left'>
-                  <Icon name='bar chart' />
-                  <Header.Content>
-                    Product Rankings
-                    <Header.Subheader>
-                      Top ranked products (min of 10 reviews)
-                    </Header.Subheader>
-                  </Header.Content>
-                </Header>
-              </Accordion.Title>
-              <Accordion.Content active={activeGraphIndex[utils.TOP_RATED_GRAPH_ID] == 0}>
-                <TopRatedChart
-                  products={products}
-                />
-              </Accordion.Content>
-            </Accordion>
+              {/* Top Rated Products Chart */}
+              <Accordion fluid styled>
+                <Accordion.Title
+                  active={activeGraphIndex[utils.TOP_RATED_GRAPH_ID] == 0}
+                  index={0}
+                  onClick={this.handleAccordionGraphClick.bind(this, utils.TOP_RATED_GRAPH_ID)}>
+                  <Header className='graph-header' as='h2' block inverted textAlign='left'>
+                    <Icon name='bar chart' />
+                    <Header.Content>
+                      Product Rankings
+                      <Header.Subheader>
+                        Top ranked products (min of 10 reviews)
+                      </Header.Subheader>
+                    </Header.Content>
+                  </Header>
+                </Accordion.Title>
+                <Accordion.Content active={activeGraphIndex[utils.TOP_RATED_GRAPH_ID] == 0}>
+                  <TopRatedChart
+                    products={products}
+                  />
+                </Accordion.Content>
+              </Accordion>
 
-            {/* Top 10 Review Topics Chart */}
-            <Accordion fluid styled>
-              <Accordion.Title 
-                active={activeGraphIndex[utils.TOPICS_GRAPH_ID] == 0}
-                index={0}
-                onClick={this.handleAccordionGraphClick.bind(this, utils.TOPICS_GRAPH_ID)}>
-                  <Header as='h2' block inverted textAlign='left'>
-                  <Icon name='pie chart' />
-                  <Header.Content>
-                    Most Common Topics
-                    <Header.Subheader>
-                      Top 10 topics for reviews
-                    </Header.Subheader>
-                  </Header.Content>
-                </Header>
-              </Accordion.Title>
-              <Accordion.Content active={activeGraphIndex[utils.TOPICS_GRAPH_ID] == 0}>
-                <CommonTopicsChart
-                  entities={entities}
-                  categories={categories}
-                  concepts={concepts}
-                  keywords={keywords}
-                  entityTypes={entityTypes}
-                />
-              </Accordion.Content>
-            </Accordion>
+              {/* Top 10 Review Topics Chart */}
+              <Accordion fluid styled>
+                <Accordion.Title 
+                  active={activeGraphIndex[utils.TOPICS_GRAPH_ID] == 0}
+                  index={0}
+                  onClick={this.handleAccordionGraphClick.bind(this, utils.TOPICS_GRAPH_ID)}>
+                  <Header className='graph-header' as='h2' block inverted textAlign='left'>
+                    <Icon name='pie chart' />
+                    <Header.Content>
+                      Most Common Topics
+                      <Header.Subheader>
+                        Top 10 topics for reviews
+                      </Header.Subheader>
+                    </Header.Content>
+                  </Header>
+                </Accordion.Title>
+                <Accordion.Content active={activeGraphIndex[utils.TOPICS_GRAPH_ID] == 0}>
+                  <CommonTopicsChart
+                    entities={entities}
+                    categories={categories}
+                    concepts={concepts}
+                    keywords={keywords}
+                    entityTypes={entityTypes}
+                  />
+                </Accordion.Content>
+              </Accordion>
             </Grid.Row>
 
           </Grid.Column>
@@ -1152,72 +1128,68 @@ class Main extends React.Component {
           <Grid.Column width={8} textAlign='center'>
             <Grid.Row className='ttt'>
 
-            {/* Trend Chart Region */}
-            <Accordion fluid styled>
-              <Accordion.Title 
-                active={activeGraphIndex[utils.SENTIMENT_GRAPH_ID] == 0}
-                index={0}
-                onClick={this.handleAccordionGraphClick.bind(this, utils.SENTIMENT_GRAPH_ID)}>
-                  <Header as='h2' block inverted textAlign='left'>
-                  <Icon name='line chart' />
-                  <Header.Content>
-                    Product Sentiment Trend
-                    <Header.Subheader>
-                      Avg sentiment score per month
-                    </Header.Subheader>
-                  </Header.Content>
-                </Header>
-              </Accordion.Title>
-              <Accordion.Content active={activeGraphIndex[utils.SENTIMENT_GRAPH_ID] == 0}>
-                <TrendChart
-                  trendData={trendData}
-                  trendLoading={trendLoading}
-                  trendError={trendError}
-                  entities={entities}
-                  categories={categories}
-                  concepts={concepts}
-                  keywords={keywords}
-                  entityTypes={entityTypes}
-                  term={trendTerm}
-                  onGetTrendDataRequest={this.getTrendData.bind(this)}
-                />
-              </Accordion.Content>
-            </Accordion>
+              {/* Trend Product Chart Region */}
+              <Accordion fluid styled>
+                <Accordion.Title 
+                  active={activeGraphIndex[utils.SENTIMENT_GRAPH_ID] == 0}
+                  index={0}
+                  onClick={this.handleAccordionGraphClick.bind(this, utils.SENTIMENT_GRAPH_ID)}>
+                  <Header className='graph-header' as='h2' block inverted textAlign='left'>
+                    <Icon name='line chart' />
+                    <Header.Content>
+                      Product Sentiment Trend
+                      <Header.Subheader>
+                        Avg sentiment over time
+                      </Header.Subheader>
+                    </Header.Content>
+                  </Header>
+                </Accordion.Title>
+                <Accordion.Content active={activeGraphIndex[utils.SENTIMENT_GRAPH_ID] == 0}>
+                  <ProductTrendChart
+                    productTrendData={productTrendData}
+                    productTrendLoading={productTrendLoading}
+                    productTrendError={productTrendError}
+                    products={products}
+                    productTrendProductId={productTrendProductId}
+                    onGetTrendDataRequest={this.fetchProductTrendData.bind(this)}
+                  />
+                </Accordion.Content>
+              </Accordion>
 
-            {/* Average Sentiment for Top 10 Reviewers Chart */}
-            <Accordion fluid styled>
-              <Accordion.Title 
-                active={activeGraphIndex[utils.REVIEWER_GRAPH_ID] == 0}
-                index={0}
-                onClick={this.handleAccordionGraphClick.bind(this, utils.REVIEWER_GRAPH_ID)}>
-                  <Header as='h2' block inverted textAlign='left'>
-                  <Icon name='bar chart' />
-                  <Header.Content>
-                    Reviewer Sentiment
-                    <Header.Subheader>
-                      Avg sentiment for top 10 reviewers
-                    </Header.Subheader>
-                  </Header.Content>
-                </Header>
-              </Accordion.Title>
-              <Accordion.Content active={activeGraphIndex[utils.REVIEWER_GRAPH_ID] == 0}>
-                <TrendChart
-                  trendData={trendData}
-                  trendLoading={trendLoading}
-                  trendError={trendError}
-                  entities={entities}
-                  categories={categories}
-                  concepts={concepts}
-                  keywords={keywords}
-                  entityTypes={entityTypes}
-                  term={trendTerm}
-                  onGetTrendDataRequest={this.getTrendData.bind(this)}
-                />
-              </Accordion.Content>
-            </Accordion>
+              {/* Average Sentiment for Top 10 Reviewers Chart */}
+              <Accordion fluid styled>
+                <Accordion.Title 
+                  active={activeGraphIndex[utils.REVIEWER_GRAPH_ID] == 0}
+                  index={0}
+                  onClick={this.handleAccordionGraphClick.bind(this, utils.REVIEWER_GRAPH_ID)}>
+                  <Header className='graph-header' as='h2' block inverted textAlign='left'>
+                    <Icon name='bar chart' />
+                    <Header.Content>
+                      Reviewer Sentiment
+                      <Header.Subheader>
+                        Avg sentiment for top 10 reviewers
+                      </Header.Subheader>
+                    </Header.Content>
+                  </Header>
+                </Accordion.Title>
+                <Accordion.Content active={activeGraphIndex[utils.REVIEWER_GRAPH_ID] == 0}>
+                  <TrendChart
+                    trendData={trendData}
+                    trendLoading={trendLoading}
+                    trendError={trendError}
+                    entities={entities}
+                    categories={categories}
+                    concepts={concepts}
+                    keywords={keywords}
+                    entityTypes={entityTypes}
+                    term={trendTerm}
+                    onGetTrendDataRequest={this.fetchTrendData.bind(this)}
+                  />
+                </Accordion.Content>
+              </Accordion>
 
-          </Grid.Row>
-        </Grid.Column>
+            </Grid.Row>
+          </Grid.Column>
         </Grid.Row>
 
       </Grid>
@@ -1321,6 +1293,9 @@ Main.propTypes = {
   sentimentFilter: PropTypes.string,
   productIdFilter: PropTypes.string,
   reviewerIdFilter: PropTypes.string,
+  productTrendData: PropTypes.object,
+  productTrendError: PropTypes.object,
+  productTrendProductId: PropTypes.string,
   trendData: PropTypes.object,
   trendError: PropTypes.object,
   trendTerm: PropTypes.string,

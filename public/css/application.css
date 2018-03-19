@@ -682,3 +682,7 @@ div.ui.search.selection.scrolling.dropdown.top-filter-class {
 button.ui.red.tiny.basic.compact.button {
   margin-bottom: 15px;
 }
+
+h2.ui.block.inverted.left.aligned.header.graph-header {
+  height: 98px;
+}

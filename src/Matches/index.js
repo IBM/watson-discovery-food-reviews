@@ -65,8 +65,8 @@ Match.propTypes = {
 
 const Matches = props => (
   <div>
-    <Container textAlign='left'>
-      <div className="matches--list" style={{height: 500, overflow: 'auto'}}>
+    <Container fluid textAlign='left'>
+      <div className="match-entry-list" style={{height: 500, overflow: 'auto'}}>
         <List divided verticalAlign='middle'>
           {props.matches.map(item =>
             <Match
