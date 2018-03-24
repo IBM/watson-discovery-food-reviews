@@ -18,7 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Menu, Dropdown, Divider } from 'semantic-ui-react';
 import { Doughnut } from 'react-chartjs-2';
-const utils = require('../../lib/utils');
+const utils = require('../../../lib/utils');
 
 /**
  * This object renders a donut object that appears at the bottom
