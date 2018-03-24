@@ -176,7 +176,7 @@ function createServer() {
     var searchQuery = req.params.searchQuery.replace(/\+/g, ' ');
     const qs = queryString.stringify({ 
       query: searchQuery,
-      count: 1000,
+      count: 2000,
       returnPassages: false,
       queryType: 'natural_language_query'
     });
@@ -233,7 +233,7 @@ function createServer() {
     console.log('Initial Search Query at start-up');
     const params = queryBuilder.search({ 
       natural_language_query: '',
-      count: 1000,
+      count: 2000,
       sort: '-Score',
       passages: false
     });

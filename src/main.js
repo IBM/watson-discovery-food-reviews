@@ -876,12 +876,6 @@ class Main extends React.Component {
       { key: 'negative', label: 'NEGATIVE', value: numNegative }
     ];
 
-    // const util = require('util');
-    // console.log("PRODUCTS: ");
-    // console.log(util.inspect(products, false, null));
-    // console.log("SELECTED SENTIMENTS: ");
-    // console.log(util.inspect(selectedSentiments, false, null));
-    // console.log('sentimentFilter: ' + sentimentFilter);
     var filtersOn = false;
     if (selectedEntities.size > 0 ||
       selectedCategories.size > 0 ||
@@ -1020,7 +1014,10 @@ class Main extends React.Component {
                       <Header as='h2' block inverted textAlign='left'>
                         <Icon name='grid layout' />
                         <Header.Content>
-                          Matches
+                          Reviews
+                          <Header.Subheader>
+                            Show/Hide Reviews with Enrichment, Sentiment, Product and Reviewer Filters
+                          </Header.Subheader>
                         </Header.Content>
                       </Header>
                       {loading ? (
@@ -1080,56 +1077,51 @@ class Main extends React.Component {
       },
       
       // Graphs Tab
-      { menuItem: { key: 'graphs', icon: 'bar graph', content: 'Graphs' },
+      { menuItem: { key: 'graphs', icon: 'bar graph', content: 'Custom Queries' },
         render: () =>
           <Tab.Pane attached={false}>
             <div>
               <Grid className='search-grid'>
                 { this.getPanelHeader() }
                 <Grid.Row>
-                  <Grid.Column width={8} textAlign='center'>
-                    <Grid.Row className='rrr'>
+                  <Grid.Column width={4}>
+                  </Grid.Column>
+                  <Grid.Column width={8} textAlign='left'>
 
+                    <Grid.Row className='rrr'>
                       {/* Top Rated Products Chart */}
                       <Accordion fluid styled>
                         <Accordion.Title
                           active={activeGraphIndex[utils.TOP_RATED_GRAPH_ID] == 0}
                           index={0}
                           onClick={this.handleAccordionGraphClick.bind(this, utils.TOP_RATED_GRAPH_ID)}>
-                          <Header className='graph-header' as='h2' block inverted textAlign='left'>
-                            <Icon name='bar chart' />
-                            <Header.Content>
-                              Product Rankings
-                              <Header.Subheader>
-                                Top ranked products (min of 10 reviews)
-                              </Header.Subheader>
-                            </Header.Content>
-                          </Header>
+                          <Icon name='dropdown' />
+                            How does this product sentiment trend over time?
                         </Accordion.Title>
-                        <Accordion.Content active={activeGraphIndex[utils.TOP_RATED_GRAPH_ID] == 0}>
+                        <Accordion.Content 
+                          active={activeGraphIndex[utils.TOP_RATED_GRAPH_ID] == 0}
+                          className='graph-accordian'>
                           <TopRatedChart
                             products={products}
                           />
                         </Accordion.Content>
                       </Accordion>
 
+                    </Grid.Row>
+
+                    <Grid.Row className='rrr'>
                       {/* Top 10 Review Topics Chart */}
                       <Accordion fluid styled>
                         <Accordion.Title
                           active={activeGraphIndex[utils.TOPICS_GRAPH_ID] == 0}
                           index={0}
                           onClick={this.handleAccordionGraphClick.bind(this, utils.TOPICS_GRAPH_ID)}>
-                          <Header className='graph-header' as='h2' block inverted textAlign='left'>
-                            <Icon name='pie chart' />
-                            <Header.Content>
-                              Most Common Topics
-                              <Header.Subheader>
-                                Top 10 topics for reviews
-                              </Header.Subheader>
-                            </Header.Content>
-                          </Header>
+                          <Icon name='dropdown' />
+                            How does this product compete with other products in the same category?
                         </Accordion.Title>
-                        <Accordion.Content active={activeGraphIndex[utils.TOPICS_GRAPH_ID] == 0}>
+                        <Accordion.Content 
+                          active={activeGraphIndex[utils.TOPICS_GRAPH_ID] == 0}
+                          className='graph-accordian'>
                           <CommonTopicsChart
                             entities={entities}
                             categories={categories}
@@ -1140,28 +1132,20 @@ class Main extends React.Component {
                         </Accordion.Content>
                       </Accordion>
                     </Grid.Row>
-                  </Grid.Column>
 
-                  <Grid.Column width={8} textAlign='center'>
                     <Grid.Row className='ttt'>
-
                       {/* Trend Product Chart Region */}
                       <Accordion fluid styled>
                         <Accordion.Title
                           active={activeGraphIndex[utils.SENTIMENT_GRAPH_ID] == 0}
                           index={0}
                           onClick={this.handleAccordionGraphClick.bind(this, utils.SENTIMENT_GRAPH_ID)}>
-                          <Header className='graph-header' as='h2' block inverted textAlign='left'>
-                            <Icon name='line chart' />
-                            <Header.Content>
-                              Product Sentiment Trend
-                              <Header.Subheader>
-                                Avg sentiment over time
-                              </Header.Subheader>
-                            </Header.Content>
-                          </Header>
+                          <Icon name='dropdown' />
+                            How is the average rating given by this reviewer?
                         </Accordion.Title>
-                        <Accordion.Content active={activeGraphIndex[utils.SENTIMENT_GRAPH_ID] == 0}>
+                        <Accordion.Content 
+                          active={activeGraphIndex[utils.SENTIMENT_GRAPH_ID] == 0}
+                          className='graph-accordian'>
                           <ProductTrendChart
                             productTrendData={productTrendData}
                             productTrendLoading={productTrendLoading}
@@ -1172,24 +1156,21 @@ class Main extends React.Component {
                           />
                         </Accordion.Content>
                       </Accordion>
+                    </Grid.Row>
 
+                    <Grid.Row className='ttt'>
                       {/* Average Sentiment for Top 10 Reviewers Chart */}
                       <Accordion fluid styled>
                         <Accordion.Title
                           active={activeGraphIndex[utils.REVIEWER_GRAPH_ID] == 0}
                           index={0}
                           onClick={this.handleAccordionGraphClick.bind(this, utils.REVIEWER_GRAPH_ID)}>
-                          <Header className='graph-header' as='h2' block inverted textAlign='left'>
-                            <Icon name='bar chart' />
-                            <Header.Content>
-                              Reviewer Sentiment
-                              <Header.Subheader>
-                                Avg sentiment for top 10 reviewers
-                              </Header.Subheader>
-                            </Header.Content>
-                          </Header>
+                          <Icon name='dropdown' />
+                            How does this product sentiment trend over time?
                         </Accordion.Title>
-                        <Accordion.Content active={activeGraphIndex[utils.REVIEWER_GRAPH_ID] == 0}>
+                        <Accordion.Content 
+                          active={activeGraphIndex[utils.REVIEWER_GRAPH_ID] == 0}
+                          className='graph-accordian'>
                           <TrendChart
                             trendData={trendData}
                             trendLoading={trendLoading}

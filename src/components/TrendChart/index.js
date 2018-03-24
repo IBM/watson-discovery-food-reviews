@@ -90,7 +90,7 @@ export default class TrendChart extends React.Component {
       datasets: [{
         label: 'Avg Scores (range -1.0 to 1.0)',
         data: scores,
-        backgroundColor: 'rgba(0,255,0,0.6)'
+        backgroundColor: 'rgb(149, 223, 168)'
       }]
     };
 

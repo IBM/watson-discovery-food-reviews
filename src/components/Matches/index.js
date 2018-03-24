@@ -25,7 +25,7 @@ import { Container, List, Label } from 'semantic-ui-react';
  */
 
 const Match = props => (
-  <List.Item>
+  <List.Item className='matches-list-item'>
     <List.Content>
       <List.Header>
         <List.Description>
@@ -44,12 +44,14 @@ const Match = props => (
     <List.Content>
       Date: { props.date }
     </List.Content>
-    <List.Content>
-      Helpfulness Rating: { props.helpRating }%
-    </List.Content>
-    <List.Content>
-      Sentiment: { props.sentiment }
-    </List.Content>
+    <List.Item>
+      <List.Content floated='right'>
+        Sentiment: { props.sentiment }
+      </List.Content>
+      <List.Content>
+        Helpfulness Rating: { props.helpRating }%
+      </List.Content>
+    </List.Item>
   </List.Item>
 );
 
@@ -58,7 +60,7 @@ Match.propTypes = {
   title: PropTypes.string.isRequired,
   text: PropTypes.string.isRequired,
   date: PropTypes.string.isRequired,
-  score: PropTypes.string.isRequired,
+  score: PropTypes.number.isRequired,
   helpRating: PropTypes.number.isRequired,
   sentiment: PropTypes.object.isRequired
 };
@@ -75,7 +77,7 @@ const Matches = props => (
               title={ getTitle(item) }
               text={ getText(item) }
               highlightText={ item.highlightText }
-              score={ getScore(item) }
+              score={ item.score }
               date={ item.date }
               helpRating = { item.helpRating }
               sentiment={ getSentiment(item) }
@@ -129,18 +131,6 @@ const getText = (item) => {
 };
 
 /**
- * getScore - round up to 4 decimal places.
- */
-const getScore = item => {
-  var score = 0.0;
-
-  if (item.score) {
-    score = Number(item.score).toFixed(4);
-  }
-  return score;
-};
-
-/**
  * getSentiment - determine which icon to display to represent
  * positive, negative, and neutral sentiment.
  */
@@ -160,8 +150,8 @@ const getSentiment = item => {
     className='sentiment-value' 
     as='a'
     color={ color }
-    size='tiny' 
-    tag>{ score  }</Label>;  
+    size='mini'> 
+    { score  }</Label>;  
 };
 
 // export so we are visible to parent
