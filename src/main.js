@@ -30,7 +30,7 @@ import ProductTrendChart from './ProductTrendChart';
 import TrendChart from './TrendChart';
 import SentimentChart from './SentimentChart';
 import CommonTopicsChart from './CommonTopicsChart';
-import { Grid, Dimmer, Button, Menu, Dropdown, Divider, Loader, Accordion, Icon, Header, Statistic } from 'semantic-ui-react';
+import { Tab, Grid, Dimmer, Button, Menu, Dropdown, Divider, Loader, Accordion, Icon, Header, Statistic } from 'semantic-ui-react';
 const utils = require('../lib/utils');
 
 /**
@@ -840,6 +840,18 @@ class Main extends React.Component {
     );
   }
 
+  getPanelHeader() {
+    return (
+      <Grid.Row className='panel-header' color={'blue'}>
+        <Grid.Column width={16} verticalAlign='middle' textAlign='center'>
+          <Header as='h1' textAlign='center'>
+            Food Review Data
+          </Header>
+        </Grid.Column>
+      </Grid.Row>
+    );
+  }
+
   /**
    * render - return all the home page object to be rendered.
    */
@@ -879,320 +891,335 @@ class Main extends React.Component {
       filtersOn = true;
     }
 
-    return (
-      <Grid celled className='search-grid'>
+    const panes = [
+      // dashboard tab
+      { menuItem: { key: 'dashboard', icon: 'dashboard', content: 'Dashboard' },
+        render: () =>
+          <Tab.Pane attached={false}>
+            <div>
+              <Grid className='search-grid'>
+                { this.getPanelHeader() }
+                <Grid.Row className='selection-header' color={'blue'}>
+                  <Grid.Column width={16} textAlign='center'>
+                    { this.getSentimentFilter() }
+                    { this.getProductFilter() }
+                    { this.getReviewerFilter() }
+                  </Grid.Column>
+                </Grid.Row>
 
-        {/* Search Field Header */}
+                {/* Results Panel */}
 
-        <Grid.Row color={'blue'}>
-          <Grid.Column width={16} textAlign='center'>
-            <Grid className='search-field-grid'>
-              <Grid.Column width={16} verticalAlign='middle' textAlign='center'>
-                <Header as='h1' textAlign='center'>
-                  Food Review Data
-                </Header>
-              </Grid.Column>
-            </Grid>
-          </Grid.Column>
-        </Grid.Row>
+                <Grid.Row className='matches-grid-row'>
 
-        <Grid.Row color={'teal'}>
-          <Grid.Column width={16} textAlign='center'>
-            { this.getSentimentFilter() }
-            { this.getProductFilter() }
-            { this.getReviewerFilter() }
-          </Grid.Column>
-        </Grid.Row>
+                  {/* Drop-Down Filters */}
 
-        {/* Results Panel */}
+                  <Grid.Column width={3}>
+                    <Header as='h2' block inverted textAlign='left'>
+                      <Icon name='filter' />
+                      <Header.Content>
+                        Filter
+                        <Header.Subheader>
+                          By Enrichments
+                        </Header.Subheader>
+                      </Header.Content>
+                    </Header>
 
-        <Grid.Row className='matches-grid-row'>
-
-          {/* Drop-Down Filters */}
-
-          <Grid.Column width={3}>
-
-            <Header as='h2' block inverted textAlign='left'>
-              <Icon name='filter' />
-              <Header.Content>
-                Filter
-                <Header.Subheader>
-                  By Enrichments
-                </Header.Subheader>
-              </Header.Content>
-            </Header>
-
-            {filtersOn ? (
-              <Button
-                compact
-                size='tiny'
-                basic
-                color='red'
-                content='clear all'
-                icon='remove'
-                onClick={this.handleClearAllFiltersClick.bind(this)}
-              />
-            ) : null}
-
-            <Accordion styled>
-              <Accordion.Title 
-                active={activeFilterIndex == utils.ENTITY_DATA_INDEX}
-                index={utils.ENTITY_DATA_INDEX}
-                onClick={this.handleAccordionClick.bind(this)}>
-                <Icon name='dropdown' />
-                  Entities
-              </Accordion.Title>
-              <Accordion.Content
-                active={activeFilterIndex == utils.ENTITY_DATA_INDEX}
-                style={{height: 350, overflow: 'auto'}}>
-                {this.getEntitiesFilter()}
-              </Accordion.Content>
-            </Accordion>
-            <Accordion styled>
-              <Accordion.Title 
-                active={activeFilterIndex == utils.CATEGORY_DATA_INDEX}
-                index={utils.CATEGORY_DATA_INDEX}
-                onClick={this.handleAccordionClick.bind(this)}>
-                <Icon name='dropdown' />
-                  Categories
-              </Accordion.Title>
-              <Accordion.Content
-                active={activeFilterIndex == utils.CATEGORY_DATA_INDEX}
-                style={{height: 350, overflow: 'auto'}}>
-                {this.getCategoriesFilter()}
-              </Accordion.Content>
-            </Accordion>
-            <Accordion styled>
-              <Accordion.Title 
-                active={activeFilterIndex == utils.CONCEPT_DATA_INDEX}
-                index={utils.CONCEPT_DATA_INDEX}
-                onClick={this.handleAccordionClick.bind(this)}>
-                <Icon name='dropdown' />
-                  Concepts
-              </Accordion.Title>
-              <Accordion.Content
-                active={activeFilterIndex == utils.CONCEPT_DATA_INDEX}
-                style={{height: 350, overflow: 'auto'}}>
-                {this.getConceptsFilter()}
-              </Accordion.Content>
-            </Accordion>
-            <Accordion styled>
-              <Accordion.Title
-                active={activeFilterIndex == utils.KEYWORD_DATA_INDEX}
-                index={utils.KEYWORD_DATA_INDEX}
-                onClick={this.handleAccordionClick.bind(this)}>
-                <Icon name='dropdown' />
-                  Keywords
-              </Accordion.Title>
-              <Accordion.Content
-                active={activeFilterIndex == utils.KEYWORD_DATA_INDEX}
-                style={{height: 350, overflow: 'auto'}}>
-                {this.getKeywordsFilter()}
-              </Accordion.Content>
-            </Accordion>
-            <Accordion styled>
-              <Accordion.Title
-                active={activeFilterIndex == utils.ENTITY_TYPE_DATA_INDEX}
-                index={utils.ENTITY_TYPE_DATA_INDEX}
-                onClick={this.handleAccordionClick.bind(this)}>
-                <Icon name='dropdown' />
-                  Entity Types
-              </Accordion.Title>
-              <Accordion.Content
-                active={activeFilterIndex == utils.ENTITY_TYPE_DATA_INDEX}
-                style={{height: 350, overflow: 'auto'}}>
-                {this.getEntityTypesFilter()}
-              </Accordion.Content>
-            </Accordion>
-            
-          </Grid.Column>
-
-          {/* Results */}
-
-          <Grid.Column width={13}>
-            <Grid.Row>
-              <Header as='h2' block inverted textAlign='left'>
-                <Icon name='grid layout' />
-                <Header.Content>
-                  Matches
-                </Header.Content>
-              </Header>
-              {loading ? (
-                <div className="results">
-                  <div className="loader--container" style={{height: 572}}>
-                    <Dimmer active inverted>
-                      <Loader>Loading</Loader>
-                    </Dimmer>
-                  </div>
-                </div>
-              ) : data ? (
-                <div className="results">
-                  <div className="row">
-                    <div>
-                      <Statistic.Group
-                        size='mini'
-                        items={ stat_items }
+                    {filtersOn ? (
+                      <Button
+                        compact
+                        size='tiny'
+                        basic
+                        color='red'
+                        content='clear all'
+                        icon='remove'
+                        onClick={this.handleClearAllFiltersClick.bind(this)}
                       />
-                      <Menu compact className="sort-dropdown">
-                        <Icon name='sort' size='large' bordered inverted />
-                        <Dropdown 
-                          item
-                          onChange={ this.sortOrderChange.bind(this) }
-                          value={ sortOrder }
-                          options={ utils.sortTypes }
-                        />
-                      </Menu>
-                    </div>
-                    <div>
-                      {this.getMatches()}
-                    </div>
-                  </div>
-                </div>
-              ) : error ? (
-                <div className="results">
-                  <div className="_container _container_large">
-                    <div className="row">
-                      {JSON.stringify(error)}
-                    </div>
-                  </div>
-                </div>
-              ) : null}
-            </Grid.Row>
-            <Divider clearing hidden/>
+                    ) : null}
 
-            {/* Pagination Menu */}
+                    <Accordion styled>
+                      <Accordion.Title
+                        active={activeFilterIndex == utils.ENTITY_DATA_INDEX}
+                        index={utils.ENTITY_DATA_INDEX}
+                        onClick={this.handleAccordionClick.bind(this)}>
+                        <Icon name='dropdown' />
+                        Entities
+                      </Accordion.Title>
+                      <Accordion.Content
+                        active={activeFilterIndex == utils.ENTITY_DATA_INDEX}
+                        style={{maxHeight: 350, overflow: 'auto'}}>
+                        {this.getEntitiesFilter()}
+                      </Accordion.Content>
+                    </Accordion>
+                    
+                    <Accordion styled>
+                      <Accordion.Title
+                        active={activeFilterIndex == utils.CATEGORY_DATA_INDEX}
+                        index={utils.CATEGORY_DATA_INDEX}
+                        onClick={this.handleAccordionClick.bind(this)}>
+                        <Icon name='dropdown' />
+                        Categories
+                      </Accordion.Title>
+                      <Accordion.Content
+                        active={activeFilterIndex == utils.CATEGORY_DATA_INDEX}
+                        style={{maxHeight: 350, overflow: 'auto'}}>
+                        {this.getCategoriesFilter()}
+                      </Accordion.Content>
+                    </Accordion>
+                    
+                    <Accordion styled>
+                      <Accordion.Title
+                        active={activeFilterIndex == utils.CONCEPT_DATA_INDEX}
+                        index={utils.CONCEPT_DATA_INDEX}
+                        onClick={this.handleAccordionClick.bind(this)}>
+                        <Icon name='dropdown' />
+                        Concepts
+                      </Accordion.Title>
+                      <Accordion.Content
+                        active={activeFilterIndex == utils.CONCEPT_DATA_INDEX}
+                        style={{maxHeight: 350, overflow: 'auto'}}>
+                        {this.getConceptsFilter()}
+                      </Accordion.Content>
+                    </Accordion>
+                    
+                    <Accordion styled>
+                      <Accordion.Title
+                        active={activeFilterIndex == utils.KEYWORD_DATA_INDEX}
+                        index={utils.KEYWORD_DATA_INDEX}
+                        onClick={this.handleAccordionClick.bind(this)}>
+                        <Icon name='dropdown' />
+                        Keywords
+                      </Accordion.Title>
+                      <Accordion.Content
+                        active={activeFilterIndex == utils.KEYWORD_DATA_INDEX}
+                        style={{maxHeight: 350, overflow: 'auto'}}>
+                        {this.getKeywordsFilter()}
+                    </Accordion.Content>
+                      
+                    </Accordion>
+                      <Accordion styled>
+                        <Accordion.Title
+                          active={activeFilterIndex == utils.ENTITY_TYPE_DATA_INDEX}
+                          index={utils.ENTITY_TYPE_DATA_INDEX}
+                          onClick={this.handleAccordionClick.bind(this)}>
+                          <Icon name='dropdown' />
+                          Entity Types
+                        </Accordion.Title>
+                      <Accordion.Content
+                        active={activeFilterIndex == utils.ENTITY_TYPE_DATA_INDEX}
+                        style={{maxHeight: 350, overflow: 'auto'}}>
+                        {this.getEntityTypesFilter()}
+                      </Accordion.Content>
+                    </Accordion>
 
-            <Grid.Row>
-              {this.getPaginationMenu()}
-            </Grid.Row>
-          </Grid.Column>
-        </Grid.Row>
+                  </Grid.Column>
+                  
+                  {/* Results */}
 
-        <Grid.Row>
-          <Grid.Column width={8} textAlign='center'>
-            <Grid.Row className='rrr'>
+                  <Grid.Column width={13}>
+                    <Grid.Row>
+                      <Header as='h2' block inverted textAlign='left'>
+                        <Icon name='grid layout' />
+                        <Header.Content>
+                          Matches
+                        </Header.Content>
+                      </Header>
+                      {loading ? (
+                        <div className="results">
+                          <div className="loader--container" style={{height: 572}}>
+                            <Dimmer active inverted>
+                              <Loader>Loading</Loader>
+                            </Dimmer>
+                          </div>
+                        </div>
+                      ) : data ? (
+                        <div className="results">
+                          <div className="row">
+                            <div>
+                              <Statistic.Group
+                                size='mini'
+                                items={ stat_items }
+                              />
+                              <Menu compact className="sort-dropdown">
+                                <Icon name='sort' size='large' bordered inverted />
+                                <Dropdown
+                                  item
+                                  onChange={ this.sortOrderChange.bind(this) }
+                                  value={ sortOrder }
+                                  options={ utils.sortTypes }
+                                />
+                              </Menu>
+                            </div>
+                            <div>
+                              {this.getMatches()}
+                            </div>
+                          </div>
+                        </div>
+                      ) : error ? (
+                        <div className="results">
+                          <div className="_container _container_large">
+                            <div className="row">
+                              {JSON.stringify(error)}
+                            </div>
+                          </div>
+                        </div>
+                      ) : null}
+                    </Grid.Row>
 
-              {/* Top Rated Products Chart */}
-              <Accordion fluid styled>
-                <Accordion.Title
-                  active={activeGraphIndex[utils.TOP_RATED_GRAPH_ID] == 0}
-                  index={0}
-                  onClick={this.handleAccordionGraphClick.bind(this, utils.TOP_RATED_GRAPH_ID)}>
-                  <Header className='graph-header' as='h2' block inverted textAlign='left'>
-                    <Icon name='bar chart' />
-                    <Header.Content>
-                      Product Rankings
-                      <Header.Subheader>
-                        Top ranked products (min of 10 reviews)
-                      </Header.Subheader>
-                    </Header.Content>
-                  </Header>
-                </Accordion.Title>
-                <Accordion.Content active={activeGraphIndex[utils.TOP_RATED_GRAPH_ID] == 0}>
-                  <TopRatedChart
-                    products={products}
-                  />
-                </Accordion.Content>
-              </Accordion>
+                    <Divider clearing hidden/>
 
-              {/* Top 10 Review Topics Chart */}
-              <Accordion fluid styled>
-                <Accordion.Title 
-                  active={activeGraphIndex[utils.TOPICS_GRAPH_ID] == 0}
-                  index={0}
-                  onClick={this.handleAccordionGraphClick.bind(this, utils.TOPICS_GRAPH_ID)}>
-                  <Header className='graph-header' as='h2' block inverted textAlign='left'>
-                    <Icon name='pie chart' />
-                    <Header.Content>
-                      Most Common Topics
-                      <Header.Subheader>
-                        Top 10 topics for reviews
-                      </Header.Subheader>
-                    </Header.Content>
-                  </Header>
-                </Accordion.Title>
-                <Accordion.Content active={activeGraphIndex[utils.TOPICS_GRAPH_ID] == 0}>
-                  <CommonTopicsChart
-                    entities={entities}
-                    categories={categories}
-                    concepts={concepts}
-                    keywords={keywords}
-                    entityTypes={entityTypes}
-                  />
-                </Accordion.Content>
-              </Accordion>
-            </Grid.Row>
+                    {/* Pagination Menu */}
 
-          </Grid.Column>
+                    <Grid.Row>
+                      {this.getPaginationMenu()}
+                    </Grid.Row>
+                  </Grid.Column>
+                </Grid.Row>
+              </Grid>
+            </div>
+          </Tab.Pane>
+      },
+      
+      // Graphs Tab
+      { menuItem: { key: 'graphs', icon: 'bar graph', content: 'Graphs' },
+        render: () =>
+          <Tab.Pane attached={false}>
+            <div>
+              <Grid className='search-grid'>
+                { this.getPanelHeader() }
+                <Grid.Row>
+                  <Grid.Column width={8} textAlign='center'>
+                    <Grid.Row className='rrr'>
 
-          <Grid.Column width={8} textAlign='center'>
-            <Grid.Row className='ttt'>
+                      {/* Top Rated Products Chart */}
+                      <Accordion fluid styled>
+                        <Accordion.Title
+                          active={activeGraphIndex[utils.TOP_RATED_GRAPH_ID] == 0}
+                          index={0}
+                          onClick={this.handleAccordionGraphClick.bind(this, utils.TOP_RATED_GRAPH_ID)}>
+                          <Header className='graph-header' as='h2' block inverted textAlign='left'>
+                            <Icon name='bar chart' />
+                            <Header.Content>
+                              Product Rankings
+                              <Header.Subheader>
+                                Top ranked products (min of 10 reviews)
+                              </Header.Subheader>
+                            </Header.Content>
+                          </Header>
+                        </Accordion.Title>
+                        <Accordion.Content active={activeGraphIndex[utils.TOP_RATED_GRAPH_ID] == 0}>
+                          <TopRatedChart
+                            products={products}
+                          />
+                        </Accordion.Content>
+                      </Accordion>
 
-              {/* Trend Product Chart Region */}
-              <Accordion fluid styled>
-                <Accordion.Title 
-                  active={activeGraphIndex[utils.SENTIMENT_GRAPH_ID] == 0}
-                  index={0}
-                  onClick={this.handleAccordionGraphClick.bind(this, utils.SENTIMENT_GRAPH_ID)}>
-                  <Header className='graph-header' as='h2' block inverted textAlign='left'>
-                    <Icon name='line chart' />
-                    <Header.Content>
-                      Product Sentiment Trend
-                      <Header.Subheader>
-                        Avg sentiment over time
-                      </Header.Subheader>
-                    </Header.Content>
-                  </Header>
-                </Accordion.Title>
-                <Accordion.Content active={activeGraphIndex[utils.SENTIMENT_GRAPH_ID] == 0}>
-                  <ProductTrendChart
-                    productTrendData={productTrendData}
-                    productTrendLoading={productTrendLoading}
-                    productTrendError={productTrendError}
-                    products={products}
-                    productTrendProductId={productTrendProductId}
-                    onGetTrendDataRequest={this.fetchProductTrendData.bind(this)}
-                  />
-                </Accordion.Content>
-              </Accordion>
+                      {/* Top 10 Review Topics Chart */}
+                      <Accordion fluid styled>
+                        <Accordion.Title
+                          active={activeGraphIndex[utils.TOPICS_GRAPH_ID] == 0}
+                          index={0}
+                          onClick={this.handleAccordionGraphClick.bind(this, utils.TOPICS_GRAPH_ID)}>
+                          <Header className='graph-header' as='h2' block inverted textAlign='left'>
+                            <Icon name='pie chart' />
+                            <Header.Content>
+                              Most Common Topics
+                              <Header.Subheader>
+                                Top 10 topics for reviews
+                              </Header.Subheader>
+                            </Header.Content>
+                          </Header>
+                        </Accordion.Title>
+                        <Accordion.Content active={activeGraphIndex[utils.TOPICS_GRAPH_ID] == 0}>
+                          <CommonTopicsChart
+                            entities={entities}
+                            categories={categories}
+                            concepts={concepts}
+                            keywords={keywords}
+                            entityTypes={entityTypes}
+                          />
+                        </Accordion.Content>
+                      </Accordion>
+                    </Grid.Row>
+                  </Grid.Column>
 
-              {/* Average Sentiment for Top 10 Reviewers Chart */}
-              <Accordion fluid styled>
-                <Accordion.Title 
-                  active={activeGraphIndex[utils.REVIEWER_GRAPH_ID] == 0}
-                  index={0}
-                  onClick={this.handleAccordionGraphClick.bind(this, utils.REVIEWER_GRAPH_ID)}>
-                  <Header className='graph-header' as='h2' block inverted textAlign='left'>
-                    <Icon name='bar chart' />
-                    <Header.Content>
-                      Reviewer Sentiment
-                      <Header.Subheader>
-                        Avg sentiment for top 10 reviewers
-                      </Header.Subheader>
-                    </Header.Content>
-                  </Header>
-                </Accordion.Title>
-                <Accordion.Content active={activeGraphIndex[utils.REVIEWER_GRAPH_ID] == 0}>
-                  <TrendChart
-                    trendData={trendData}
-                    trendLoading={trendLoading}
-                    trendError={trendError}
-                    entities={entities}
-                    categories={categories}
-                    concepts={concepts}
-                    keywords={keywords}
-                    entityTypes={entityTypes}
-                    term={trendTerm}
-                    onGetTrendDataRequest={this.fetchTrendData.bind(this)}
-                  />
-                </Accordion.Content>
-              </Accordion>
+                  <Grid.Column width={8} textAlign='center'>
+                    <Grid.Row className='ttt'>
 
-            </Grid.Row>
-          </Grid.Column>
-        </Grid.Row>
+                      {/* Trend Product Chart Region */}
+                      <Accordion fluid styled>
+                        <Accordion.Title
+                          active={activeGraphIndex[utils.SENTIMENT_GRAPH_ID] == 0}
+                          index={0}
+                          onClick={this.handleAccordionGraphClick.bind(this, utils.SENTIMENT_GRAPH_ID)}>
+                          <Header className='graph-header' as='h2' block inverted textAlign='left'>
+                            <Icon name='line chart' />
+                            <Header.Content>
+                              Product Sentiment Trend
+                              <Header.Subheader>
+                                Avg sentiment over time
+                              </Header.Subheader>
+                            </Header.Content>
+                          </Header>
+                        </Accordion.Title>
+                        <Accordion.Content active={activeGraphIndex[utils.SENTIMENT_GRAPH_ID] == 0}>
+                          <ProductTrendChart
+                            productTrendData={productTrendData}
+                            productTrendLoading={productTrendLoading}
+                            productTrendError={productTrendError}
+                            products={products}
+                            productTrendProductId={productTrendProductId}
+                            onGetTrendDataRequest={this.fetchProductTrendData.bind(this)}
+                          />
+                        </Accordion.Content>
+                      </Accordion>
 
-      </Grid>
+                      {/* Average Sentiment for Top 10 Reviewers Chart */}
+                      <Accordion fluid styled>
+                        <Accordion.Title
+                          active={activeGraphIndex[utils.REVIEWER_GRAPH_ID] == 0}
+                          index={0}
+                          onClick={this.handleAccordionGraphClick.bind(this, utils.REVIEWER_GRAPH_ID)}>
+                          <Header className='graph-header' as='h2' block inverted textAlign='left'>
+                            <Icon name='bar chart' />
+                            <Header.Content>
+                              Reviewer Sentiment
+                              <Header.Subheader>
+                                Avg sentiment for top 10 reviewers
+                              </Header.Subheader>
+                            </Header.Content>
+                          </Header>
+                        </Accordion.Title>
+                        <Accordion.Content active={activeGraphIndex[utils.REVIEWER_GRAPH_ID] == 0}>
+                          <TrendChart
+                            trendData={trendData}
+                            trendLoading={trendLoading}
+                            trendError={trendError}
+                            entities={entities}
+                            categories={categories}
+                            concepts={concepts}
+                            keywords={keywords}
+                            entityTypes={entityTypes}
+                            term={trendTerm}
+                            onGetTrendDataRequest={this.fetchTrendData.bind(this)}
+                          />
+                        </Accordion.Content>
+                      </Accordion>
+                    </Grid.Row>
+                  </Grid.Column>
+                </Grid.Row>
+              </Grid>
+            </div>
+          </Tab.Pane>
+      }
+    ];
+
+    return (
+      <div>
+        <Tab 
+          className='tab-content' 
+          menu={{ pointing: true }}
+          panes={panes} />
+      </div>
     );
   }
 }

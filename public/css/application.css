@@ -646,6 +646,30 @@ input[type=radio]:checked + label.buttons-group--button {
   font-size: x-small !important;
 }
 
+div.blue.row.panel-header {
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
+
+div.blue.row.selection-header {
+  padding-top: 0px;
+}
+
+div.ui.segment.active.tab {
+  margin-top: 0px;
+  padding-top: 0px;
+  padding-left: 0px;
+  padding-right: 0px;
+  padding-bottom: 0px;
+  border-bottom-width: 0px;
+  border-top-width: 0px;
+}
+
+div.row.matches-grid-row {
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+}
+
 div.ui.celled.grid.search-grid {
   margin-top: 0px;
 }
