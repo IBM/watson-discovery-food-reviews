@@ -32,7 +32,7 @@ describe('Query builder returns params for discovery service', () => {
       'term(enriched_text.concepts.text).term(enriched_text.sentiment.document.label),' +
       'term(enriched_text.keywords.text).term(enriched_text.sentiment.document.label),' +
       'term(enriched_text.entities.type).term(enriched_text.sentiment.document.label),' +
-      'term(ProductId,count:100),term(UserId,count:100)]'
+      'term(ProductId,count:100).average(Score),term(UserId,count:100)]'
     });
   });
 
@@ -52,7 +52,7 @@ describe('Query builder returns params for discovery service', () => {
         'term(enriched_text.concepts.text).term(enriched_text.sentiment.document.label),' +
         'term(enriched_text.keywords.text).term(enriched_text.sentiment.document.label),' +
         'term(enriched_text.entities.type).term(enriched_text.sentiment.document.label),' +
-        'term(ProductId,count:100),term(UserId,count:100)]',
+        'term(ProductId,count:100).average(Score),term(UserId,count:100)]',
       natural_language_query: 'test',
       filter: 'enriched_text.categories.label::"test"',
       count: 500,

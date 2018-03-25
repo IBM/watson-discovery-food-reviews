@@ -28,7 +28,7 @@ import EntityTypesFilter from './components/EntityTypesFilter';
 import TopRatedChart from './components/TopRatedChart';
 import ProductTrendChart from './components/ProductTrendChart';
 import TrendChart from './components/TrendChart';
-import SentimentChart from './components/SentimentChart';
+// import SentimentChart from './components/SentimentChart';
 import CommonTopicsChart from './components/CommonTopicsChart';
 import { Tab, Grid, Dimmer, Button, Menu, Dropdown, Divider, Loader, Accordion, Icon, Header, Statistic } from 'semantic-ui-react';
 const utils = require('../lib/utils');
@@ -862,8 +862,8 @@ class Main extends React.Component {
       selectedConcepts,selectedKeywords, selectedEntityTypes,
       numMatches, numPositive, numNeutral, numNegative,
       productTrendData, productTrendLoading, productTrendError, productTrendProductId,
-      trendData, trendLoading, trendError, trendTerm,
-      sortOrder, sentimentTerm } = this.state;
+      trendData, trendLoading, trendError, trendTerm, // sentimentTerm
+      sortOrder } = this.state;
 
     // used for filter and graph accordions
     const { activeFilterIndex } = this.state;
@@ -987,17 +987,17 @@ class Main extends React.Component {
                         active={activeFilterIndex == utils.KEYWORD_DATA_INDEX}
                         style={{maxHeight: 350, overflow: 'auto'}}>
                         {this.getKeywordsFilter()}
-                    </Accordion.Content>
-                      
+                      </Accordion.Content>
                     </Accordion>
-                      <Accordion styled>
-                        <Accordion.Title
-                          active={activeFilterIndex == utils.ENTITY_TYPE_DATA_INDEX}
-                          index={utils.ENTITY_TYPE_DATA_INDEX}
-                          onClick={this.handleAccordionClick.bind(this)}>
-                          <Icon name='dropdown' />
-                          Entity Types
-                        </Accordion.Title>
+
+                    <Accordion styled>
+                      <Accordion.Title
+                        active={activeFilterIndex == utils.ENTITY_TYPE_DATA_INDEX}
+                        index={utils.ENTITY_TYPE_DATA_INDEX}
+                        onClick={this.handleAccordionClick.bind(this)}>
+                        <Icon name='dropdown' />
+                        Entity Types
+                      </Accordion.Title>
                       <Accordion.Content
                         active={activeFilterIndex == utils.ENTITY_TYPE_DATA_INDEX}
                         style={{maxHeight: 350, overflow: 'auto'}}>

@@ -51,7 +51,7 @@ exports[`renders correctly 1`] = `
       className="item"
       onClick={[Function]}
     >
-      15
+      10
     </a>
     <a
       className="item"

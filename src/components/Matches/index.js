@@ -160,7 +160,7 @@ const getText = (item) => {
  * positive, negative, and neutral sentiment.
  */
 const getSentiment = item => {
-  var score = Math.round(item.sentimentScore * 100) / 100
+  var score = Math.round(item.sentimentScore * 100) / 100;
   var color = 'white';
   switch (item.sentimentLabel) {
   case 'negative': 
