@@ -126,7 +126,6 @@ class Main extends React.Component {
       // misc panel
       currentPage: currentPage || '1',  // which page of matches are we showing
       activeFilterIndex: utils.SENTIMENT_DATA_INDEX, // which filter index is expanded/active
-      activeGraphIndex: new Array(utils.graph_ids.length).fill(1)
     };
   }
 
@@ -140,19 +139,6 @@ class Main extends React.Component {
     const { activeFilterIndex } = this.state;
     const newIndex = activeFilterIndex === index ? -1 : index;
     this.setState({ activeFilterIndex: newIndex });
-  }
-
-  /**
-   * handleAccordionGraphClick - (callback function)
-   * User has selected one of the
-   * graph header boxes to expand/hide a graph.
-   */
-  handleAccordionGraphClick(graphId, e, titleProps) {
-    const { index } = titleProps;
-    const { activeGraphIndex } = this.state;
-    const newIndex = activeGraphIndex[graphId] === index ? -1 : index;
-    activeGraphIndex[graphId] = newIndex;
-    this.setState({activeGraphIndex: activeGraphIndex});
   }
 
   /**
@@ -865,9 +851,8 @@ class Main extends React.Component {
       trendData, trendLoading, trendError, trendTerm, // sentimentTerm
       sortOrder } = this.state;
 
-    // used for filter and graph accordions
+    // used for filter accordions
     const { activeFilterIndex } = this.state;
-    const { activeGraphIndex } = this.state;
 
     const stat_items = [
       { key: 'matches', label: 'REVIEWS', value: numMatches },
@@ -902,63 +887,63 @@ class Main extends React.Component {
       },
       { menuItem: { key: 'commonChart', content: 'How does this product compete with other products in the same category?' },
         render: () =>
-        <div>
-          <Grid celled className='big-graph-grid'>
-            <Grid.Row className='selection-header'>
-              <Grid.Column width={16} textAlign='center'>
-                <CommonTopicsChart
-                  entities={entities}
-                  categories={categories}
-                  concepts={concepts}
-                  keywords={keywords}
-                  entityTypes={entityTypes}
-                />
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>
-        </div>
+          <div>
+            <Grid celled className='big-graph-grid'>
+              <Grid.Row className='selection-header'>
+                <Grid.Column width={16} textAlign='center'>
+                  <CommonTopicsChart
+                    entities={entities}
+                    categories={categories}
+                    concepts={concepts}
+                    keywords={keywords}
+                    entityTypes={entityTypes}
+                  />
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
+          </div>
       },
       { menuItem: { key: 'productTrendChart', content: 'How is the average rating given by this reviewer?' },
         render: () =>
-        <div>
-          <Grid celled className='big-graph-grid'>
-            <Grid.Row className='selection-header'>
-              <Grid.Column width={16} textAlign='center'>
-                <ProductTrendChart
-                  productTrendData={productTrendData}
-                  productTrendLoading={productTrendLoading}
-                  productTrendError={productTrendError}
-                  products={products}
-                  productTrendProductId={productTrendProductId}
-                  onGetTrendDataRequest={this.fetchProductTrendData.bind(this)}
-                />
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>
-        </div>
+          <div>
+            <Grid celled className='big-graph-grid'>
+              <Grid.Row className='selection-header'>
+                <Grid.Column width={16} textAlign='center'>
+                  <ProductTrendChart
+                    productTrendData={productTrendData}
+                    productTrendLoading={productTrendLoading}
+                    productTrendError={productTrendError}
+                    products={products}
+                    productTrendProductId={productTrendProductId}
+                    onGetTrendDataRequest={this.fetchProductTrendData.bind(this)}
+                  />
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
+          </div>
       },
       { menuItem: { key: 'trendChart', content: 'How does this product sentiment trend over time?' },
         render: () =>
-        <div>
-          <Grid celled className='big-graph-grid'>
-            <Grid.Row className='selection-header'>
-              <Grid.Column width={16} textAlign='center'>
-                <TrendChart
-                  trendData={trendData}
-                  trendLoading={trendLoading}
-                  trendError={trendError}
-                  entities={entities}
-                  categories={categories}
-                  concepts={concepts}
-                  keywords={keywords}
-                  entityTypes={entityTypes}
-                  term={trendTerm}
-                  onGetTrendDataRequest={this.fetchTrendData.bind(this)}
-                />
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>
-        </div>
+          <div>
+            <Grid celled className='big-graph-grid'>
+              <Grid.Row className='selection-header'>
+                <Grid.Column width={16} textAlign='center'>
+                  <TrendChart
+                    trendData={trendData}
+                    trendLoading={trendLoading}
+                    trendError={trendError}
+                    entities={entities}
+                    categories={categories}
+                    concepts={concepts}
+                    keywords={keywords}
+                    entityTypes={entityTypes}
+                    term={trendTerm}
+                    onGetTrendDataRequest={this.fetchTrendData.bind(this)}
+                  />
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
+          </div>
       }
     ];
      
@@ -1150,7 +1135,7 @@ class Main extends React.Component {
 
                   <Grid.Column width={4}>
 
-                  {/* Sentiment Chart Region */}
+                    {/* Sentiment Chart Region */}
 
                     <Grid.Row className='rrr'>
                       <Header as='h2' block inverted textAlign='left'>
@@ -1169,7 +1154,7 @@ class Main extends React.Component {
                         keywords={keywords}
                         entityTypes={entityTypes}
                       />
-                      </Grid.Row>
+                    </Grid.Row>
                   </Grid.Column>
 
                 </Grid.Row>
