@@ -16,7 +16,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Container, List, Label } from 'semantic-ui-react';
+import { Container, List, Label, Table, Grid, Divider } from 'semantic-ui-react';
 
 /**
  * This object renders the results of the search query on the web page. 
@@ -25,34 +25,59 @@ import { Container, List, Label } from 'semantic-ui-react';
  */
 
 const Match = props => (
-  <List.Item className='matches-list-item'>
-    <List.Content>
-      <List.Header>
-        <List.Description>
-          <span dangerouslySetInnerHTML={{__html: props.title}}></span>
-        </List.Description>
-      </List.Header>
-    </List.Content>
-    <List.Content>
-      <List.Description>
-        <span dangerouslySetInnerHTML={{__html: props.text}}></span>
-      </List.Description>
-    </List.Content>
-    <List.Content>
-      Rating: { props.score }
-    </List.Content>
-    <List.Content>
-      Date: { props.date }
-    </List.Content>
-    <List.Item>
-      <List.Content floated='right'>
-        Sentiment: { props.sentiment }
-      </List.Content>
-      <List.Content>
-        Helpfulness Rating: { props.helpRating }%
-      </List.Content>
-    </List.Item>
-  </List.Item>
+  <div>
+    <Grid className='matches-grid'>
+      <Grid.Row>
+        <Grid.Column width={12} floated='left'>
+          <List>
+            <List.Item className='matches-list-item'>
+              <List.Content>
+                <List.Header>
+                  <List.Description>
+                    <span dangerouslySetInnerHTML={{__html: props.title}}></span>
+                  </List.Description>
+                </List.Header>
+              </List.Content>
+              <List.Content>
+                <List.Description>
+                  <span dangerouslySetInnerHTML={{__html: props.text}}></span>
+                </List.Description>
+              </List.Content>
+            </List.Item>
+          </List>
+        </Grid.Column>
+        <Grid.Column width={4} floated='right'>
+          <Table collapsing compact='very' size='small'>
+            <Table.Body>
+              <Table.Row>
+                <Table.Cell>Date:</Table.Cell>
+                <Table.Cell>{ props.date }</Table.Cell>
+              </Table.Row>
+              <Table.Row>
+                <Table.Cell >Rating:</Table.Cell>
+                <Table.Cell>{ props.score }</Table.Cell>
+              </Table.Row>
+              <Table.Row>
+                <Table.Cell>
+                  Helpfulness Rating:
+                </Table.Cell>
+                <Table.Cell>{ props.helpRating }%</Table.Cell>
+              </Table.Row>
+              <Table.Row>
+                <Table.Cell>Sentiment:</Table.Cell>
+                <Table.Cell>
+                  { props.sentiment }
+                </Table.Cell>
+              </Table.Row>
+            </Table.Body>
+          </Table>
+        </Grid.Column>
+      </Grid.Row>
+    </Grid>
+
+    <Divider clearing/>
+
+  </div>
 );
 
 // type check to ensure we are called correctly
@@ -135,8 +160,8 @@ const getText = (item) => {
  * positive, negative, and neutral sentiment.
  */
 const getSentiment = item => {
-  var score = Number(item.sentimentScore).toFixed(2);
-  var color = 'grey';
+  var score = Math.round(item.sentimentScore * 100) / 100
+  var color = 'white';
   switch (item.sentimentLabel) {
   case 'negative': 
     color='red';

@@ -697,7 +697,12 @@ h1.ui.center.aligned.header {
 }
 
 div.item.matches-list-item {
-  padding-bottom: 12px !important;
+  font-size: 16px;
+}
+
+table.ui.small.collapsing.very.compact.table {
+  font-size: 10px;
+  margin-top: 8px;
 }
 
 div.ui.icon.input.searchinput {
