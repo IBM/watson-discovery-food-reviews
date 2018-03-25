@@ -18,18 +18,20 @@ import 'isomorphic-fetch';
 import React from 'react';
 import PropTypes from 'prop-types';
 import queryString from 'query-string';
-import Matches from './Matches';
-import PaginationMenu from './PaginationMenu';
-import EntitiesFilter from './EntitiesFilter';
-import CategoriesFilter from './CategoriesFilter';
-import ConceptsFilter from './ConceptsFilter';
-import KeywordsFilter from './KeywordsFilter';
-import EntityTypesFilter from './EntityTypesFilter';
-import TrendChart from './TrendChart';
-import SentimentChart from './SentimentChart';
-import { Grid, Dimmer, Button, Menu, Dropdown, Divider, Loader, Accordion, Icon, Header, Statistic } from 'semantic-ui-react';
+import Matches from './components/Matches';
+import PaginationMenu from './components/PaginationMenu';
+import EntitiesFilter from './components/EntitiesFilter';
+import CategoriesFilter from './components/CategoriesFilter';
+import ConceptsFilter from './components/ConceptsFilter';
+import KeywordsFilter from './components/KeywordsFilter';
+import EntityTypesFilter from './components/EntityTypesFilter';
+import TopRatedChart from './components/TopRatedChart';
+import ProductTrendChart from './components/ProductTrendChart';
+import TrendChart from './components/TrendChart';
+// import SentimentChart from './components/SentimentChart';
+import CommonTopicsChart from './components/CommonTopicsChart';
+import { Tab, Grid, Dimmer, Button, Menu, Dropdown, Divider, Loader, Accordion, Icon, Header, Statistic } from 'semantic-ui-react';
 const utils = require('../lib/utils');
-//const util = require('util');
 
 /**
  * Main React object that contains all objects on the web page.
@@ -68,6 +70,10 @@ class Main extends React.Component {
       selectedEntityTypes,
       // matches panel
       currentPage,
+      // product trending chart
+      productTrendData,
+      productTrendError,
+      productTrendProductId,
       // trending chart
       trendData,
       trendError,
@@ -105,16 +111,22 @@ class Main extends React.Component {
       selectedConcepts: selectedConcepts || new Set(),
       selectedKeywords: selectedKeywords || new Set(),
       selectedEntityTypes: selectedEntityTypes || new Set(),
+      // product trending chart
+      productTrendData: productTrendData || null,
+      productTrendError: productTrendError,
+      productTrendProductId: productTrendProductId || utils.NO_PRODUCT_ITEM,
+      productTrendLoading: false,
       // trending chart
       trendData: trendData || null,
       trendError: trendError,
-      trendTerm: trendTerm || utils.TRENDING_TERM_ITEM,
+      trendTerm: trendTerm || utils.NO_TERM_ITEM,
       trendLoading: false,
       // sentiment chart
-      sentimentTerm: sentimentTerm || utils.SENTIMENT_TERM_ITEM,
+      sentimentTerm: sentimentTerm || utils.ALL_TERM_ITEM,
       // misc panel
       currentPage: currentPage || '1',  // which page of matches are we showing
       activeFilterIndex: utils.SENTIMENT_DATA_INDEX, // which filter index is expanded/active
+      activeGraphIndex: new Array(utils.graph_ids.length).fill(1)
     };
   }
 
@@ -128,6 +140,19 @@ class Main extends React.Component {
     const { activeFilterIndex } = this.state;
     const newIndex = activeFilterIndex === index ? -1 : index;
     this.setState({ activeFilterIndex: newIndex });
+  }
+
+  /**
+   * handleAccordionGraphClick - (callback function)
+   * User has selected one of the
+   * graph header boxes to expand/hide a graph.
+   */
+  handleAccordionGraphClick(graphId, e, titleProps) {
+    const { index } = titleProps;
+    const { activeGraphIndex } = this.state;
+    const newIndex = activeGraphIndex[graphId] === index ? -1 : index;
+    activeGraphIndex[graphId] = newIndex;
+    this.setState({activeGraphIndex: activeGraphIndex});
   }
 
   /**
@@ -243,88 +268,7 @@ class Main extends React.Component {
   }
 
   /**
-   * tagItemSelected - (callback function)
-   * User has selected an item from the tag cloud object
-   * to filter on. This results in making a new qeury to the 
-   * disco service.
-   */
-  tagItemSelected(tag) {
-    var { selectedTagValue, cloudType } = tag;
-    console.log('tagValue [FROM TAG CLOUD]: ' + selectedTagValue);
-
-    // manually add this item to the list of selected items
-    // based on filter type. This is needed so that both the 
-    // tag cloud and the filter objects stay in sync (both 
-    // reflect what items have been selected).
-    const { entities, selectedEntities, 
-      categories, selectedCategories, 
-      concepts, selectedConcepts,
-      keywords, selectedKeywords,
-      entityTypes, selectedEntityTypes,
-      searchQuery  } = this.state;
-
-    if (cloudType === utils.CATEGORY_FILTER) {
-      var fullName = this.buildFullTagName(selectedTagValue, categories.results);
-      if (selectedCategories.has(fullName)) {
-        selectedCategories.delete(fullName);
-      } else {
-        selectedCategories.add(fullName);
-      }
-      this.setState({
-        selectedCategories: selectedCategories
-      });
-
-    } else if (cloudType == utils.CONCEPT_FILTER) {
-      fullName = this.buildFullTagName(selectedTagValue, concepts.results);
-      if (selectedConcepts.has(fullName)) {
-        selectedConcepts.delete(fullName);
-      } else {
-        selectedConcepts.add(fullName);
-      }
-      this.setState({
-        selectedConcepts: selectedConcepts
-      });
-
-    } else if (cloudType == utils.KEYWORD_FILTER) {
-      fullName = this.buildFullTagName(selectedTagValue, keywords.results);
-      if (selectedKeywords.has(fullName)) {
-        selectedKeywords.delete(fullName);
-      } else {
-        selectedKeywords.add(fullName);
-      }
-      this.setState({
-        selectedKeywords: selectedKeywords
-      });
-
-    } else if (cloudType == utils.ENTITIY_FILTER) {
-      fullName = this.buildFullTagName(selectedTagValue, entities.results);
-      if (selectedEntities.has(fullName)) {
-        selectedEntities.delete(fullName);
-      } else {
-        selectedEntities.add(fullName);
-      }
-      this.setState({
-        selectedEntities: selectedEntities
-      });
-
-    } else if (cloudType == utils.ENTITY_TYPE_FILTER) {
-      fullName = this.buildFullTagName(selectedTagValue, entityTypes.results);
-      if (selectedEntityTypes.has(fullName)) {
-        selectedEntityTypes.delete(fullName);
-      } else {
-        selectedEntityTypes.add(fullName);
-      }
-      this.setState({
-        selectedEntityTypes: selectedEntityTypes
-      });
-    }
-
-    // execute new search w/ filters
-    this.fetchData(searchQuery, false);
-  }
-
-  /**
-   * getTrendData - (callback function)
+   * fetchTrendData - (callback function)
    * User has entered a new search string to query on. 
    * This results in making a new qeury to the disco service.
    * Keep track of the current term value so that main stays
@@ -333,11 +277,11 @@ class Main extends React.Component {
    * NOTE: This function is also called at startup to 
    * display a default graph.
    */
-  getTrendData(data) {
+  fetchTrendData(data) {
     var { chartType, term } = data;
 
     // we don't have any data to show for "all" items, so just clear chart
-    if (term === utils.TRENDING_TERM_ITEM) {
+    if (term === utils.NO_TERM_ITEM) {
       this.setState(
         { 
           trendData: null,
@@ -408,14 +352,82 @@ class Main extends React.Component {
   }
   
   /**
-   * fetchData - build the query that will be passed to the 
+   * fetchProductTrendData - (callback function)
+   * User has entered a new search string to query on.
+   * This results in making a new qeury to the disco service.
+   * Keep track of the current term value so that main stays
+   * in sync with the trending chart component.
+   *
+   * NOTE: This function is also called at startup to
+   * display a default graph.
+   */
+  fetchProductTrendData(data) {
+    var { productId } = data;
+
+    // we don't have any data to show if no product selected, so just clear chart
+    if (productId === utils.NO_PRODUCT_ITEM) {
+      this.setState({
+        productTrendData: null,
+        productTrendLoading: false,
+        productTrendError: null,
+        productTrendProductId: productId
+      });
+      return;
+    }
+
+    this.setState({
+      productTrendLoading: true,
+      productTrendProductId: productId
+    });
+
+    const qs = queryString.stringify({
+      filters: 'ProductId::' + '"' + productId + '"',
+      count: 2000
+    });
+
+    // send request
+    fetch(`/api/trending?${qs}`)
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw response;
+        }
+      })
+      .then(json => {
+        // const util = require('util');
+        console.log('+++ DISCO PRODUCT TREND RESULTS +++');
+        // console.log(util.inspect(json.aggregations[0].results, false, null));
+        console.log('numMatches: ' + json.matching_results);
+
+        this.setState({
+          productTrendData: json,
+          productTrendLoading: false,
+          productTrendError: null,
+          productTrendProductId: productId
+        });
+      })
+      .catch(response => {
+        this.setState({
+          productTrendError: (response.status === 429) ? 'Number of free queries per month exceeded' : 'Error fetching results',
+          productTrendLoading: false,
+          productTrendData: null,
+          productTrendProductId: utils.NO_PRODUCT_ITEM
+        });
+        // eslint-disable-next-line no-console
+        console.error(response);
+      });
+  }
+
+  /**
+   * fetchData - build the query that will be passed to the
    * discovery service.
    */
   fetchData(query, clearFilters) {
     const searchQuery = query;
     var {
-      selectedEntities, 
-      selectedCategories, 
+      selectedEntities,
+      selectedCategories,
       selectedConcepts,
       selectedKeywords,
       selectedEntityTypes,
@@ -467,18 +479,19 @@ class Main extends React.Component {
       .then(json => {
         var data = utils.parseData(json);
 
+        // format the data for UI
         data = utils.formatData(data, filterString);
         data.results = this.sortData(data, sortOrder);
+
+        // add up totals for the sentiment of reviews
+        var totals = utils.getTotals(data);
 
         console.log('+++ DISCO RESULTS +++');
         // const util = require('util');
         // console.log(util.inspect(data.results, false, null));
         console.log('numMatches: ' + data.results.length);
-      
-        // add up totals for the sentiment of reviews
-        var totals = utils.getTotals(data);
 
-        this.setState({ 
+        this.setState({
           data: data,
           products: parseProducts(json),
           reviewers: parseReviewers(json),
@@ -494,8 +507,8 @@ class Main extends React.Component {
           numNeutral: totals.numNeutral,
           error: null,
           trendData: null,
-          sentimentTerm: utils.SENTIMENT_TERM_ITEM,
-          trendTerm: utils.TRENDING_TERM_ITEM
+          sentimentTerm: utils.ALL_TERM_ITEM,
+          trendTerm: utils.NO_TERM_ITEM
         });
         scrollToMain();
       })
@@ -614,26 +627,6 @@ class Main extends React.Component {
     
     console.log('FilterString: ' + filterString);
     return filterString;
-  }
-
-  /**
-   * buildFullTagName - this matches the selected tag cloud item with
-   * the item in the filter collection. This is needed to keep them in 
-   * sync with each other. This takes care of the issue where the tag
-   * cloud item is formatted differently than the collection item (the
-   * collection item name has a count appended to it).
-   */
-  buildFullTagName(tag, collection) {
-    // find the tag in collection
-    for (var i=0; i<collection.length; i++) {
-      console.log('compare tag: ' + tag + ' with: ' + collection[i].key);
-      if (collection[i].key === tag) {
-        // return the full tag so we can match the entries
-        // listed in the filters (which also show num of matches)
-        return collection[i].key + ' (' + collection[i].matching_results + ')';
-      }
-    }
-    return tag;
   }
 
   /**
@@ -847,20 +840,34 @@ class Main extends React.Component {
     );
   }
 
+  getPanelHeader() {
+    return (
+      <Grid.Row className='panel-header' color={'blue'}>
+        <Grid.Column width={16} verticalAlign='middle' textAlign='center'>
+          <Header as='h1' textAlign='center'>
+            Food Review Data
+          </Header>
+        </Grid.Column>
+      </Grid.Row>
+    );
+  }
+
   /**
    * render - return all the home page object to be rendered.
    */
   render() {
-    const { loading, data, error,
+    const { loading, data, error, products,
       entities, categories, concepts, keywords, entityTypes,
       selectedEntities, selectedCategories, 
       selectedConcepts,selectedKeywords, selectedEntityTypes,
       numMatches, numPositive, numNeutral, numNegative,
-      trendData, trendLoading, trendError, trendTerm,
-      sortOrder, sentimentTerm } = this.state;
+      productTrendData, productTrendLoading, productTrendError, productTrendProductId,
+      trendData, trendLoading, trendError, trendTerm, // sentimentTerm
+      sortOrder } = this.state;
 
-    // used for filter accordions
+    // used for filter and graph accordions
     const { activeFilterIndex } = this.state;
+    const { activeGraphIndex } = this.state;
 
     const stat_items = [
       { key: 'matches', label: 'REVIEWS', value: numMatches },
@@ -869,12 +876,6 @@ class Main extends React.Component {
       { key: 'negative', label: 'NEGATIVE', value: numNegative }
     ];
 
-    // const util = require('util');
-    // console.log("PRODUCTS: ");
-    // console.log(util.inspect(products, false, null));
-    // console.log("SELECTED SENTIMENTS: ");
-    // console.log(util.inspect(selectedSentiments, false, null));
-    // console.log('sentimentFilter: ' + sentimentFilter);
     var filtersOn = false;
     if (selectedEntities.size > 0 ||
       selectedCategories.size > 0 ||
@@ -884,229 +885,322 @@ class Main extends React.Component {
       filtersOn = true;
     }
 
-    return (
-      <Grid celled className='search-grid'>
+    const panes = [
+      // dashboard tab
+      { menuItem: { key: 'dashboard', icon: 'dashboard', content: 'Dashboard' },
+        render: () =>
+          <Tab.Pane attached={false}>
+            <div>
+              <Grid className='search-grid'>
+                { this.getPanelHeader() }
+                <Grid.Row className='selection-header' color={'blue'}>
+                  <Grid.Column width={16} textAlign='center'>
+                    { this.getSentimentFilter() }
+                    { this.getProductFilter() }
+                    { this.getReviewerFilter() }
+                  </Grid.Column>
+                </Grid.Row>
 
-        {/* Search Field Header */}
+                {/* Results Panel */}
 
-        <Grid.Row color={'blue'}>
-          <Grid.Column width={16} textAlign='center'>
-            <Grid className='search-field-grid'>
-              <Grid.Column width={16} verticalAlign='middle' textAlign='center'>
-                <Header as='h1' textAlign='center'>
-                  Food Review Data
-                </Header>
-              </Grid.Column>
-            </Grid>
-          </Grid.Column>
-        </Grid.Row>
+                <Grid.Row className='matches-grid-row'>
 
-        <Grid.Row color={'teal'}>
-          <Grid.Column width={16} textAlign='center'>
-            { this.getSentimentFilter() }
-            { this.getProductFilter() }
-            { this.getReviewerFilter() }
-          </Grid.Column>
-        </Grid.Row>
+                  {/* Drop-Down Filters */}
 
-        {/* Results Panel */}
+                  <Grid.Column width={3}>
+                    <Header as='h2' block inverted textAlign='left'>
+                      <Icon name='filter' />
+                      <Header.Content>
+                        Filter
+                        <Header.Subheader>
+                          By Enrichments
+                        </Header.Subheader>
+                      </Header.Content>
+                    </Header>
 
-        <Grid.Row className='matches-grid-row'>
+                    {filtersOn ? (
+                      <Button
+                        compact
+                        size='tiny'
+                        basic
+                        color='red'
+                        content='clear all'
+                        icon='remove'
+                        onClick={this.handleClearAllFiltersClick.bind(this)}
+                      />
+                    ) : null}
 
-          {/* Drop-Down Filters */}
+                    <Accordion styled>
+                      <Accordion.Title
+                        active={activeFilterIndex == utils.ENTITY_DATA_INDEX}
+                        index={utils.ENTITY_DATA_INDEX}
+                        onClick={this.handleAccordionClick.bind(this)}>
+                        <Icon name='dropdown' />
+                        Entities
+                      </Accordion.Title>
+                      <Accordion.Content
+                        active={activeFilterIndex == utils.ENTITY_DATA_INDEX}
+                        style={{maxHeight: 350, overflow: 'auto'}}>
+                        {this.getEntitiesFilter()}
+                      </Accordion.Content>
+                    </Accordion>
+                    
+                    <Accordion styled>
+                      <Accordion.Title
+                        active={activeFilterIndex == utils.CATEGORY_DATA_INDEX}
+                        index={utils.CATEGORY_DATA_INDEX}
+                        onClick={this.handleAccordionClick.bind(this)}>
+                        <Icon name='dropdown' />
+                        Categories
+                      </Accordion.Title>
+                      <Accordion.Content
+                        active={activeFilterIndex == utils.CATEGORY_DATA_INDEX}
+                        style={{maxHeight: 350, overflow: 'auto'}}>
+                        {this.getCategoriesFilter()}
+                      </Accordion.Content>
+                    </Accordion>
+                    
+                    <Accordion styled>
+                      <Accordion.Title
+                        active={activeFilterIndex == utils.CONCEPT_DATA_INDEX}
+                        index={utils.CONCEPT_DATA_INDEX}
+                        onClick={this.handleAccordionClick.bind(this)}>
+                        <Icon name='dropdown' />
+                        Concepts
+                      </Accordion.Title>
+                      <Accordion.Content
+                        active={activeFilterIndex == utils.CONCEPT_DATA_INDEX}
+                        style={{maxHeight: 350, overflow: 'auto'}}>
+                        {this.getConceptsFilter()}
+                      </Accordion.Content>
+                    </Accordion>
+                    
+                    <Accordion styled>
+                      <Accordion.Title
+                        active={activeFilterIndex == utils.KEYWORD_DATA_INDEX}
+                        index={utils.KEYWORD_DATA_INDEX}
+                        onClick={this.handleAccordionClick.bind(this)}>
+                        <Icon name='dropdown' />
+                        Keywords
+                      </Accordion.Title>
+                      <Accordion.Content
+                        active={activeFilterIndex == utils.KEYWORD_DATA_INDEX}
+                        style={{maxHeight: 350, overflow: 'auto'}}>
+                        {this.getKeywordsFilter()}
+                      </Accordion.Content>
+                    </Accordion>
 
-          <Grid.Column width={3}>
+                    <Accordion styled>
+                      <Accordion.Title
+                        active={activeFilterIndex == utils.ENTITY_TYPE_DATA_INDEX}
+                        index={utils.ENTITY_TYPE_DATA_INDEX}
+                        onClick={this.handleAccordionClick.bind(this)}>
+                        <Icon name='dropdown' />
+                        Entity Types
+                      </Accordion.Title>
+                      <Accordion.Content
+                        active={activeFilterIndex == utils.ENTITY_TYPE_DATA_INDEX}
+                        style={{maxHeight: 350, overflow: 'auto'}}>
+                        {this.getEntityTypesFilter()}
+                      </Accordion.Content>
+                    </Accordion>
 
-            <Header as='h2' block inverted textAlign='left'>
-              <Icon name='filter' />
-              <Header.Content>
-                Filter
-                <Header.Subheader>
-                  By Enrichments
-                </Header.Subheader>
-              </Header.Content>
-            </Header>
+                  </Grid.Column>
+                  
+                  {/* Results */}
 
-            {filtersOn ? (
-              <Button
-                compact
-                size='tiny'
-                fluid
-                basic
-                color='red'
-                content='clear all'
-                icon='remove'
-                onClick={this.handleClearAllFiltersClick.bind(this)}
-              />
-            ) : null}
+                  <Grid.Column width={13}>
+                    <Grid.Row>
+                      <Header as='h2' block inverted textAlign='left'>
+                        <Icon name='grid layout' />
+                        <Header.Content>
+                          Reviews
+                          <Header.Subheader>
+                            Show/Hide Reviews with Enrichment, Sentiment, Product and Reviewer Filters
+                          </Header.Subheader>
+                        </Header.Content>
+                      </Header>
+                      {loading ? (
+                        <div className="results">
+                          <div className="loader--container" style={{height: 572}}>
+                            <Dimmer active inverted>
+                              <Loader>Loading</Loader>
+                            </Dimmer>
+                          </div>
+                        </div>
+                      ) : data ? (
+                        <div className="results">
+                          <div className="row">
+                            <div>
+                              <Statistic.Group
+                                size='mini'
+                                items={ stat_items }
+                              />
+                              <Menu compact className="sort-dropdown">
+                                <Icon name='sort' size='large' bordered inverted />
+                                <Dropdown
+                                  item
+                                  onChange={ this.sortOrderChange.bind(this) }
+                                  value={ sortOrder }
+                                  options={ utils.sortTypes }
+                                />
+                              </Menu>
+                            </div>
+                            <div>
+                              {this.getMatches()}
+                            </div>
+                          </div>
+                        </div>
+                      ) : error ? (
+                        <div className="results">
+                          <div className="_container _container_large">
+                            <div className="row">
+                              {JSON.stringify(error)}
+                            </div>
+                          </div>
+                        </div>
+                      ) : null}
+                    </Grid.Row>
 
-            <Accordion styled>
-              <Accordion.Title 
-                active={activeFilterIndex == utils.ENTITY_DATA_INDEX}
-                index={utils.ENTITY_DATA_INDEX}
-                onClick={this.handleAccordionClick.bind(this)}>
-                <Icon name='dropdown' />
-                Entities
-              </Accordion.Title>
-              <Accordion.Content active={activeFilterIndex == utils.ENTITY_DATA_INDEX}>
-                {this.getEntitiesFilter()}
-              </Accordion.Content>
-            </Accordion>
-            <Accordion styled>
-              <Accordion.Title 
-                active={activeFilterIndex == utils.CATEGORY_DATA_INDEX}
-                index={utils.CATEGORY_DATA_INDEX}
-                onClick={this.handleAccordionClick.bind(this)}>
-                <Icon name='dropdown' />
-                Categories
-              </Accordion.Title>
-              <Accordion.Content active={activeFilterIndex == utils.CATEGORY_DATA_INDEX}>
-                {this.getCategoriesFilter()}
-              </Accordion.Content>
-            </Accordion>
-            <Accordion styled>
-              <Accordion.Title 
-                active={activeFilterIndex == utils.CONCEPT_DATA_INDEX}
-                index={utils.CONCEPT_DATA_INDEX}
-                onClick={this.handleAccordionClick.bind(this)}>
-                <Icon name='dropdown' />
-                Concepts
-              </Accordion.Title>
-              <Accordion.Content active={activeFilterIndex == utils.CONCEPT_DATA_INDEX}>
-                {this.getConceptsFilter()}
-              </Accordion.Content>
-            </Accordion>
-            <Accordion styled>
-              <Accordion.Title
-                active={activeFilterIndex == utils.KEYWORD_DATA_INDEX}
-                index={utils.KEYWORD_DATA_INDEX}
-                onClick={this.handleAccordionClick.bind(this)}>
-                <Icon name='dropdown' />
-                Keywords
-              </Accordion.Title>
-              <Accordion.Content active={activeFilterIndex == utils.KEYWORD_DATA_INDEX}>
-                {this.getKeywordsFilter()}
-              </Accordion.Content>
-            </Accordion>
-            <Accordion styled>
-              <Accordion.Title
-                active={activeFilterIndex == utils.ENTITY_TYPE_DATA_INDEX}
-                index={utils.ENTITY_TYPE_DATA_INDEX}
-                onClick={this.handleAccordionClick.bind(this)}>
-                <Icon name='dropdown' />
-                Entity Types
-              </Accordion.Title>
-              <Accordion.Content active={activeFilterIndex == utils.ENTITY_TYPE_DATA_INDEX}>
-                {this.getEntityTypesFilter()}
-              </Accordion.Content>
-            </Accordion>
-            
-          </Grid.Column>
+                    <Divider clearing hidden/>
 
-          {/* Results */}
+                    {/* Pagination Menu */}
 
-          <Grid.Column width={7}>
-            <Grid.Row>
-              {loading ? (
-                <div className="results">
-                  <div className="loader--container">
-                    <Dimmer active inverted>
-                      <Loader>Loading</Loader>
-                    </Dimmer>
-                  </div>
-                </div>
-              ) : data ? (
-                <div className="results">
-                  <div className="_container _container_large">
-                    <div className="row">
-                      <div>
-                        <Header as='h2' block inverted textAlign='left'>
-                          <Icon name='grid layout' />
-                          <Header.Content>
-                            Matches
-                          </Header.Content>
-                        </Header>
-                        <Statistic.Group
-                          size='mini'
-                          items={ stat_items }
-                        />
-                        <Menu compact className="sort-dropdown">
-                          <Icon name='sort' size='large' bordered inverted />
-                          <Dropdown 
-                            item
-                            onChange={ this.sortOrderChange.bind(this) }
-                            value={ sortOrder }
-                            options={ utils.sortTypes }
+                    <Grid.Row>
+                      {this.getPaginationMenu()}
+                    </Grid.Row>
+                  </Grid.Column>
+                </Grid.Row>
+              </Grid>
+            </div>
+          </Tab.Pane>
+      },
+      
+      // Graphs Tab
+      { menuItem: { key: 'graphs', icon: 'bar graph', content: 'Custom Queries' },
+        render: () =>
+          <Tab.Pane attached={false}>
+            <div>
+              <Grid className='search-grid'>
+                { this.getPanelHeader() }
+                <Grid.Row>
+                  <Grid.Column width={4}>
+                  </Grid.Column>
+                  <Grid.Column width={8} textAlign='left'>
+
+                    <Grid.Row className='rrr'>
+                      {/* Top Rated Products Chart */}
+                      <Accordion fluid styled>
+                        <Accordion.Title
+                          active={activeGraphIndex[utils.TOP_RATED_GRAPH_ID] == 0}
+                          index={0}
+                          onClick={this.handleAccordionGraphClick.bind(this, utils.TOP_RATED_GRAPH_ID)}>
+                          <Icon name='dropdown' />
+                            How does this product sentiment trend over time?
+                        </Accordion.Title>
+                        <Accordion.Content 
+                          active={activeGraphIndex[utils.TOP_RATED_GRAPH_ID] == 0}
+                          className='graph-accordian'>
+                          <TopRatedChart
+                            products={products}
                           />
-                        </Menu>
-                      </div>
-                      <div>
-                        {this.getMatches()}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : error ? (
-                <div className="results">
-                  <div className="_container _container_large">
-                    <div className="row">
-                      {JSON.stringify(error)}
-                    </div>
-                  </div>
-                </div>
-              ) : null}
-            </Grid.Row>
-            <Divider clearing hidden/>
+                        </Accordion.Content>
+                      </Accordion>
 
-            {/* Pagination Menu */}
+                    </Grid.Row>
 
-            <Grid.Row>
-              {this.getPaginationMenu()}
-            </Grid.Row>
-          </Grid.Column>
+                    <Grid.Row className='rrr'>
+                      {/* Top 10 Review Topics Chart */}
+                      <Accordion fluid styled>
+                        <Accordion.Title
+                          active={activeGraphIndex[utils.TOPICS_GRAPH_ID] == 0}
+                          index={0}
+                          onClick={this.handleAccordionGraphClick.bind(this, utils.TOPICS_GRAPH_ID)}>
+                          <Icon name='dropdown' />
+                            How does this product compete with other products in the same category?
+                        </Accordion.Title>
+                        <Accordion.Content 
+                          active={activeGraphIndex[utils.TOPICS_GRAPH_ID] == 0}
+                          className='graph-accordian'>
+                          <CommonTopicsChart
+                            entities={entities}
+                            categories={categories}
+                            concepts={concepts}
+                            keywords={keywords}
+                            entityTypes={entityTypes}
+                          />
+                        </Accordion.Content>
+                      </Accordion>
+                    </Grid.Row>
 
-          <Grid.Column width={6}>
+                    <Grid.Row className='ttt'>
+                      {/* Trend Product Chart Region */}
+                      <Accordion fluid styled>
+                        <Accordion.Title
+                          active={activeGraphIndex[utils.SENTIMENT_GRAPH_ID] == 0}
+                          index={0}
+                          onClick={this.handleAccordionGraphClick.bind(this, utils.SENTIMENT_GRAPH_ID)}>
+                          <Icon name='dropdown' />
+                            How is the average rating given by this reviewer?
+                        </Accordion.Title>
+                        <Accordion.Content 
+                          active={activeGraphIndex[utils.SENTIMENT_GRAPH_ID] == 0}
+                          className='graph-accordian'>
+                          <ProductTrendChart
+                            productTrendData={productTrendData}
+                            productTrendLoading={productTrendLoading}
+                            productTrendError={productTrendError}
+                            products={products}
+                            productTrendProductId={productTrendProductId}
+                            onGetTrendDataRequest={this.fetchProductTrendData.bind(this)}
+                          />
+                        </Accordion.Content>
+                      </Accordion>
+                    </Grid.Row>
 
-            {/* Sentiment Chart Region */}
+                    <Grid.Row className='ttt'>
+                      {/* Average Sentiment for Top 10 Reviewers Chart */}
+                      <Accordion fluid styled>
+                        <Accordion.Title
+                          active={activeGraphIndex[utils.REVIEWER_GRAPH_ID] == 0}
+                          index={0}
+                          onClick={this.handleAccordionGraphClick.bind(this, utils.REVIEWER_GRAPH_ID)}>
+                          <Icon name='dropdown' />
+                            How does this product sentiment trend over time?
+                        </Accordion.Title>
+                        <Accordion.Content 
+                          active={activeGraphIndex[utils.REVIEWER_GRAPH_ID] == 0}
+                          className='graph-accordian'>
+                          <TrendChart
+                            trendData={trendData}
+                            trendLoading={trendLoading}
+                            trendError={trendError}
+                            entities={entities}
+                            categories={categories}
+                            concepts={concepts}
+                            keywords={keywords}
+                            entityTypes={entityTypes}
+                            term={trendTerm}
+                            onGetTrendDataRequest={this.fetchTrendData.bind(this)}
+                          />
+                        </Accordion.Content>
+                      </Accordion>
+                    </Grid.Row>
+                  </Grid.Column>
+                </Grid.Row>
+              </Grid>
+            </div>
+          </Tab.Pane>
+      }
+    ];
 
-            <Grid.Row className='rrr'>
-              <SentimentChart
-                entities={entities}
-                categories={categories}
-                concepts={concepts}
-                keywords={keywords}
-                entityTypes={entityTypes}
-                term={sentimentTerm}
-                onSentimentTermChanged={this.sentimentTermChanged.bind(this)}
-              />
-            </Grid.Row>
-
-            <Divider hidden/>
-            <Divider/>
-            <Divider hidden/>
-
-            {/* Trend Chart Region */}
-
-            <Grid.Row className='ttt'>
-              <div className="trend-chart">
-                <TrendChart
-                  trendData={trendData}
-                  trendLoading={trendLoading}
-                  trendError={trendError}
-                  entities={entities}
-                  categories={categories}
-                  concepts={concepts}
-                  keywords={keywords}
-                  entityTypes={entityTypes}
-                  term={trendTerm}
-                  onGetTrendDataRequest={this.getTrendData.bind(this)}
-                />
-              </div>
-            </Grid.Row>
-
-          </Grid.Column>
-        </Grid.Row>
-      </Grid>
+    return (
+      <div>
+        <Tab 
+          className='tab-content' 
+          menu={{ pointing: true }}
+          panes={panes} />
+      </div>
     );
   }
 }
@@ -1207,6 +1301,9 @@ Main.propTypes = {
   sentimentFilter: PropTypes.string,
   productIdFilter: PropTypes.string,
   reviewerIdFilter: PropTypes.string,
+  productTrendData: PropTypes.object,
+  productTrendError: PropTypes.object,
+  productTrendProductId: PropTypes.string,
   trendData: PropTypes.object,
   trendError: PropTypes.object,
   trendTerm: PropTypes.string,

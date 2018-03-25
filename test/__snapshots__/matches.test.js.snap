@@ -3,84 +3,151 @@
 exports[`renders correctly 1`] = `
 <div>
   <div
-    className="ui left aligned container"
+    className="ui fluid left aligned container"
   >
     <div
-      className="matches--list"
+      className="match-entry-list"
     >
       <div
         className="ui divided middle aligned list"
         role="list"
       >
-        <div
-          className="item"
-          data-value={undefined}
-          onClick={[Function]}
-          role="listitem"
-        >
+        <div>
           <div
-            className="content"
+            className="ui grid matches-grid"
           >
             <div
-              className="header"
+              className="row"
             >
               <div
-                className="description"
+                className="left floated twelve wide column"
               >
-                <span
-                  dangerouslySetInnerHTML={
-                    Object {
-                      "__html": "<div className=\\"description\\">test title<span style={Object { \\"backgroundColor\\": \\"#ffffb3\\" }}></span></div>",
-                    }
-                  }
-                />
+                <div
+                  className="ui list"
+                  role="list"
+                >
+                  <div
+                    className="item matches-list-item"
+                    data-value={undefined}
+                    onClick={[Function]}
+                    role="listitem"
+                  >
+                    <div
+                      className="content"
+                    >
+                      <div
+                        className="header"
+                      >
+                        <div
+                          className="description"
+                        >
+                          <span
+                            dangerouslySetInnerHTML={
+                              Object {
+                                "__html": "<div className=\\"description\\">test title<span style={Object { \\"backgroundColor\\": \\"#ffffb3\\" }}></span></div>",
+                              }
+                            }
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className="content"
+                    >
+                      <div
+                        className="description"
+                      >
+                        <span
+                          dangerouslySetInnerHTML={
+                            Object {
+                              "__html": "<div className=\\"description\\">I had a great time<span style={Object { \\"backgroundColor\\": \\"#ffffb3\\" }}></span></div>",
+                            }
+                          }
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                className="right floated four wide column"
+              >
+                <table
+                  className="ui small collapsing very compact table"
+                >
+                  <tbody
+                    className=""
+                  >
+                    <tr
+                      className=""
+                    >
+                      <td
+                        className=""
+                      >
+                        Date:
+                      </td>
+                      <td
+                        className=""
+                      >
+                        2014-11-01
+                      </td>
+                    </tr>
+                    <tr
+                      className=""
+                    >
+                      <td
+                        className=""
+                      >
+                        Rating:
+                      </td>
+                      <td
+                        className=""
+                      >
+                        1
+                      </td>
+                    </tr>
+                    <tr
+                      className=""
+                    >
+                      <td
+                        className=""
+                      >
+                        Helpfulness Rating:
+                      </td>
+                      <td
+                        className=""
+                      >
+                        50
+                        %
+                      </td>
+                    </tr>
+                    <tr
+                      className=""
+                    >
+                      <td
+                        className=""
+                      >
+                        Sentiment:
+                      </td>
+                      <td
+                        className=""
+                      >
+                        <a
+                          className="ui green mini label sentiment-value"
+                          onClick={[Function]}
+                        >
+                          0.76
+                        </a>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
           <div
-            className="content"
-          >
-            <div
-              className="description"
-            >
-              <span
-                dangerouslySetInnerHTML={
-                  Object {
-                    "__html": "<div className=\\"description\\">I had a great time<span style={Object { \\"backgroundColor\\": \\"#ffffb3\\" }}></span></div>",
-                  }
-                }
-              />
-            </div>
-          </div>
-          <div
-            className="content"
-          >
-            Rating: 
-            1.0000
-          </div>
-          <div
-            className="content"
-          >
-            Date: 
-            2014-11-01
-          </div>
-          <div
-            className="content"
-          >
-            Helpfulness Rating: 
-            %
-          </div>
-          <div
-            className="content"
-          >
-            Sentiment: 
-            <a
-              className="ui green tiny tag label sentiment-value"
-              onClick={[Function]}
-            >
-              0.76
-            </a>
-          </div>
+            className="ui clearing divider"
+          />
         </div>
       </div>
     </div>

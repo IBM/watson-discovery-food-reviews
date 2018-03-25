@@ -15,7 +15,7 @@
  */
 
 import React from 'react';
-import Matches from '../src/Matches';
+import Matches from '../src/components/Matches';
 import renderer from 'react-test-renderer';
 
 var match = {
@@ -28,7 +28,7 @@ var match = {
       'date': '2014-11-01',
       'sentimentLabel': 'positive',
       'sentimentScore': 0.761482,
-      'passage': { 'showPassage': false },
+      'helpRating': 50,
       'highlight': { 'showHighlight': false }
     }
   ]

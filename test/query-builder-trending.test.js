@@ -26,7 +26,7 @@ describe('Trending query builder returns params for discovery service', () => {
     expect(queryBuilderTrending.search()).toEqual({
       environment_id: 'environment',
       collection_id: 'collection',
-      aggregation: 'timeslice(date,1month).average(enriched_text.sentiment.document.score)'
+      aggregation: 'timeslice(date,1week,anomaly:true).average(enriched_text.sentiment.document.score)'
     });
   });
 
@@ -38,7 +38,7 @@ describe('Trending query builder returns params for discovery service', () => {
     })).toEqual({
       environment_id: 'environment',
       collection_id: 'collection',
-      aggregation: 'timeslice(date,1month).average(enriched_text.sentiment.document.score)',
+      aggregation: 'timeslice(date,1week,anomaly:true).average(enriched_text.sentiment.document.score)',
       query: 'enriched_text.categories.label::"test"',
       filter: 'enriched_text.categories.label::"test"',
       count: 500

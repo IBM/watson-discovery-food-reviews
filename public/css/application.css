@@ -646,8 +646,63 @@ input[type=radio]:checked + label.buttons-group--button {
   font-size: x-small !important;
 }
 
+div.blue.row.panel-header {
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
+
+div.blue.row.selection-header {
+  padding-top: 0px;
+}
+
+div.ui.segment.active.tab {
+  margin-top: 0px;
+  padding-top: 0px;
+  padding-left: 0px;
+  padding-right: 0px;
+  padding-bottom: 0px;
+  border-bottom-width: 0px;
+  border-top-width: 0px;
+}
+
+div.row.matches-grid-row {
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+}
+
 div.ui.celled.grid.search-grid {
   margin-top: 0px;
+}
+
+div.content.active.graph-accordian {
+  padding-bottom: 40px !important;
+}
+
+h1.ui.center.aligned.header {
+  color: rgb(70,70,70);
+}
+
+.sort.large.bordered.inverted.icon {
+  background-color: rgb(90,90,90) !important;
+}
+
+.ui.green.mini.label.sentiment-value {
+  color: rgb(0,0,0) !important;
+  background-color:  rgb(149, 223, 168) !important;
+}
+
+.ui.red.mini.label.sentiment-value {
+  color: rgb(0,0,0) !important;
+  background-color:  rgb(231, 134, 101) !important;
+}
+
+div.item.matches-list-item {
+  font-size: 16px;
+}
+
+table.ui.small.collapsing.very.compact.table {
+  font-size: 10px;
+  margin-top: 8px;
 }
 
 div.ui.icon.input.searchinput {
@@ -679,6 +734,10 @@ div.ui.search.selection.scrolling.dropdown.top-filter-class {
   margin-right: 10px;
 }
 
-button.ui.red.tiny.basic.compact.fluid.button {
+button.ui.red.tiny.basic.compact.button {
   margin-bottom: 15px;
+}
+
+h2.ui.block.inverted.left.aligned.header.graph-header {
+  height: 98px;
 }

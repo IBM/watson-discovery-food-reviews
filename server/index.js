@@ -26,7 +26,7 @@ const queryString = require('query-string');
 const queryBuilder = require('./query-builder');
 const queryTrendBuilder = require('./query-builder-trending');
 const WatsonDiscoverySetup = require('../lib/watson-discovery-setup');
-const watson = require('watson-developer-cloud');
+const DiscoveryV1 = require('watson-developer-cloud/discovery/v1');
 const utils = require('../lib/utils');
 
 /**
@@ -51,9 +51,8 @@ arrayOfFiles.forEach(function(file) {
 // out of memory errors.
 //discoveryDocs = discoveryDocs.slice(0,100);
 
-const discovery = watson.discovery({
+const discovery = new DiscoveryV1({
   // uname/pwd will be pulled in from VCAP_SERVICES or .env
-  version: 'v1',
   version_date: '2017-11-07'
 });
 
@@ -177,7 +176,7 @@ function createServer() {
     var searchQuery = req.params.searchQuery.replace(/\+/g, ' ');
     const qs = queryString.stringify({ 
       query: searchQuery,
-      count: 1000,
+      count: 2000,
       returnPassages: false,
       queryType: 'natural_language_query'
     });
@@ -234,7 +233,7 @@ function createServer() {
     console.log('Initial Search Query at start-up');
     const params = queryBuilder.search({ 
       natural_language_query: '',
-      count: 1000,
+      count: 2000,
       sort: '-Score',
       passages: false
     });
