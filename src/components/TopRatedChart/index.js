@@ -16,7 +16,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Grid } from 'semantic-ui-react';
+import { Grid, Header, Segment } from 'semantic-ui-react';
 import RC2 from 'react-chartjs-2';
 //const utils = require('../../../lib/utils');
 
@@ -98,6 +98,16 @@ export default class TopRatedChart extends React.Component {
 
     return (
       <div className="top-ranking-chart">
+        <Grid.Row className='query-header'>
+          <Header as='h5' textAlign='left'>
+            Key Concept: Aggregate on keywords in negative reviews.
+          </Header>
+          <Segment inverted size='mini' textAlign='left'>
+            {'filter=enriched_text.docSentiment.scores<=-0.25,product_id:[PRODUCT_ID]'}
+            <br/>
+            {'aggregation=term(enriched_text.keywords.name'}
+          </Segment>
+        </Grid.Row>
         <Grid.Row>
           <div className="top-ranking-chart">
             <RC2
