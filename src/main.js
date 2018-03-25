@@ -885,13 +885,90 @@ class Main extends React.Component {
       filtersOn = true;
     }
 
-    const panes = [
+    const queryTabs = [
+      { menuItem: { key: 'topChart', content: 'How does this product sentiment trend over time?' },
+        render: () =>
+          <div>
+            <Grid celled className='big-graph-grid'>
+              <Grid.Row className='selection-header'>
+                <Grid.Column width={16} textAlign='center'>
+                  <TopRatedChart
+                    products={products}
+                  />
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
+          </div>
+      },
+      { menuItem: { key: 'commonChart', content: 'How does this product compete with other products in the same category?' },
+        render: () =>
+        <div>
+          <Grid celled className='big-graph-grid'>
+            <Grid.Row className='selection-header'>
+              <Grid.Column width={16} textAlign='center'>
+                <CommonTopicsChart
+                  entities={entities}
+                  categories={categories}
+                  concepts={concepts}
+                  keywords={keywords}
+                  entityTypes={entityTypes}
+                />
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </div>
+      },
+      { menuItem: { key: 'productTrendChart', content: 'How is the average rating given by this reviewer?' },
+        render: () =>
+        <div>
+          <Grid celled className='big-graph-grid'>
+            <Grid.Row className='selection-header'>
+              <Grid.Column width={16} textAlign='center'>
+                <ProductTrendChart
+                  productTrendData={productTrendData}
+                  productTrendLoading={productTrendLoading}
+                  productTrendError={productTrendError}
+                  products={products}
+                  productTrendProductId={productTrendProductId}
+                  onGetTrendDataRequest={this.fetchProductTrendData.bind(this)}
+                />
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </div>
+      },
+      { menuItem: { key: 'trendChart', content: 'How does this product sentiment trend over time?' },
+        render: () =>
+        <div>
+          <Grid celled className='big-graph-grid'>
+            <Grid.Row className='selection-header'>
+              <Grid.Column width={16} textAlign='center'>
+                <TrendChart
+                  trendData={trendData}
+                  trendLoading={trendLoading}
+                  trendError={trendError}
+                  entities={entities}
+                  categories={categories}
+                  concepts={concepts}
+                  keywords={keywords}
+                  entityTypes={entityTypes}
+                  term={trendTerm}
+                  onGetTrendDataRequest={this.fetchTrendData.bind(this)}
+                />
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </div>
+      }
+    ];
+     
+    const mainTabs = [
       // dashboard tab
       { menuItem: { key: 'dashboard', icon: 'dashboard', content: 'Dashboard' },
         render: () =>
-          <Tab.Pane attached={false}>
+          <Tab.Pane attached='bottom'>
             <div>
-              <Grid className='search-grid'>
+              <Grid celled className='search-grid'>
                 { this.getPanelHeader() }
                 <Grid.Row className='selection-header' color={'blue'}>
                   <Grid.Column width={16} textAlign='center'>
@@ -1009,10 +1086,10 @@ class Main extends React.Component {
                   
                   {/* Results */}
 
-                  <Grid.Column width={13}>
+                  <Grid.Column width={9}>
                     <Grid.Row>
                       <Header as='h2' block inverted textAlign='left'>
-                        <Icon name='grid layout' />
+                        <Icon name='list layout' />
                         <Header.Content>
                           Reviews
                           <Header.Subheader>
@@ -1070,6 +1147,31 @@ class Main extends React.Component {
                       {this.getPaginationMenu()}
                     </Grid.Row>
                   </Grid.Column>
+
+                  <Grid.Column width={4}>
+
+                  {/* Sentiment Chart Region */}
+
+                    <Grid.Row className='rrr'>
+                      <Header as='h2' block inverted textAlign='left'>
+                        <Icon name='pie chart' />
+                        <Header.Content>
+                          Sentiment Chart
+                          <Header.Subheader>
+                            Sentiment scores by percentage
+                          </Header.Subheader>
+                        </Header.Content>
+                      </Header>
+                      <CommonTopicsChart
+                        entities={entities}
+                        categories={categories}
+                        concepts={concepts}
+                        keywords={keywords}
+                        entityTypes={entityTypes}
+                      />
+                      </Grid.Row>
+                  </Grid.Column>
+
                 </Grid.Row>
               </Grid>
             </div>
@@ -1079,113 +1181,23 @@ class Main extends React.Component {
       // Graphs Tab
       { menuItem: { key: 'graphs', icon: 'bar graph', content: 'Custom Queries' },
         render: () =>
-          <Tab.Pane attached={false}>
+          <Tab.Pane attached='bottom'>
             <div>
-              <Grid className='search-grid'>
+              <Grid className='search-grid' celled>
                 { this.getPanelHeader() }
-                <Grid.Row>
-                  <Grid.Column width={4}>
+                <Grid.Row color={'blue'}>
+                  <Grid.Column width={16} verticalAlign='middle' textAlign='center'>
+                    <Header className='graph-panel-subheader' as='h3' textAlign='center'>
+                      Custom Queries to Analyze Trends and Formulate Insights
+                    </Header>
                   </Grid.Column>
-                  <Grid.Column width={8} textAlign='left'>
-
-                    <Grid.Row className='rrr'>
-                      {/* Top Rated Products Chart */}
-                      <Accordion fluid styled>
-                        <Accordion.Title
-                          active={activeGraphIndex[utils.TOP_RATED_GRAPH_ID] == 0}
-                          index={0}
-                          onClick={this.handleAccordionGraphClick.bind(this, utils.TOP_RATED_GRAPH_ID)}>
-                          <Icon name='dropdown' />
-                            How does this product sentiment trend over time?
-                        </Accordion.Title>
-                        <Accordion.Content 
-                          active={activeGraphIndex[utils.TOP_RATED_GRAPH_ID] == 0}
-                          className='graph-accordian'>
-                          <TopRatedChart
-                            products={products}
-                          />
-                        </Accordion.Content>
-                      </Accordion>
-
-                    </Grid.Row>
-
-                    <Grid.Row className='rrr'>
-                      {/* Top 10 Review Topics Chart */}
-                      <Accordion fluid styled>
-                        <Accordion.Title
-                          active={activeGraphIndex[utils.TOPICS_GRAPH_ID] == 0}
-                          index={0}
-                          onClick={this.handleAccordionGraphClick.bind(this, utils.TOPICS_GRAPH_ID)}>
-                          <Icon name='dropdown' />
-                            How does this product compete with other products in the same category?
-                        </Accordion.Title>
-                        <Accordion.Content 
-                          active={activeGraphIndex[utils.TOPICS_GRAPH_ID] == 0}
-                          className='graph-accordian'>
-                          <CommonTopicsChart
-                            entities={entities}
-                            categories={categories}
-                            concepts={concepts}
-                            keywords={keywords}
-                            entityTypes={entityTypes}
-                          />
-                        </Accordion.Content>
-                      </Accordion>
-                    </Grid.Row>
-
-                    <Grid.Row className='ttt'>
-                      {/* Trend Product Chart Region */}
-                      <Accordion fluid styled>
-                        <Accordion.Title
-                          active={activeGraphIndex[utils.SENTIMENT_GRAPH_ID] == 0}
-                          index={0}
-                          onClick={this.handleAccordionGraphClick.bind(this, utils.SENTIMENT_GRAPH_ID)}>
-                          <Icon name='dropdown' />
-                            How is the average rating given by this reviewer?
-                        </Accordion.Title>
-                        <Accordion.Content 
-                          active={activeGraphIndex[utils.SENTIMENT_GRAPH_ID] == 0}
-                          className='graph-accordian'>
-                          <ProductTrendChart
-                            productTrendData={productTrendData}
-                            productTrendLoading={productTrendLoading}
-                            productTrendError={productTrendError}
-                            products={products}
-                            productTrendProductId={productTrendProductId}
-                            onGetTrendDataRequest={this.fetchProductTrendData.bind(this)}
-                          />
-                        </Accordion.Content>
-                      </Accordion>
-                    </Grid.Row>
-
-                    <Grid.Row className='ttt'>
-                      {/* Average Sentiment for Top 10 Reviewers Chart */}
-                      <Accordion fluid styled>
-                        <Accordion.Title
-                          active={activeGraphIndex[utils.REVIEWER_GRAPH_ID] == 0}
-                          index={0}
-                          onClick={this.handleAccordionGraphClick.bind(this, utils.REVIEWER_GRAPH_ID)}>
-                          <Icon name='dropdown' />
-                            How does this product sentiment trend over time?
-                        </Accordion.Title>
-                        <Accordion.Content 
-                          active={activeGraphIndex[utils.REVIEWER_GRAPH_ID] == 0}
-                          className='graph-accordian'>
-                          <TrendChart
-                            trendData={trendData}
-                            trendLoading={trendLoading}
-                            trendError={trendError}
-                            entities={entities}
-                            categories={categories}
-                            concepts={concepts}
-                            keywords={keywords}
-                            entityTypes={entityTypes}
-                            term={trendTerm}
-                            onGetTrendDataRequest={this.fetchTrendData.bind(this)}
-                          />
-                        </Accordion.Content>
-                      </Accordion>
-                    </Grid.Row>
+                </Grid.Row>
+                <Grid.Row>
+                  <Grid.Column width={16} textAlign='center'>
+                    <Tab 
+                      className='tab-content' 
+                      menu={{ pointing: true, vertical: true, fluid: true, tabular: 'right' }}
+                      panes={queryTabs} />
                   </Grid.Column>
                 </Grid.Row>
               </Grid>
@@ -1199,7 +1211,7 @@ class Main extends React.Component {
         <Tab 
           className='tab-content' 
           menu={{ pointing: true }}
-          panes={panes} />
+          panes={mainTabs} />
       </div>
     );
   }

@@ -636,7 +636,9 @@ input[type=radio]:checked + label.buttons-group--button {
   padding: 6px;
 }
 
+/****************************************/
 /* overrides for semantic-ui components */
+/****************************************/
 
 .ui.centered.fluid.card {
   background: #d9e5ef;
@@ -647,8 +649,8 @@ input[type=radio]:checked + label.buttons-group--button {
 }
 
 div.blue.row.panel-header {
-  padding-top: 30px;
-  padding-bottom: 30px;
+  padding-top: 5px !important;
+  padding-bottom: 5px !important;
 }
 
 div.blue.row.selection-header {
@@ -674,11 +676,33 @@ div.ui.celled.grid.search-grid {
   margin-top: 0px;
 }
 
+div.ui.pointing.menu {
+  margin-bottom: 0px;
+}
+
+div.row.query-header {
+  margin-bottom: 12px;
+}
+
+h3.ui.center.aligned.header.graph-panel-subheader {
+  padding-top: 10px;
+  padding-bottom: 8px;
+}
+
 div.content.active.graph-accordian {
   padding-bottom: 40px !important;
 }
 
+div.ui.celled.grid.big-graph-grid {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
 h1.ui.center.aligned.header {
+  color: rgb(70,70,70);
+}
+
+h3.ui.center.aligned.header {
   color: rgb(70,70,70);
 }
 
@@ -697,7 +721,7 @@ h1.ui.center.aligned.header {
 }
 
 div.item.matches-list-item {
-  font-size: 16px;
+  font-size: 14px;
 }
 
 table.ui.small.collapsing.very.compact.table {
