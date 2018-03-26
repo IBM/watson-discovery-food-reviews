@@ -51,21 +51,22 @@ const Match = props => (
             <Table.Body>
               <Table.Row>
                 <Table.Cell>Date:</Table.Cell>
-                <Table.Cell>{ props.date }</Table.Cell>
+                <Table.Cell className='ratings-data-value'>{ props.date }</Table.Cell>
               </Table.Row>
               <Table.Row>
                 <Table.Cell >Rating:</Table.Cell>
-                <Table.Cell>{ props.score }</Table.Cell>
+                <Table.Cell className='ratings-data-value'>{ props.score }</Table.Cell>
               </Table.Row>
               <Table.Row>
                 <Table.Cell>
                   Helpfulness Rating:
                 </Table.Cell>
-                <Table.Cell>{ props.helpRating }%</Table.Cell>
+                <Table.Cell className='ratings-data-value'>{ props.helpRating }%</Table.Cell>
               </Table.Row>
               <Table.Row>
                 <Table.Cell>Sentiment:</Table.Cell>
-                <Table.Cell>
+                <Table.Cell  className='ratings-data-value'
+                  style={{backgroundColor: props.sentimentColor}}>
                   { props.sentiment }
                 </Table.Cell>
               </Table.Row>
@@ -87,7 +88,8 @@ Match.propTypes = {
   date: PropTypes.string.isRequired,
   score: PropTypes.number.isRequired,
   helpRating: PropTypes.number.isRequired,
-  sentiment: PropTypes.object.isRequired
+  sentiment: PropTypes.number.isRequired,
+  sentimentColor: PropTypes.string.isRequired
 };
 
 const Matches = props => (
@@ -104,8 +106,9 @@ const Matches = props => (
               highlightText={ item.highlightText }
               score={ item.score }
               date={ item.date }
-              helpRating = { item.helpRating }
-              sentiment={ getSentiment(item) }
+              helpRating ={ item.helpRating }
+              sentiment={ Math.round(item.sentimentScore * 100) / 100 }
+              sentimentColor={ getSentimentColor(item) }
             />)
           }
         </List>
@@ -156,27 +159,15 @@ const getText = (item) => {
 };
 
 /**
- * getSentiment - determine which icon to display to represent
- * positive, negative, and neutral sentiment.
+ * getSentimentColor - set background color for cell based on 
+ * positive or negative sentiment.
  */
-const getSentiment = item => {
-  var score = Math.round(item.sentimentScore * 100) / 100;
-  var color = 'white';
-  switch (item.sentimentLabel) {
-  case 'negative': 
-    color='red';
-    break;
-  case 'positive': 
-    color='green';
-    break;
+const getSentimentColor = item => {
+  if (item.sentimentLabel === 'negative') {
+    return 'rgb(231, 134, 101)';
+  } else {
+    return 'rgb(149, 223, 168)';
   }
-
-  return <Label 
-    className='sentiment-value' 
-    as='a'
-    color={ color }
-    size='mini'> 
-    { score  }</Label>;  
 };
 
 // export so we are visible to parent

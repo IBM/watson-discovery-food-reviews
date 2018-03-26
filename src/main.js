@@ -1138,15 +1138,6 @@ class Main extends React.Component {
                     {/* Sentiment Chart Region */}
 
                     <Grid.Row className='rrr'>
-                      <Header as='h2' block inverted textAlign='left'>
-                        <Icon name='pie chart' />
-                        <Header.Content>
-                          Sentiment Chart
-                          <Header.Subheader>
-                            Sentiment scores by percentage
-                          </Header.Subheader>
-                        </Header.Content>
-                      </Header>
                       <SentimentChart
                         entities={entities}
                         categories={categories}
