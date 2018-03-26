@@ -2,7 +2,7 @@
 declared-services:
   wdfr-discovery-service:
     label: discovery
-    plan: standard
+    plan: lite
 applications:
 - path: .
   name: watson-discovery-food-reviews
