@@ -16,7 +16,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Container, List, Label, Table, Grid, Divider } from 'semantic-ui-react';
+import { Container, List, Table, Grid, Divider } from 'semantic-ui-react';
 
 /**
  * This object renders the results of the search query on the web page. 
