@@ -28,7 +28,7 @@ import EntityTypesFilter from './components/EntityTypesFilter';
 import TopRatedChart from './components/TopRatedChart';
 import ProductTrendChart from './components/ProductTrendChart';
 import TrendChart from './components/TrendChart';
-// import SentimentChart from './components/SentimentChart';
+import SentimentChart from './components/SentimentChart';
 import CommonTopicsChart from './components/CommonTopicsChart';
 import { Tab, Grid, Dimmer, Button, Menu, Dropdown, Divider, Loader, Accordion, Icon, Header, Statistic } from 'semantic-ui-react';
 const utils = require('../lib/utils');
@@ -848,8 +848,8 @@ class Main extends React.Component {
       selectedConcepts,selectedKeywords, selectedEntityTypes,
       numMatches, numPositive, numNeutral, numNegative,
       productTrendData, productTrendLoading, productTrendError, productTrendProductId,
-      trendData, trendLoading, trendError, trendTerm, // sentimentTerm
-      sortOrder } = this.state;
+      trendData, trendLoading, trendError, trendTerm, 
+      sentimentTerm, sortOrder } = this.state;
 
     // used for filter accordions
     const { activeFilterIndex } = this.state;
@@ -1147,12 +1147,14 @@ class Main extends React.Component {
                           </Header.Subheader>
                         </Header.Content>
                       </Header>
-                      <CommonTopicsChart
+                      <SentimentChart
                         entities={entities}
                         categories={categories}
                         concepts={concepts}
                         keywords={keywords}
                         entityTypes={entityTypes}
+                        term={sentimentTerm}
+                        onSentimentTermChanged={this.sentimentTermChanged.bind(this)}
                       />
                     </Grid.Row>
                   </Grid.Column>

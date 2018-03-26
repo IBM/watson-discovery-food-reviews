@@ -140,14 +140,14 @@ export default class SentimentChart extends React.Component {
         ],
         // colors for each piece of the graph
         backgroundColor: [
-          'rgba(0,255,0,0.6)',
+          'rgb(149, 223, 168)',
           'rgba(192,192,192,0.6)',
-          'rgba(255,0,0,0.6)'
+          'rgb(231, 134, 101)',
         ],
         hoverBackgroundColor: [
-          'rgba(0,255,0,0.6)',
+          'rgb(149, 223, 168)',
           'rgba(192,192,192,0.6)',
-          'rgba(255,0,0,0.6)'
+          'rgb(231, 134, 101)',
         ]
       }]
     };
