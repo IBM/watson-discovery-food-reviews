@@ -725,8 +725,13 @@ div.item.matches-list-item {
 }
 
 table.ui.small.collapsing.very.compact.table {
-  font-size: 10px;
+  font-size: 11px;
   margin-top: 8px;
+  float: right;
+}
+
+td.ratings-data-value {
+  color:  #7C6767;
 }
 
 div.ui.icon.input.searchinput {

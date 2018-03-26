@@ -87,7 +87,7 @@ exports[`renders correctly 1`] = `
                         Date:
                       </td>
                       <td
-                        className=""
+                        className="ratings-data-value"
                       >
                         2014-11-01
                       </td>
@@ -101,7 +101,7 @@ exports[`renders correctly 1`] = `
                         Rating:
                       </td>
                       <td
-                        className=""
+                        className="ratings-data-value"
                       >
                         1
                       </td>
@@ -115,7 +115,7 @@ exports[`renders correctly 1`] = `
                         Helpfulness Rating:
                       </td>
                       <td
-                        className=""
+                        className="ratings-data-value"
                       >
                         50
                         %
@@ -130,14 +130,14 @@ exports[`renders correctly 1`] = `
                         Sentiment:
                       </td>
                       <td
-                        className=""
+                        className="ratings-data-value"
+                        style={
+                          Object {
+                            "backgroundColor": "rgb(149, 223, 168)",
+                          }
+                        }
                       >
-                        <a
-                          className="ui green mini label sentiment-value"
-                          onClick={[Function]}
-                        >
-                          0.76
-                        </a>
+                        0.76
                       </td>
                     </tr>
                   </tbody>

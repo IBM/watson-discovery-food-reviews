@@ -16,7 +16,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Menu, Dropdown, Divider } from 'semantic-ui-react';
+import { Menu, Dropdown, Divider, Header, Icon } from 'semantic-ui-react';
 import { Doughnut } from 'react-chartjs-2';
 const utils = require('../../../lib/utils');
 
@@ -248,7 +248,7 @@ export default class SentimentChart extends React.Component {
 
     return (
       <div>
-        {/* <Header as='h2' block inverted textAlign='left'>
+        <Header as='h2' block inverted textAlign='left'>
           <Icon name='pie chart' />
           <Header.Content>
             Sentiment Chart
@@ -256,7 +256,7 @@ export default class SentimentChart extends React.Component {
               Sentiment scores by percentage
             </Header.Subheader>
           </Header.Content>
-        </Header> */}
+        </Header>
         <Menu compact floated={true}>
           <Dropdown 
             item
