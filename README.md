@@ -23,6 +23,8 @@ When the reader has completed this Code Pattern, they will understand how to:
 * Create UI components to represent enriched data created by the Watson Discovery Service.
 * Build a complete web app that utilizes popular JavaScript technologies to feature Watson Discovery Service data and enrichments.
 
+![](images/architecture.png)
+
 ## Flow
 1. The food review json files are added to the Discovery collection.
 2. The user interacts with the backend server via the app UI. The frontend app UI uses React to render search results and can reuse all of the views that are used by the backend for server side rendering. The frontend is using semantic-ui-react components and is responsive.
