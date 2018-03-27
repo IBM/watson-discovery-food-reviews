@@ -828,7 +828,7 @@ class Main extends React.Component {
 
   getPanelHeader() {
     return (
-      <Grid.Row className='panel-header' color={'blue'}>
+      <Grid.Row className='main-panel-header'>
         <Grid.Column width={16} verticalAlign='middle' textAlign='center'>
           <Header as='h1' textAlign='center'>
             Food Review Data
@@ -969,7 +969,7 @@ class Main extends React.Component {
 
                   {/* Drop-Down Filters */}
 
-                  <Grid.Column width={3}>
+                  <Grid.Column className='main-panel-column' width={3}>
                     <Header as='h2' block inverted textAlign='left'>
                       <Icon name='filter' />
                       <Header.Content>
@@ -1071,7 +1071,7 @@ class Main extends React.Component {
                   
                   {/* Results */}
 
-                  <Grid.Column width={9}>
+                  <Grid.Column className='main-panel-column' width={9}>
                     <Grid.Row>
                       <Header as='h2' block inverted textAlign='left'>
                         <Icon name='list layout' />
@@ -1133,7 +1133,7 @@ class Main extends React.Component {
                     </Grid.Row>
                   </Grid.Column>
 
-                  <Grid.Column width={4}>
+                  <Grid.Column className='main-panel-column' width={4}>
 
                     {/* Sentiment Chart Region */}
 
@@ -1187,9 +1187,9 @@ class Main extends React.Component {
     return (
       <div>
         <Tab 
-          className='tab-content' 
-          menu={{ pointing: true }}
-          panes={mainTabs} />
+          className='tab-content'
+          menu={{ inverted: true, attached: true }}
+          panes={ mainTabs } />
       </div>
     );
   }

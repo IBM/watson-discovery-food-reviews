@@ -140,16 +140,17 @@ export default class SentimentChart extends React.Component {
         ],
         // colors for each piece of the graph
         backgroundColor: [
-          'rgb(149, 223, 168)',
+          'rgb(115, 203, 173)',
           'rgba(192,192,192,0.6)',
-          'rgb(231, 134, 101)',
+          'rgb(227, 122, 110)',
         ],
         hoverBackgroundColor: [
-          'rgb(149, 223, 168)',
+          'rgb(115, 203, 173)',
           'rgba(192,192,192,0.6)',
-          'rgb(231, 134, 101)',
+          'rgb(227, 122, 110)',
         ]
-      }]
+      }],
+      maintainAspectRatio: false
     };
     return ret;
   }
@@ -279,6 +280,8 @@ export default class SentimentChart extends React.Component {
           <Doughnut 
             data={ this.getChartData() }
             options={ options }
+            width={300}
+            height={400}
           />       
         </div>
       </div>

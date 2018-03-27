@@ -164,9 +164,9 @@ const getText = (item) => {
  */
 const getSentimentColor = item => {
   if (item.sentimentLabel === 'negative') {
-    return 'rgb(231, 134, 101)';
+    return 'rgb(227, 122, 110)';
   } else {
-    return 'rgb(149, 223, 168)';
+    return 'rgb(115, 203, 173)';
   }
 };
 
