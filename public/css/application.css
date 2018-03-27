@@ -688,6 +688,10 @@ div.ui.inverted.menu {
   background-color: rgb(20,72,126);
 }
 
+div.ui.inverted.attached.menu a.active.item {
+  background-color: #2185d0;
+}
+
 div.row.query-header {
   margin-bottom: 12px;
 }
