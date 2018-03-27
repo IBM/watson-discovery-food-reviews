@@ -3,7 +3,9 @@
 
 # Discovery customer sentiment from product reviews
 
-In this Code Pattern, we walk you through a working example of a web application that queries and manipulates data from the Watson Discovery Service. This web app contains multiple UI components that you can use as a starting point for developing your own Watson Discovery Service applications. 
+In this Code Pattern, we walk you through a working example of a web application that queries and manipulates data from the Watson Discovery Service. With the aid of data modeling using the Watson Knowledge Studio service, the data will have additional enrichments that will provide improved insights for user analysis.
+
+This web app contains multiple UI components that you can use as a starting point for developing your own Watson Discovery and Knowledge Studio service applications. 
 
 The main benefit of using the Watson Discovery Service is its powerful analytics engine that provides cognitive enrichments and insights into your data. This app provides examples of how to showcase these enrichments through the use of filters, lists and graphs. The key enrichments that we will focus on are:
 
@@ -15,31 +17,30 @@ The main benefit of using the Watson Discovery Service is its powerful analytics
 * Relations - 
 * Sentiment - the overall positive or negative sentiment of each document.
 
+With Watson Knowledge Studio (WKS), data modeling can be used to inform Watson Discovery of additional entities and relationships that go beyond its default entity extraction and enrichment process. Through the use of annotations, the user can indicate entities and entity relationships on a small subset of documents, which can then be applied to a much larger set of similar documents. This model can then be applied to a Watson Discovery service instance and encorporated into the Discovery enrichment process as documents are uploaded into the service. 
+
 For this Code Pattern, we will be using data that contains food reviews.
 
 When the reader has completed this Code Pattern, they will understand how to:
+* Use Watson Knowledge Studio to create a data model.
+* Deploy a WKS model to Watson Discovery.
 * Load and enrich data in the Watson Discovery Service.
 * Query and manipulate data in the Watson Discovery Service.
 * Create UI components to represent enriched data created by the Watson Discovery Service.
 * Build a complete web app that utilizes popular JavaScript technologies to feature Watson Discovery Service data and enrichments.
 
-![](images/architecture.png)
+![](doc/source/images/architecture.png)
 
 ## Flow
-1. The food review json files are added to the Discovery collection.
-2. The user interacts with the backend server via the app UI. The frontend app UI uses React to render search results and can reuse all of the views that are used by the backend for server side rendering. The frontend is using semantic-ui-react components and is responsive.
-3. User input is processed and routed to the backend server, which is responsible for server side rendering of the views to be displayed on the browser. The backend server is written using express and uses express-react-views engine to render views written using React.
-4. The backend server sends user requests to the Watson Discovery Service. It acts as a proxy server, forwarding queries from the frontend to the Watson Discovery Service API while keeping sensitive API keys concealed from the user.
+1. A sample set of review documents are loaded into WKS for annotation.
+2. A WKS model is created.
+3. The WKS model is applied to a Watson Discovery service instance.
+4. The food review json files are added to the Discovery collection.
+5. The user interacts with the backend server via the app UI. The frontend app UI uses React to render search results and can reuse all of the views that are used by the backend for server side rendering. The frontend is using semantic-ui-react components and is responsive.
+6. User input is processed and routed to the backend server, which is responsible for server side rendering of the views to be displayed on the browser. The backend server is written using express and uses express-react-views engine to render views written using React.
+7. The backend server sends user requests to the Watson Discovery Service. It acts as a proxy server, forwarding queries from the frontend to the Watson Discovery Service API while keeping sensitive API keys concealed from the user.
 
-### How does Watson Knowledge Studio work?
-
-The image below explains the process of how Watson Knowledge Studio works in light detail. For greater detail see Steps [4. Upload Type System](#4-upload-type-system) through [9. Deploy the machine learning model to NLU](#9-deploy-the-machine-learning-model-to-nlu).
-
-![](doc/source/images/wks-nlu-process.png)
-
-In short, a type system is built and supporting documents are uploaded that have domain specific wording. From here a model must be built to properly understand the documents, this is where the annotations come in. Once the corpus and annotations are set you are free to create a model and deploy it to a Watson Natural Language Understanding instance.
-
-> Note: see [DEVELOPING.md](DEVELOPING.md) for project structure.
+> NOTE: see [DEVELOPING.md](DEVELOPING.md) for project structure.
 
 ## Included components
 * [Watson Discovery](https://www.ibm.com/watson/developercloud/discovery.html): A cognitive search and content analytics engine for applications to identify patterns, trends, and actionable insights.
@@ -61,23 +62,33 @@ Use the ``Deploy to IBM Cloud`` button **OR** create the services and run locall
 
 [![Deploy to IBM Cloud](https://metrics-tracker.mybluemix.net/stats/c612c58fcbb9552f348a4e0e5e148846/button.svg)](https://bluemix.net/deploy?repository=https://github.com/IBM/watson-discovery-food-reviews)
 
-1. Press the above ``Deploy to IBM Cloud`` button and then click on ``Deploy``.
+1. Due to the requirement that the Watson Discovery service has to exist before a WKS model can be applied, you must first create the Discovery service manually by going to the following link: [**Watson Discovery**](https://console.ng.bluemix.net/catalog/services/discovery).
 
-2. In Toolchains, click on Delivery Pipeline to watch while the app is deployed. Once deployed, the app can be viewed by clicking 'View app'.
+2. Rename your service to: `wdfr-discovery-service`.
+
+3. Press the above ``Deploy to IBM Cloud`` button and then click on ``Deploy``.
+
+4. In Toolchains, click on Delivery Pipeline to watch while the app is deployed. Once deployed, the app can be viewed by clicking 'View app'.
 
 ![](doc/source/images/toolchain-pipeline.png)
 
-3. To see the app and services created and configured for this journey, use the IBM Cloud dashboard. The app is named `watson-discovery-food-reviews` with a unique suffix. The following services are created and easily identified by the `wdfr-` prefix:
-    * wdfr-discovery-service
+5. To see the app created and configured for this journey, use the IBM Cloud dashboard. The app is named `watson-discovery-food-reviews` with a unique suffix. 
 
 ## Run locally
 > NOTE: These steps are only needed when running locally instead of using the ``Deploy to IBM Cloud`` button.
 
 1. [Clone the repo](#1-clone-the-repo)
 2. [Create IBM Cloud services](#2-create-ibm-cloud-services)
-3. [Load the Discovery files](#3-load-the-discovery-files)
-4. [Configure credentials](#4-configure-credentials)
-5. [Run the application](#5-run-the-application)
+3. [Create a Watson Knowledge Studio workspace](#3-create-a-watson-knowledge-studio-workspace)
+4. [Upload Type System](#4-upload-type-system)
+5. [Import Corpus Documents](#5-import-corpus-documents)
+6. [Create an Annotation Set](#6-create-an-annotation-set)
+7. [Create a Task for Human Annotation](#7-create-a-task-for-human-annotation)
+8. [Create the model](#8-create-the-model)
+9. [Deploy the machine learning model to Watson Discovery](#9-deploy-the-machine-learning-model-to-watson-discovery)
+10. [Load the Discovery files](#3-load-the-discovery-files)
+11. [Configure credentials](#4-configure-credentials)
+12. [Run the application](#5-run-the-application)
 
 ### 1. Clone the repo
 ```
@@ -89,8 +100,87 @@ $ git clone https://github.com/IBM/watson-discovery-food-reviews
 Create the following services:
 
 * [**Watson Discovery**](https://console.ng.bluemix.net/catalog/services/discovery)
+* [**Watson Knowledge Studio**](https://console.bluemix.net/catalog/services/knowledge-studio)
 
-### 3. Load the Discovery files
+## 3. Create a Watson Knowledge Studio workspace
+
+Launch the **WKS** tool and create a new **workspace**.
+
+## 4. Upload Type System
+
+A type system allows us to define things that are specific to review documents. The type system controls how content can be annotated by defining the types of entities that can be labeled and how relationships among different entities can be labeled.
+
+## 5. Import Corpus Documents
+
+Corpus documents are required to train our machine-learning annotator component. For this Code Pattern, the corpus documents will contain example review documents.
+
+## 6. Create an Annotation Set
+
+Once the corpus documents are loaded, we can start the human annotation process. This begins by dividing the corpus into multiple document sets and assigning the document sets to human annotators (for this Code Pattern, we will just be using using one document set and one annotator).
+
+From the **Access & Tools -> Documents** panel, press the **Create Annotation Sets** button. Select a valid **Annotator** user, and provide a unique name for **Set name**.
+
+## 7. Create a Task for Human Annotation
+
+Add a task for human annotation by creating a task and assigning it annotation sets.
+
+From the **Access & Tools -> Documents** panel, select the **Task** tab and press the **Add Task** button.
+
+### 7.1 Start the Human Annotation task
+
+Click on the task card to view the task details panel.
+
+Click the **Annotate** button to start the **Human Annotation** task.
+
+If you select any of the documents in the list, the **Document Annotation** panel will be displayed. Since we previously imported the corpus documents, the entity and relationship annotations are already completed (as shown in the following examples). You can annotate mentions (occurrences of words/phrases which can be annotated as an entity) to play around, or you can modify one by annotating mentions with a different entity.
+
+### 7.2 Submit Annotation Set
+
+From the **Task** details panel, press the **Submit All Documents** button.
+
+All documents should change status to **Completed**.
+
+Press the blue "File" icon to toggle back to the **Task** panel, which will show the completion percentage for each task.
+
+From the **Access & Tools -> Documents** panel, select the **Task** tab and select the task to view the details panel.
+
+Select your **Annotation Set Name** and then press the **Accept** button. This step is required to ensure that the annotation set is considered **ground truth**.
+
+> NOTE: The objective of the annotation project is to obtain ground truth, the collection of vetted data that is used to adapt WKS to a particular domain.
+
+**Status** should now be set to **COMPLETED**.
+
+## 8. Create the model
+
+Go to the **Model Management -> Performance** panel, and press the **Train and evaluate** button.
+
+From the **Document Set** name list, select the **Annotation Set Name** you created previously and press the **Train & Evaluate** button.
+
+This process may take several minutes to complete. Progress will be shown in the upper right corner of the panel.
+
+> Note: In practice, you would create separate annotation sets (each containing thousands of messages) for training and evaluation.
+
+Once complete, you will see the results of the train and evaluate process.
+
+You can view the log files of the process by clicking the **View Log** button.
+
+## 9. Deploy the machine learning model to Watson Discovery
+
+Now we can deploy our new model to the already created **Watson Discovery** service. Navigate to the **Version** menu on the left and press **Take Snapshot**.
+
+The snapshot version will now be available for deployment to Watson Discovery.
+
+To start the process, click the **Deploy** button associated with your snapshot version.
+
+Select the option to deploy to **Discovery**.
+
+Then enter your IBM Cloud account information to locate your **Discovery** service to deploy to.
+
+Once deployed, a **Model ID** will be created. Keep note of this value as it will be required later in this Code Pattern.
+
+> NOTE: You can also view this **Model ID** by pressing the **Discovery** button listed with your snapshot version.
+
+### 10. Load the Discovery files
 
 Launch the **Watson Discovery** tool. Create a **new data collection**
 and give the data collection a unique name.
@@ -113,7 +203,7 @@ From the new collection data panel, under `Add data to this collection` use `Dra
 
 > Save the **environment_id** and **collection_id** for your `.env` file in the next step.
 
-### 4. Configure credentials
+### 11. Configure credentials
 ```
 cp env.sample .env
 ```
@@ -136,11 +226,15 @@ DISCOVERY_COLLECTION_ID=<add_discovery_collection>
 
 ```
 
-### 5. Run the application
+### 12. Run the application
 1. Install [Node.js](https://nodejs.org/en/) runtime or NPM.
 1. Start the app by running `npm install`, followed by `npm start`.
 1. Access the UI by pointing your browser at `localhost:3000`.
 > Note: `PORT` can be configured in `.env`.
+
+# Sample UI layout
+ 
+![](doc/source/images/sample-output.png)
 
 # Troubleshooting
 
