@@ -70,7 +70,7 @@ export default class TopRatedChart extends React.Component {
       datasets: [{
         label: 'Scores (range 0.0 to 5.0)',
         data: scores,
-        backgroundColor: 'rgb(149, 223, 168)'
+        backgroundColor: 'rgb(115, 203, 173)'
       }]
     };
 

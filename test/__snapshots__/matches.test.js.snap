@@ -133,7 +133,7 @@ exports[`renders correctly 1`] = `
                         className="ratings-data-value"
                         style={
                           Object {
-                            "backgroundColor": "rgb(149, 223, 168)",
+                            "backgroundColor": "rgb(115, 203, 173)",
                           }
                         }
                       >

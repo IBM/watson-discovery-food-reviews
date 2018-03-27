@@ -11,6 +11,8 @@ The main benefit of using the Watson Discovery Service is its powerful analytics
 * Categories - classification of the data into a hierarchy of categories up to 5 levels deep.
 * Concepts - identified general concepts that aren't necessarily referenced in the data.
 * Keywords - important topics typically used to index or search the data.
+* Entity Types - 
+* Relations - 
 * Sentiment - the overall positive or negative sentiment of each document.
 
 For this Code Pattern, we will be using data that contains food reviews.
@@ -27,10 +29,19 @@ When the reader has completed this Code Pattern, they will understand how to:
 3. User input is processed and routed to the backend server, which is responsible for server side rendering of the views to be displayed on the browser. The backend server is written using express and uses express-react-views engine to render views written using React.
 4. The backend server sends user requests to the Watson Discovery Service. It acts as a proxy server, forwarding queries from the frontend to the Watson Discovery Service API while keeping sensitive API keys concealed from the user.
 
+### How does Watson Knowledge Studio work?
+
+The image below explains the process of how Watson Knowledge Studio works in light detail. For greater detail see Steps [4. Upload Type System](#4-upload-type-system) through [9. Deploy the machine learning model to NLU](#9-deploy-the-machine-learning-model-to-nlu).
+
+![](doc/source/images/wks-nlu-process.png)
+
+In short, a type system is built and supporting documents are uploaded that have domain specific wording. From here a model must be built to properly understand the documents, this is where the annotations come in. Once the corpus and annotations are set you are free to create a model and deploy it to a Watson Natural Language Understanding instance.
+
 > Note: see [DEVELOPING.md](DEVELOPING.md) for project structure.
 
 ## Included components
 * [Watson Discovery](https://www.ibm.com/watson/developercloud/discovery.html): A cognitive search and content analytics engine for applications to identify patterns, trends, and actionable insights.
+* [Watson Knowledge Studio](https://www.ibm.com/watson/services/knowledge-studio/): Teach Watson the language of your domain with custom models that identify entities and relationships unique to your industry, in unstructured text. Use the models in Watson Discovery, Watson Natural Language Understanding, and Watson Explorer.
 
 ## Featured technologies
 * [Node.js](https://nodejs.org/): An open-source JavaScript run-time environment for executing server-side JavaScript code.

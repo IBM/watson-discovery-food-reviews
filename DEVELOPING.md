@@ -27,19 +27,19 @@ Below is a general overview of the most important directories and files in the p
 ├── src # Views that get rendered by the server and the client bundle.js
 │   ├── index.js # HTML view that is rendered
 │   ├── main.js # Main component of view which is rendered as HTML server side and contains client side code
-│   ├── FilterBase # Base component for all filter objects
-│   │   ├── FilterContainer # Base component for all filter continers
-│   │   └── FilterItem # Base component for all filter items
-│   ├── CategoriesFilter # Filter Component that contains Category items
-│   ├── ConceptsFilter # Filter Component that contains Concept items
-│   ├── EntitiesFilter # Filter Component that contains Entity text items
-│   ├── KeywordsFilter # Filter Component that contains Keyword items
-│   ├── EntityTypesFilter # Filter Component that contains Entity type items
-│   ├── Matches # Component that display all search results
-│   ├── PaginationMenu # Component the displays a menu to page through search results
-│   ├── SearchField # Component that allows the user to specify the search string
-│   ├── SentimentChart # Component that displays a donut chart to visualize sentiment of results
-│   ├── TagCloudRegion # Component that shows a tag cloud of entities/categories/concepts
+│   ├── components # UI components
+│   |   └── FilterBase # Base component for all filter objects
+│   │   │    ├── FilterContainer # Base component for all filter continers
+│   │   │    └── FilterItem # Base component for all filter items
+│   │   ├── CategoriesFilter # Filter Component that contains Category items
+│   |   ├── ConceptsFilter # Filter Component that contains Concept items
+│   |   ├── EntitiesFilter # Filter Component that contains Entity text items
+│   |   ├── KeywordsFilter # Filter Component that contains Keyword items
+│   |   ├── EntityTypesFilter # Filter Component that contains Entity type items
+│   |   ├── Matches # Component that display all search results
+│   |   ├── PaginationMenu # Component the displays a menu to page through search results
+│   |   ├── SearchField # Component that allows the user to specify the search string
+│   |   └── SentimentChart # Component that displays a donut chart to visualize sentiment of results
 │   └── layouts # Layout for page
 │       └── default.js
 ├── test # Jest test files
