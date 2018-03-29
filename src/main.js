@@ -1233,17 +1233,11 @@ class Main extends React.Component {
                 <Grid.Row color={'blue'}>
                   <Grid.Column width={16} verticalAlign='middle' textAlign='center'>
                     <Header className='graph-panel-subheader' as='h3' textAlign='center'>
-                      Queries to Analyze Trends and Formulate Insights
                     </Header>
                   </Grid.Column>
                 </Grid.Row>
 
                 <Grid.Row>
-                  <Grid.Column width={16} verticalAlign='middle' textAlign='center'>
-                    <Header className='common-query-panel-header' as='h2' textAlign='center'>
-                      Common Queries
-                    </Header>
-                  </Grid.Column>
                   <Grid.Column className='query-panel' width={16} textAlign='center'>
                     <Tab 
                       className='tab-content' 
@@ -1258,39 +1252,33 @@ class Main extends React.Component {
 
       // Interactive Queries Tab
       { menuItem: { key: 'interactive-queries', icon: 'search', content: 'Interactive Queries' },
-      render: () =>
-        <Tab.Pane attached='bottom'>
-          <div>
-            <Grid className='search-grid' celled>
-              { this.getPanelHeader() }
-              <Grid.Row color={'blue'}>
-                <Grid.Column width={16} verticalAlign='middle' textAlign='center'>
-                  <Header className='graph-panel-subheader' as='h3' textAlign='center'>
-                    Queries to Analyze Trends and Formulate Insights
-                  </Header>
-                </Grid.Column>
-              </Grid.Row>
+        render: () =>
+          <Tab.Pane attached='bottom'>
+            <div>
+              <Grid className='search-grid' celled>
+                { this.getPanelHeader() }
+                <Grid.Row color={'blue'}>
+                  <Grid.Column width={16} verticalAlign='middle' textAlign='center'>
+                    <Header className='graph-panel-subheader' as='h3' textAlign='center'>
+                    </Header>
+                  </Grid.Column>
+                </Grid.Row>
 
-              <Grid.Row>
-                <Grid.Column width={16} verticalAlign='middle' textAlign='center'>
-                  <Header className='custom-query-panel-header' as='h2' textAlign='center'>
-                    Custom Query
-                  </Header>
-                </Grid.Column>
-                <Grid.Column width={16} textAlign='center'>
-                  <CustomQueryPanel
-                    queryData={customQueryData}
-                    products={products}
-                    reviewers={reviewers}
-                    onGetCustomQueryRequest={this.fetchCustomQueryData.bind(this)}
-                  />
-                </Grid.Column>
-              </Grid.Row>
-            </Grid>
-          </div>
-        </Tab.Pane>
-    }
-  ];
+                <Grid.Row>
+                  <Grid.Column  className='query-panel' width={16} textAlign='center'>
+                    <CustomQueryPanel
+                      queryData={customQueryData}
+                      products={products}
+                      reviewers={reviewers}
+                      onGetCustomQueryRequest={this.fetchCustomQueryData.bind(this)}
+                    />
+                  </Grid.Column>
+                </Grid.Row>
+              </Grid>
+            </div>
+          </Tab.Pane>
+      }
+    ];
 
     return (
       <div>

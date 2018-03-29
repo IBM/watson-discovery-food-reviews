@@ -697,8 +697,8 @@ div.row.query-header {
 }
 
 h3.ui.center.aligned.header.graph-panel-subheader {
-  padding-top: 10px;
-  padding-bottom: 8px;
+  padding-top: 20px;
+  padding-bottom: 21px;
 }
 
 div.content.active.graph-accordian {
@@ -786,8 +786,8 @@ h2.ui.block.inverted.left.aligned.header.graph-header {
 }
 
 div.center.aligned.sixteen.wide.column.query-panel {
-  padding-top: 30px;
-  padding-bottom: 30px;
+  padding-top: 60px;
+  padding-bottom: 20px;
   padding-left: 30px;
   padding-right: 30px;
 }
