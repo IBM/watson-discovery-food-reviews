@@ -214,7 +214,7 @@ export default class CommonQueryPanelBase extends React.Component {
                       <List.Item key={item.id}>
                         { item.text }
                       </List.Item>
-                      ) 
+                    ) 
                     }
                   </List>
                 </Grid.Column>

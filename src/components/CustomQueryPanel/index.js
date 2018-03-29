@@ -18,7 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Matches from '../Matches';
 import { TagCloud } from 'react-tagcloud';
-import { Grid, Menu, Dimmer, Input, Button, Loader, Dropdown, Header, Divider, List } from 'semantic-ui-react';
+import { Grid, Dimmer, Input, Button, Loader, Dropdown, Header, Divider, List } from 'semantic-ui-react';
 const utils = require('../../../lib/utils');
 
 /**
@@ -88,14 +88,14 @@ export default class CustomQueryPanel extends React.Component {
     });
   }
 
-  doCustomQuerySearch(event) {
+  doCustomQuerySearch() {
     var { queryData } = this.state;
     this.props.onGetCustomQueryRequest({
       queryData: queryData
     });
   }
 
-  doCustomQueryClear(event) {
+  doCustomQueryClear() {
     var { queryData, clearQuery, clearSentiment, clearProduct, clearReviewer } = this.state;
     queryData.data = null;
     queryData.loading = false;
@@ -125,7 +125,7 @@ export default class CustomQueryPanel extends React.Component {
   }
 
   getShowProductOptions() {
-    const { products, productIdFilter } = this.state;
+    const { products } = this.state;
     var showProductOptions = [
       { key: 'ALL', value: 'ALL', text: 'For All Products' }
     ];
@@ -142,7 +142,7 @@ export default class CustomQueryPanel extends React.Component {
   }
 
   getShowReviewerOptions() {
-    const { reviewers, reviewerIdFilter } = this.state;
+    const { reviewers } = this.state;
     var showReviewersOptions = [
       { key: 'ALL', value: 'ALL', text: 'For All Reviewers' }
     ];
@@ -347,7 +347,7 @@ export default class CustomQueryPanel extends React.Component {
                       <List.Item key={item.id}>
                         { item.text }
                       </List.Item>
-                      ) 
+                    ) 
                     }
                   </List>
                 </Grid.Column>

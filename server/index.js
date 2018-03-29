@@ -268,7 +268,7 @@ function createServer() {
               loading: false,
               error: null,
               category: utils.NO_CATEGORY_SELECTED
-            }
+            };
             commonQueryData.push(obj);
           }
           var customQueryData = {
@@ -280,7 +280,7 @@ function createServer() {
             reviewer: 'ALL',
             sentiment: 'ALL',
             placeHolder: 'Enter search string...'
-          }
+          };
       
           res.render('index', { 
             data: matches,

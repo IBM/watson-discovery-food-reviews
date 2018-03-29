@@ -33,7 +33,7 @@ import CQPHighSentiment from './components/CQPHighSentiment';
 import CQPHighScoreLowSentiment from './components/CQPHighScoreLowSentiment';
 import CQPLowScoreHighSentiment from './components/CQPLowScoreHighSentiment';
 import CQPMostUseful from './components/CQPMostUseful';
-import { Tab, Grid, Dimmer, Button, Input, Menu, Dropdown, Divider, Loader, Accordion, Icon, Header, Statistic } from 'semantic-ui-react';
+import { Tab, Grid, Dimmer, Button, Menu, Dropdown, Divider, Loader, Accordion, Icon, Header, Statistic } from 'semantic-ui-react';
 const utils = require('../lib/utils');
 
 /**
@@ -169,15 +169,7 @@ class Main extends React.Component {
    * User has entered a new search string to query on. 
    * This results in making a new qeury to the disco service.
    */
-  // searchQueryChanged(query) {
-  //   const { searchQuery } = query;
-  //   console.log('searchQuery [FROM SEARCH]: ' + searchQuery);
-   
-  //   // true = clear all filters for new search
-  //   //this.fetchData(searchQuery, true);
-  // }
   searchQueryChanged(event, data) {
-    console.log("searchQuery: " +  data.value);
     this.state({ searchQuery: data.value });
   }
 
@@ -311,41 +303,41 @@ class Main extends React.Component {
     
     // send request
     fetch(`/api/customQuery?${qs}`)
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        throw response;
-      }
-    })
-    .then(json => {
-      // const util = require('util');
-      console.log('+++ DISCO COMMON QUERY RESULTS +++');
-      // console.log(util.inspect(json.aggregations[0].results, false, null));
-      console.log('numMatches: ' + json.matching_results);
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw response;
+        }
+      })
+      .then(json => {
+        // const util = require('util');
+        console.log('+++ DISCO COMMON QUERY RESULTS +++');
+        // console.log(util.inspect(json.aggregations[0].results, false, null));
+        console.log('numMatches: ' + json.matching_results);
 
-      queryData.data = json;
-      queryData.loading = false;
-      queryData.error = null;
-      this.setState({
-        customQueryData: queryData
+        queryData.data = json;
+        queryData.loading = false;
+        queryData.error = null;
+        this.setState({
+          customQueryData: queryData
+        });
+      })
+      .catch(response => {
+        queryData.data = null;
+        queryData.loading = false;
+        queryData.error = (response.status === 429) ? 'Number of free queries per month exceeded' : 'Error fetching results';
+        queryData.query = '';
+        queryData.sentiment = 'ALL';
+        queryData.product = 'ALL';
+        queryData.reviewer = 'ALL';
+        queryData.placeHolder = 'Enter search string...';
+        this.setState({
+          customQueryData: queryData
+        });
+        // eslint-disable-next-line no-console
+        console.error(response);
       });
-    })
-    .catch(response => {
-      queryData.data = null;
-      queryData.loading = false;
-      queryData.error = (response.status === 429) ? 'Number of free queries per month exceeded' : 'Error fetching results';
-      queryData.query = '';
-      queryData.sentiment = 'ALL';
-      queryData.product = 'ALL';
-      queryData.reviewer = 'ALL';
-      queryData.placeHolder = 'Enter search string...';
-      this.setState({
-        customQueryData: queryData
-      });
-      // eslint-disable-next-line no-console
-      console.error(response);
-    });
   }
 
   /**
@@ -384,41 +376,41 @@ class Main extends React.Component {
 
     var qs;
     switch (queryType) {
-      case utils.CQT_HIGH_SCORE:
-        qs = queryString.stringify({
-          query: 'Score>=4.0,enriched_text.categories.label:"' + category + '"',
-          count: 10,
-          sort: '-Score'
-        });
-        break;
-      case utils.CQT_HIGH_SENTIMENT:
-        qs = queryString.stringify({
-          query: 'enriched_text.sentiment.document.score>=0.70,enriched_text.categories.label:"' + category + '"',
-          count: 10,
-          sort: '-enriched_text.sentiment.document.score'
-        });
-        break;
-      case utils.CQT_HIGH_SCORE_LOW_SENTIMENT:
-        qs = queryString.stringify({
-          query: 'Score>=4.0,enriched_text.sentiment.document.label::"negative",enriched_text.categories.label:"' + category + '"',
-          count: 10,
-          sort: 'enriched_text.sentiment.document.score'
-        });
-        break;
-      case utils.CQT_LOW_SCORE_HIGH_SENTIMENT:
-        qs = queryString.stringify({
-          query: 'Score<=3.0,enriched_text.sentiment.document.label::"positive",enriched_text.categories.label:"' + category + '"',
-          count: 10,
-          sort: '-enriched_text.sentiment.document.score'
-        });
-        break;
-      case utils.CQT_HIGH_SCORE_LOW_SENTIMENT:
-        qs = queryString.stringify({
-          query: 'Score>=4.0,enriched_text.sentiment.document.label::"negative",enriched_text.categories.label:"' + category + '"',
-          count: 10,
-          sort: 'enriched_text.sentiment.document.score'
-        });
-        break;
+    case utils.CQT_HIGH_SCORE:
+      qs = queryString.stringify({
+        query: 'Score>=4.0,enriched_text.categories.label:"' + category + '"',
+        count: 10,
+        sort: '-Score'
+      });
+      break;
+    case utils.CQT_HIGH_SENTIMENT:
+      qs = queryString.stringify({
+        query: 'enriched_text.sentiment.document.score>=0.70,enriched_text.categories.label:"' + category + '"',
+        count: 10,
+        sort: '-enriched_text.sentiment.document.score'
+      });
+      break;
+    case utils.CQT_HIGH_SCORE_LOW_SENTIMENT:
+      qs = queryString.stringify({
+        query: 'Score>=4.0,enriched_text.sentiment.document.label::"negative",enriched_text.categories.label:"' + category + '"',
+        count: 10,
+        sort: 'enriched_text.sentiment.document.score'
+      });
+      break;
+    case utils.CQT_LOW_SCORE_HIGH_SENTIMENT:
+      qs = queryString.stringify({
+        query: 'Score<=3.0,enriched_text.sentiment.document.label::"positive",enriched_text.categories.label:"' + category + '"',
+        count: 10,
+        sort: '-enriched_text.sentiment.document.score'
+      });
+      break;
+    case utils.CQT_MOST_USEFUL:
+      qs = queryString.stringify({
+        query: 'Score>=4.0,enriched_text.sentiment.document.label::"negative",enriched_text.categories.label:"' + category + '"',
+        count: 10,
+        sort: 'enriched_text.sentiment.document.score'
+      });
+      break;
     }
 
     // send request
@@ -629,7 +621,6 @@ class Main extends React.Component {
     filterString = filterString + entityTypesString;
 
     // and sentiment filter, if selected
-    console.log('sentimentFilter:' + sentimentFilter);
     if (typeof sentimentFilter !== 'undefined' && sentimentFilter.length > 1) {
       if (sentimentFilter !== 'ALL') {
         if (filterString != '') {
@@ -640,7 +631,6 @@ class Main extends React.Component {
     }
 
     // add any product ID filter, if selected
-    console.log('productIdFilter:' + productIdFilter);
     if (typeof productIdFilter !== 'undefined' && productIdFilter.length > 1) {
       if (productIdFilter !== 'ALL') {
         if (filterString != '') {
@@ -651,7 +641,6 @@ class Main extends React.Component {
     }
     
     // add any reviewer ID filter, if selected
-    console.log('reviewerIdFilter:' + reviewerIdFilter);
     if (typeof reviewerIdFilter !== 'undefined' && reviewerIdFilter.length > 1) {
       if (reviewerIdFilter !== 'ALL') {
         if (filterString != '') {
@@ -920,97 +909,97 @@ class Main extends React.Component {
       { menuItem: 
         { key: 'query_' + utils.CQT_HIGH_SCORE, 
           content: 'What reviews of <category> have the highest scores?' },
-        render: () =>
-          <div>
-            <Grid celled className='big-graph-grid'>
-              <Grid.Row className='selection-header'>
-                <Grid.Column width={16} textAlign='center'>
-                  <CQPHighScore
-                    queryData={commonQueryData}
-                    categories={categories}
-                    queryType={utils.CQT_HIGH_SCORE}
-                    onGetCommonQueryRequest={this.fetchCommonQueryData.bind(this)}
-                  />
-                </Grid.Column>
-              </Grid.Row>
-            </Grid>
-          </div>
+      render: () =>
+        <div>
+          <Grid celled className='big-graph-grid'>
+            <Grid.Row className='selection-header'>
+              <Grid.Column width={16} textAlign='center'>
+                <CQPHighScore
+                  queryData={commonQueryData}
+                  categories={categories}
+                  queryType={utils.CQT_HIGH_SCORE}
+                  onGetCommonQueryRequest={this.fetchCommonQueryData.bind(this)}
+                />
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </div>
       },
       { menuItem: 
         { key: 'query_' + utils.CQT_HIGH_SENTIMENT, 
           content: 'What reviews of <category> have the most positive sentiment?' },
-        render: () =>
-          <div>
-            <Grid celled className='big-graph-grid'>
-              <Grid.Row className='selection-header'>
-                <Grid.Column width={16} textAlign='center'>
-                  <CQPHighSentiment
-                    queryData={commonQueryData}
-                    categories={categories}
-                    queryType={utils.CQT_HIGH_SENTIMENT}
-                    onGetCommonQueryRequest={this.fetchCommonQueryData.bind(this)}
-                  />
-                </Grid.Column>
-              </Grid.Row>
-            </Grid>
-          </div>
+      render: () =>
+        <div>
+          <Grid celled className='big-graph-grid'>
+            <Grid.Row className='selection-header'>
+              <Grid.Column width={16} textAlign='center'>
+                <CQPHighSentiment
+                  queryData={commonQueryData}
+                  categories={categories}
+                  queryType={utils.CQT_HIGH_SENTIMENT}
+                  onGetCommonQueryRequest={this.fetchCommonQueryData.bind(this)}
+                />
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </div>
       },
       { menuItem: 
         { key: 'query_' + utils.CQT_HIGH_SCORE_LOW_SENTIMENT, 
           content: 'Which top scoring reviews of <category> have the most negative sentiment?' },
-        render: () =>
-          <div>
-            <Grid celled className='big-graph-grid'>
-              <Grid.Row className='selection-header'>
-                <Grid.Column width={16} textAlign='center'>
-                  <CQPHighScoreLowSentiment
-                    queryData={commonQueryData}
-                    categories={categories}
-                    queryType={utils.CQT_HIGH_SCORE_LOW_SENTIMENT}
-                    onGetCommonQueryRequest={this.fetchCommonQueryData.bind(this)}
-                  />
-                </Grid.Column>
-              </Grid.Row>
-            </Grid>
-          </div>
+      render: () =>
+        <div>
+          <Grid celled className='big-graph-grid'>
+            <Grid.Row className='selection-header'>
+              <Grid.Column width={16} textAlign='center'>
+                <CQPHighScoreLowSentiment
+                  queryData={commonQueryData}
+                  categories={categories}
+                  queryType={utils.CQT_HIGH_SCORE_LOW_SENTIMENT}
+                  onGetCommonQueryRequest={this.fetchCommonQueryData.bind(this)}
+                />
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </div>
       },
       { menuItem: 
         { key: 'query_' + utils.CQT_LOW_SCORE_HIGH_SENTIMENT, 
           content: 'Which low scoring reviews of <category> have the most positive sentiment?' },
-        render: () =>
-          <div>
-            <Grid celled className='big-graph-grid'>
-              <Grid.Row className='selection-header'>
-                <Grid.Column width={16} textAlign='center'>
-                  <CQPLowScoreHighSentiment
-                    queryData={commonQueryData}
-                    categories={categories}
-                    queryType={utils.CQT_LOW_SCORE_HIGH_SENTIMENT}
-                    onGetCommonQueryRequest={this.fetchCommonQueryData.bind(this)}
-                  />
-                </Grid.Column>
-              </Grid.Row>
-            </Grid>
-          </div>
+      render: () =>
+        <div>
+          <Grid celled className='big-graph-grid'>
+            <Grid.Row className='selection-header'>
+              <Grid.Column width={16} textAlign='center'>
+                <CQPLowScoreHighSentiment
+                  queryData={commonQueryData}
+                  categories={categories}
+                  queryType={utils.CQT_LOW_SCORE_HIGH_SENTIMENT}
+                  onGetCommonQueryRequest={this.fetchCommonQueryData.bind(this)}
+                />
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </div>
       },
       { menuItem: 
         { key: 'query_' + utils.CQT_MOST_USEFUL, 
           content: 'Which <positive,negative> sentiment reviews of <category> were most useful?' },
-        render: () =>
-          <div>
-            <Grid celled className='big-graph-grid'>
-              <Grid.Row className='selection-header'>
-                <Grid.Column width={16} textAlign='center'>
-                  <CQPMostUseful
-                    queryData={commonQueryData}
-                    categories={categories}
-                    queryType={utils.CQT_MOST_USEFUL}
-                    onGetCommonQueryRequest={this.fetchCommonQueryData.bind(this)}
-                  />
-                </Grid.Column>
-              </Grid.Row>
-            </Grid>
-          </div>
+      render: () =>
+        <div>
+          <Grid celled className='big-graph-grid'>
+            <Grid.Row className='selection-header'>
+              <Grid.Column width={16} textAlign='center'>
+                <CQPMostUseful
+                  queryData={commonQueryData}
+                  categories={categories}
+                  queryType={utils.CQT_MOST_USEFUL}
+                  onGetCommonQueryRequest={this.fetchCommonQueryData.bind(this)}
+                />
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </div>
       }
     ];
      
@@ -1394,6 +1383,7 @@ Main.propTypes = {
   productIdFilter: PropTypes.string,
   reviewerIdFilter: PropTypes.string,
   commonQueryData: PropTypes.array,
+  customQueryData: PropTypes.object,
   sentimentTerm: PropTypes.string,
   error: PropTypes.object
 };
