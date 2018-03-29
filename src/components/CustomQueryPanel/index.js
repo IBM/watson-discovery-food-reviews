@@ -162,11 +162,11 @@ export default class CustomQueryPanel extends React.Component {
    * getEntities - return top 5 entities for placement in list.
    */
   getEntities() {
-    const { queryData, queryType } = this.state;
+    const { queryData } = this.state;
     var entities = [];
 
-    if (queryData[queryType] && queryData[queryType].data.matching_results) {
-      const data = queryData[queryType].data.aggregations[utils.ENTITY_DATA_INDEX];
+    if (queryData && queryData.data.matching_results) {
+      const data = queryData.data.aggregations[utils.ENTITY_DATA_INDEX];
       // get top 5 entities
       var count = 0;
       data.results.forEach(function(item) {
@@ -187,11 +187,11 @@ export default class CustomQueryPanel extends React.Component {
    * getKeywords - return top 10 keywords to display in the tag cloud.
    */
   getKeywords() {
-    const { queryData, queryType } = this.state;
+    const { queryData } = this.state;
     var keywords = [];
 
-    if (queryData[queryType] && queryData[queryType].data.matching_results) {
-      const data = queryData[queryType].data.aggregations[utils.KEYWORD_DATA_INDEX];
+    if (queryData && queryData.data.matching_results) {
+      const data = queryData.data.aggregations[utils.KEYWORD_DATA_INDEX];
       // get top 10 keywords
       var count = 0;
       data.results.forEach(function(item) {
@@ -207,7 +207,7 @@ export default class CustomQueryPanel extends React.Component {
 
     return keywords;
   }
-
+  
   getReviews() {
     const { queryData } = this.state;
 
