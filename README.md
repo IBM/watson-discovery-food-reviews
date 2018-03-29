@@ -13,8 +13,7 @@ The main benefit of using the Watson Discovery Service is its powerful analytics
 * Categories - classification of the data into a hierarchy of categories up to 5 levels deep.
 * Concepts - identified general concepts that aren't necessarily referenced in the data.
 * Keywords - important topics typically used to index or search the data.
-* Entity Types - 
-* Relations - 
+* Entity Types -  the classification of the discovered entities, such as person, location, or job title.
 * Sentiment - the overall positive or negative sentiment of each document.
 
 With Watson Knowledge Studio (WKS), data modeling can be used to inform Watson Discovery of additional entities and relationships that go beyond its default entity extraction and enrichment process. Through the use of annotations, the user can indicate entities and entity relationships on a small subset of documents, which can then be applied to a much larger set of similar documents. This model can then be applied to a Watson Discovery service instance and encorporated into the Discovery enrichment process as documents are uploaded into the service. 

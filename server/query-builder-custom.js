@@ -27,10 +27,17 @@ module.exports = {
     const params = Object.assign({
       environment_id: this.environment_id,
       collection_id: this.collection_id,
-      aggregation: 'timeslice(date,1week,anomaly:true).average(enriched_text.sentiment.document.score)'
+      passages: false,
+      highlight: true,
+      aggregation:
+      '[term(enriched_text.entities.text).term(enriched_text.sentiment.document.label),' +
+      'term(enriched_text.categories.label).term(enriched_text.sentiment.document.label),' +
+      'term(enriched_text.concepts.text).term(enriched_text.sentiment.document.label),' +
+      'term(enriched_text.keywords.text).term(enriched_text.sentiment.document.label),' +
+      'term(enriched_text.entities.type).term(enriched_text.sentiment.document.label)]'
     }, queryOpts);
 
-    console.log('Discovery Trending Query Params: ');
+    console.log('Custom Query Params: ');
     console.log(util.inspect(params, false, null));
     return params;
   }

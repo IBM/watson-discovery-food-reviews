@@ -24,7 +24,7 @@ require('isomorphic-fetch');
 const Promise = require('bluebird');
 const queryString = require('query-string');
 const queryBuilder = require('./query-builder');
-const queryTrendBuilder = require('./query-builder-trending');
+const queryCustomBuilder = require('./query-builder-custom');
 const WatsonDiscoverySetup = require('../lib/watson-discovery-setup');
 const DiscoveryV1 = require('watson-developer-cloud/discovery/v1');
 const utils = require('../lib/utils');
@@ -84,8 +84,8 @@ const WatsonDiscoServer = new Promise((resolve) => {
       console.log('collection_id: ' + collection_id);
       queryBuilder.setEnvironmentId(environment_id);
       queryBuilder.setCollectionId(collection_id);
-      queryTrendBuilder.setEnvironmentId(environment_id);
-      queryTrendBuilder.setCollectionId(collection_id);
+      queryCustomBuilder.setEnvironmentId(environment_id);
+      queryCustomBuilder.setCollectionId(collection_id);
 
       collectionParams.documents = discoveryDocs;
       console.log('Begin loading ' + discoveryDocs.length + 
@@ -103,23 +103,33 @@ const WatsonDiscoServer = new Promise((resolve) => {
 function createServer() {
   const server = require('./express');
 
-  // handles search request from search bar
-  server.get('/api/trending', (req, res) => {
-    const { query, filters, count } = req.query;
+  // handles custom queries
+  server.get('/api/customQuery', (req, res) => {
+    const { query, filters, queryType, count, sort } = req.query;
 
-    console.log('In /api/trending: query = ' + query);
+    console.log('In /api/commonQuery: query = ' + query);
     
     // build params for the trending search request
     var params = {};
-    params.query = query;
+    if (queryType == 'natural_language_query') {
+      params.natural_language_query = query;
+    } else {
+      params.query = query;
+    }
 
-    // add any filters and a limit to the number of matches that can be found
     if (filters) {
       params.filter = filters;
     }
-    params.count = count;
 
-    var searchParams = queryTrendBuilder.search(params);
+    if (count) {
+      params.count = parseInt(count);
+    }
+
+    if (sort) {
+      params.sort = sort;
+    }
+
+    var searchParams = queryCustomBuilder.search(params);
     discovery.query(searchParams)
       .then(response => res.json(response))
       .catch(error => {
@@ -249,6 +259,28 @@ function createServer() {
           // const util = require('util');
           // console.log('++++++++++++ DISCO RESULTS ++++++++++++++++++++');
           // console.log(util.inspect(results, false, null));
+
+          // first time init of data needed for common and custom queries
+          var commonQueryData = [];
+          for (var i=0; i<utils.CQT_NUM_QUERIES; i++) {
+            var obj = {
+              data: null,
+              loading: false,
+              error: null,
+              category: utils.NO_CATEGORY_SELECTED
+            };
+            commonQueryData.push(obj);
+          }
+          var customQueryData = {
+            data: null,
+            loading: false,
+            error: null,
+            query: '',
+            product: 'ALL',
+            reviewer: 'ALL',
+            sentiment: 'ALL',
+            placeHolder: 'Enter search string...'
+          };
       
           res.render('index', { 
             data: matches,
@@ -262,7 +294,9 @@ function createServer() {
             numMatches: matches.results.length,
             numPositive: totals.numPositive,
             numNeutral: totals.numNeutral,
-            numNegative: totals.numNegative
+            numNegative: totals.numNegative,
+            commonQueryData: commonQueryData,
+            customQueryData: customQueryData
           });
     
           resolve(results);

@@ -25,11 +25,14 @@ import CategoriesFilter from './components/CategoriesFilter';
 import ConceptsFilter from './components/ConceptsFilter';
 import KeywordsFilter from './components/KeywordsFilter';
 import EntityTypesFilter from './components/EntityTypesFilter';
-import TopRatedChart from './components/TopRatedChart';
-import ProductTrendChart from './components/ProductTrendChart';
-import TrendChart from './components/TrendChart';
 import SentimentChart from './components/SentimentChart';
-import CommonTopicsChart from './components/CommonTopicsChart';
+import KeywordsTagCloud from './components/KeywordsTagCloud';
+import CustomQueryPanel from './components/CustomQueryPanel';
+import CQPHighScore from './components/CQPHighScore';
+import CQPHighSentiment from './components/CQPHighSentiment';
+import CQPHighScoreLowSentiment from './components/CQPHighScoreLowSentiment';
+import CQPLowScoreHighSentiment from './components/CQPLowScoreHighSentiment';
+import CQPMostUseful from './components/CQPMostUseful';
 import { Tab, Grid, Dimmer, Button, Menu, Dropdown, Divider, Loader, Accordion, Icon, Header, Statistic } from 'semantic-ui-react';
 const utils = require('../lib/utils');
 
@@ -70,14 +73,10 @@ class Main extends React.Component {
       selectedEntityTypes,
       // matches panel
       currentPage,
-      // product trending chart
-      productTrendData,
-      productTrendError,
-      productTrendProductId,
-      // trending chart
-      trendData,
-      trendError,
-      trendTerm,
+      // common query panel
+      commonQueryData,
+      // custom query panel
+      customQueryData,
       // sentiment chart
       sentimentTerm
     } = this.props;
@@ -111,16 +110,10 @@ class Main extends React.Component {
       selectedConcepts: selectedConcepts || new Set(),
       selectedKeywords: selectedKeywords || new Set(),
       selectedEntityTypes: selectedEntityTypes || new Set(),
-      // product trending chart
-      productTrendData: productTrendData || null,
-      productTrendError: productTrendError,
-      productTrendProductId: productTrendProductId || utils.NO_PRODUCT_ITEM,
-      productTrendLoading: false,
-      // trending chart
-      trendData: trendData || null,
-      trendError: trendError,
-      trendTerm: trendTerm || utils.NO_TERM_ITEM,
-      trendLoading: false,
+      // common query data
+      commonQueryData: commonQueryData,
+      // custom query data
+      customQueryData: customQueryData,
       // sentiment chart
       sentimentTerm: sentimentTerm || utils.ALL_TERM_ITEM,
       // misc panel
@@ -176,12 +169,8 @@ class Main extends React.Component {
    * User has entered a new search string to query on. 
    * This results in making a new qeury to the disco service.
    */
-  searchQueryChanged(query) {
-    const { searchQuery } = query;
-    console.log('searchQuery [FROM SEARCH]: ' + searchQuery);
-   
-    // true = clear all filters for new search
-    this.fetchData(searchQuery, true);
+  searchQueryChanged(event, data) {
+    this.state({ searchQuery: data.value });
   }
 
   applySentimentFilter(event, data) {
@@ -254,7 +243,7 @@ class Main extends React.Component {
   }
 
   /**
-   * fetchTrendData - (callback function)
+   * fetchCustomQueryData - (callback function)
    * User has entered a new search string to query on. 
    * This results in making a new qeury to the disco service.
    * Keep track of the current term value so that main stays
@@ -263,48 +252,57 @@ class Main extends React.Component {
    * NOTE: This function is also called at startup to 
    * display a default graph.
    */
-  fetchTrendData(data) {
-    var { chartType, term } = data;
+  fetchCustomQueryData(data) {
+    var { queryData } = data;
 
-    // we don't have any data to show for "all" items, so just clear chart
-    if (term === utils.NO_TERM_ITEM) {
-      this.setState(
-        { 
-          trendData: null,
-          trendLoading: false,
-          trendError: null,
-          trendTerm: term
-        });
-      return;
-    } 
-    
+    queryData.loading = true;
     this.setState({
-      trendLoading: true,
-      trendTerm: term
+      customQueryData: queryData
     });
 
-    // build query string, with based on filter type
-    var trendQuery = '';
-    if (chartType === utils.ENTITIY_FILTER) {
-      trendQuery = 'enriched_text.entities.text::' + term;
-    } else if (chartType === utils.CATEGORY_FILTER) {
-      trendQuery = 'enriched_text.categories.label::' + term;
-    } else if (chartType === utils.CONCEPT_FILTER) {
-      trendQuery = 'enriched_text.concepts.text::' + term;
-    } else if (chartType === utils.KEYWORD_FILTER) {
-      trendQuery = 'enriched_text.keywords.text::' + term;
-    } else if (chartType === utils.ENTITY_TYPE_FILTER) {
-      trendQuery = 'enriched_text.entities.type::' + term;
+    // apply user specified filters
+    var filterString = '';
+    console.log('sentimentFilter:' + queryData.sentiment);
+    if (queryData.sentiment.length > 1) {
+      if (queryData.sentiment !== 'ALL') {
+        filterString = 'enriched_text.sentiment.document.label::' + queryData.sentiment;
+      }
     }
 
-    const qs = queryString.stringify({
-      query: trendQuery,
-      filters: this.buildFilterStringForQuery(),
-      count: 2000
-    });
+    // add any product ID filter, if selected
+    console.log('productIdFilter:' + queryData.product);
+    if (queryData.product.length > 1) {
+      if (queryData.product !== 'ALL') {
+        if (filterString != '') {
+          filterString = filterString + ',';
+        }
+        filterString = filterString + 'ProductId::' + queryData.product;
+      }
+    }
+    
+    // add any reviewer ID filter, if selected
+    console.log('reviewerIdFilter:' + queryData.reviewer);
+    if (queryData.reviewer.length > 1) {
+      if (queryData.reviewer !== 'ALL') {
+        if (filterString != '') {
+          filterString = filterString + ',';
+        }
+        filterString = filterString + 'UserId::' + queryData.reviewer;
+      }
+    }
+    
+    console.log('FilterString: ' + filterString);
 
+    const qs = queryString.stringify({
+      query: queryData.query,
+      queryType: 'natural_language_query',
+      filters: filterString,
+      count: 10,
+      sort: '-Score'
+    });
+    
     // send request
-    fetch(`/api/trending?${qs}`)
+    fetch(`/api/customQuery?${qs}`)
       .then(response => {
         if (response.ok) {
           return response.json();
@@ -314,65 +312,109 @@ class Main extends React.Component {
       })
       .then(json => {
         // const util = require('util');
-        console.log('+++ DISCO TREND RESULTS +++');
+        console.log('+++ DISCO COMMON QUERY RESULTS +++');
         // console.log(util.inspect(json.aggregations[0].results, false, null));
         console.log('numMatches: ' + json.matching_results);
-      
-        this.setState({ 
-          trendData: json,
-          trendLoading: false,
-          trendError: null,
-          trendTerm: term
+
+        queryData.data = json;
+        queryData.loading = false;
+        queryData.error = null;
+        this.setState({
+          customQueryData: queryData
         });
       })
       .catch(response => {
+        queryData.data = null;
+        queryData.loading = false;
+        queryData.error = (response.status === 429) ? 'Number of free queries per month exceeded' : 'Error fetching results';
+        queryData.query = '';
+        queryData.sentiment = 'ALL';
+        queryData.product = 'ALL';
+        queryData.reviewer = 'ALL';
+        queryData.placeHolder = 'Enter search string...';
         this.setState({
-          trendError: (response.status === 429) ? 'Number of free queries per month exceeded' : 'Error fetching results',
-          trendLoading: false,
-          trendData: null,
-          trendTerm: utils.TRENDING_TERM_ITEM
+          customQueryData: queryData
         });
         // eslint-disable-next-line no-console
         console.error(response);
       });
   }
-  
+
   /**
-   * fetchProductTrendData - (callback function)
-   * User has entered a new search string to query on.
+   * fetchCommonQueryData - (callback function)
+   * User has entered a new search string to query on. 
    * This results in making a new qeury to the disco service.
    * Keep track of the current term value so that main stays
    * in sync with the trending chart component.
-   *
-   * NOTE: This function is also called at startup to
+   * 
+   * NOTE: This function is also called at startup to 
    * display a default graph.
    */
-  fetchProductTrendData(data) {
-    var { productId } = data;
+  fetchCommonQueryData(data) {
+    var { category, queryType } = data;
+    var { commonQueryData } = this.state;
 
-    // we don't have any data to show if no product selected, so just clear chart
-    if (productId === utils.NO_PRODUCT_ITEM) {
+    // make a copy so we can modify and update state
+    var queryData = commonQueryData;
+
+    if (category === utils.NO_CATEGORY_SELECTED) {
+      queryData[queryType].data = null;
+      queryData[queryType].loading = false;
+      queryData[queryType].error = null;
+      queryData[queryType].category = category;
       this.setState({
-        productTrendData: null,
-        productTrendLoading: false,
-        productTrendError: null,
-        productTrendProductId: productId
+        commonQueryData: queryData
       });
       return;
     }
 
+    queryData[queryType].loading = true;
+    queryData[queryType].category = category;
     this.setState({
-      productTrendLoading: true,
-      productTrendProductId: productId
+      commonQueryData: queryData
     });
 
-    const qs = queryString.stringify({
-      filters: 'ProductId::' + '"' + productId + '"',
-      count: 2000
-    });
+    var qs;
+    switch (queryType) {
+    case utils.CQT_HIGH_SCORE:
+      qs = queryString.stringify({
+        query: 'Score>=4.0,enriched_text.categories.label:"' + category + '"',
+        count: 10,
+        sort: '-Score'
+      });
+      break;
+    case utils.CQT_HIGH_SENTIMENT:
+      qs = queryString.stringify({
+        query: 'enriched_text.sentiment.document.score>=0.70,enriched_text.categories.label:"' + category + '"',
+        count: 10,
+        sort: '-enriched_text.sentiment.document.score'
+      });
+      break;
+    case utils.CQT_HIGH_SCORE_LOW_SENTIMENT:
+      qs = queryString.stringify({
+        query: 'Score>=4.0,enriched_text.sentiment.document.label::"negative",enriched_text.categories.label:"' + category + '"',
+        count: 10,
+        sort: 'enriched_text.sentiment.document.score'
+      });
+      break;
+    case utils.CQT_LOW_SCORE_HIGH_SENTIMENT:
+      qs = queryString.stringify({
+        query: 'Score<=3.0,enriched_text.sentiment.document.label::"positive",enriched_text.categories.label:"' + category + '"',
+        count: 10,
+        sort: '-enriched_text.sentiment.document.score'
+      });
+      break;
+    case utils.CQT_MOST_USEFUL:
+      qs = queryString.stringify({
+        query: 'Score>=4.0,enriched_text.sentiment.document.label::"negative",enriched_text.categories.label:"' + category + '"',
+        count: 10,
+        sort: 'enriched_text.sentiment.document.score'
+      });
+      break;
+    }
 
     // send request
-    fetch(`/api/trending?${qs}`)
+    fetch(`/api/customQuery?${qs}`)
       .then(response => {
         if (response.ok) {
           return response.json();
@@ -382,23 +424,25 @@ class Main extends React.Component {
       })
       .then(json => {
         // const util = require('util');
-        console.log('+++ DISCO PRODUCT TREND RESULTS +++');
+        console.log('+++ DISCO COMMON QUERY RESULTS +++');
         // console.log(util.inspect(json.aggregations[0].results, false, null));
         console.log('numMatches: ' + json.matching_results);
 
+        queryData[queryType].data = json;
+        queryData[queryType].loading = false;
+        queryData[queryType].error = null;
+        queryData[queryType].category = category;
         this.setState({
-          productTrendData: json,
-          productTrendLoading: false,
-          productTrendError: null,
-          productTrendProductId: productId
+          commonQueryData: queryData
         });
       })
       .catch(response => {
+        queryData[queryType].data = null;
+        queryData[queryType].loading = false;
+        queryData[queryType].error = (response.status === 429) ? 'Number of free queries per month exceeded' : 'Error fetching results';
+        queryData[queryType].category = utils.NO_CATEGORY_SELECTED;
         this.setState({
-          productTrendError: (response.status === 429) ? 'Number of free queries per month exceeded' : 'Error fetching results',
-          productTrendLoading: false,
-          productTrendData: null,
-          productTrendProductId: utils.NO_PRODUCT_ITEM
+          commonQueryData: queryData
         });
         // eslint-disable-next-line no-console
         console.error(response);
@@ -446,7 +490,7 @@ class Main extends React.Component {
 
     // build query string, with filters and optional params
     const qs = queryString.stringify({
-      query: searchQuery,
+      //query: searchQuery,
       filters: filterString,
       count: 2000,
       // sort: sortOrder,
@@ -492,9 +536,7 @@ class Main extends React.Component {
           numNegative: totals.numNegative,
           numNeutral: totals.numNeutral,
           error: null,
-          trendData: null,
           sentimentTerm: utils.ALL_TERM_ITEM,
-          trendTerm: utils.NO_TERM_ITEM
         });
         scrollToMain();
       })
@@ -579,7 +621,6 @@ class Main extends React.Component {
     filterString = filterString + entityTypesString;
 
     // and sentiment filter, if selected
-    console.log('sentimentFilter:' + sentimentFilter);
     if (typeof sentimentFilter !== 'undefined' && sentimentFilter.length > 1) {
       if (sentimentFilter !== 'ALL') {
         if (filterString != '') {
@@ -590,7 +631,6 @@ class Main extends React.Component {
     }
 
     // add any product ID filter, if selected
-    console.log('productIdFilter:' + productIdFilter);
     if (typeof productIdFilter !== 'undefined' && productIdFilter.length > 1) {
       if (productIdFilter !== 'ALL') {
         if (filterString != '') {
@@ -601,7 +641,6 @@ class Main extends React.Component {
     }
     
     // add any reviewer ID filter, if selected
-    console.log('reviewerIdFilter:' + reviewerIdFilter);
     if (typeof reviewerIdFilter !== 'undefined' && reviewerIdFilter.length > 1) {
       if (reviewerIdFilter !== 'ALL') {
         if (filterString != '') {
@@ -660,7 +699,6 @@ class Main extends React.Component {
 
   getSentimentFilter() {
     const { sentimentFilter } = this.state;
-    
     const reviewSentimentOptions = [
       { key: 'ALL', value: 'ALL', text: 'Show All Reviews' },
       { key: 'POS', value: 'positive', text: 'Show Positive Reviews' },
@@ -685,7 +723,6 @@ class Main extends React.Component {
    */
   getProductFilter() {
     const { products, productIdFilter } = this.state;
-
     var showProductOptions = [
       { key: 'ALL', value: 'ALL', text: 'For All Products' }
     ];
@@ -710,7 +747,7 @@ class Main extends React.Component {
       />
     );
   }
-  
+
   /**
    * getReviewerFilter - return reviewers filter object to be rendered.
    */
@@ -727,7 +764,6 @@ class Main extends React.Component {
         text: 'For Reviewer: ' + entry.key  + ' (' + entry.matching_results + ')'
       });
     });
-
 
     return (
       <Dropdown 
@@ -842,13 +878,12 @@ class Main extends React.Component {
    * render - return all the home page object to be rendered.
    */
   render() {
-    const { loading, data, error, products,
+    const { loading, data, error, products, reviewers,
       entities, categories, concepts, keywords, entityTypes,
       selectedEntities, selectedCategories, 
       selectedConcepts,selectedKeywords, selectedEntityTypes,
       numMatches, numPositive, numNeutral, numNegative,
-      productTrendData, productTrendLoading, productTrendError, productTrendProductId,
-      trendData, trendLoading, trendError, trendTerm, 
+      commonQueryData, customQueryData,
       sentimentTerm, sortOrder } = this.state;
 
     // used for filter accordions
@@ -871,79 +906,100 @@ class Main extends React.Component {
     }
 
     const queryTabs = [
-      { menuItem: { key: 'topChart', content: 'How does this product sentiment trend over time?' },
-        render: () =>
-          <div>
-            <Grid celled className='big-graph-grid'>
-              <Grid.Row className='selection-header'>
-                <Grid.Column width={16} textAlign='center'>
-                  <TopRatedChart
-                    products={products}
-                  />
-                </Grid.Column>
-              </Grid.Row>
-            </Grid>
-          </div>
+      { menuItem: 
+        { key: 'query_' + utils.CQT_HIGH_SCORE, 
+          content: 'What reviews of <category> have the highest scores?' },
+      render: () =>
+        <div>
+          <Grid celled className='big-graph-grid'>
+            <Grid.Row className='selection-header'>
+              <Grid.Column width={16} textAlign='center'>
+                <CQPHighScore
+                  queryData={commonQueryData}
+                  categories={categories}
+                  queryType={utils.CQT_HIGH_SCORE}
+                  onGetCommonQueryRequest={this.fetchCommonQueryData.bind(this)}
+                />
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </div>
       },
-      { menuItem: { key: 'commonChart', content: 'How does this product compete with other products in the same category?' },
-        render: () =>
-          <div>
-            <Grid celled className='big-graph-grid'>
-              <Grid.Row className='selection-header'>
-                <Grid.Column width={16} textAlign='center'>
-                  <CommonTopicsChart
-                    entities={entities}
-                    categories={categories}
-                    concepts={concepts}
-                    keywords={keywords}
-                    entityTypes={entityTypes}
-                  />
-                </Grid.Column>
-              </Grid.Row>
-            </Grid>
-          </div>
+      { menuItem: 
+        { key: 'query_' + utils.CQT_HIGH_SENTIMENT, 
+          content: 'What reviews of <category> have the most positive sentiment?' },
+      render: () =>
+        <div>
+          <Grid celled className='big-graph-grid'>
+            <Grid.Row className='selection-header'>
+              <Grid.Column width={16} textAlign='center'>
+                <CQPHighSentiment
+                  queryData={commonQueryData}
+                  categories={categories}
+                  queryType={utils.CQT_HIGH_SENTIMENT}
+                  onGetCommonQueryRequest={this.fetchCommonQueryData.bind(this)}
+                />
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </div>
       },
-      { menuItem: { key: 'productTrendChart', content: 'How is the average rating given by this reviewer?' },
-        render: () =>
-          <div>
-            <Grid celled className='big-graph-grid'>
-              <Grid.Row className='selection-header'>
-                <Grid.Column width={16} textAlign='center'>
-                  <ProductTrendChart
-                    productTrendData={productTrendData}
-                    productTrendLoading={productTrendLoading}
-                    productTrendError={productTrendError}
-                    products={products}
-                    productTrendProductId={productTrendProductId}
-                    onGetTrendDataRequest={this.fetchProductTrendData.bind(this)}
-                  />
-                </Grid.Column>
-              </Grid.Row>
-            </Grid>
-          </div>
+      { menuItem: 
+        { key: 'query_' + utils.CQT_HIGH_SCORE_LOW_SENTIMENT, 
+          content: 'Which top scoring reviews of <category> have the most negative sentiment?' },
+      render: () =>
+        <div>
+          <Grid celled className='big-graph-grid'>
+            <Grid.Row className='selection-header'>
+              <Grid.Column width={16} textAlign='center'>
+                <CQPHighScoreLowSentiment
+                  queryData={commonQueryData}
+                  categories={categories}
+                  queryType={utils.CQT_HIGH_SCORE_LOW_SENTIMENT}
+                  onGetCommonQueryRequest={this.fetchCommonQueryData.bind(this)}
+                />
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </div>
       },
-      { menuItem: { key: 'trendChart', content: 'How does this product sentiment trend over time?' },
-        render: () =>
-          <div>
-            <Grid celled className='big-graph-grid'>
-              <Grid.Row className='selection-header'>
-                <Grid.Column width={16} textAlign='center'>
-                  <TrendChart
-                    trendData={trendData}
-                    trendLoading={trendLoading}
-                    trendError={trendError}
-                    entities={entities}
-                    categories={categories}
-                    concepts={concepts}
-                    keywords={keywords}
-                    entityTypes={entityTypes}
-                    term={trendTerm}
-                    onGetTrendDataRequest={this.fetchTrendData.bind(this)}
-                  />
-                </Grid.Column>
-              </Grid.Row>
-            </Grid>
-          </div>
+      { menuItem: 
+        { key: 'query_' + utils.CQT_LOW_SCORE_HIGH_SENTIMENT, 
+          content: 'Which low scoring reviews of <category> have the most positive sentiment?' },
+      render: () =>
+        <div>
+          <Grid celled className='big-graph-grid'>
+            <Grid.Row className='selection-header'>
+              <Grid.Column width={16} textAlign='center'>
+                <CQPLowScoreHighSentiment
+                  queryData={commonQueryData}
+                  categories={categories}
+                  queryType={utils.CQT_LOW_SCORE_HIGH_SENTIMENT}
+                  onGetCommonQueryRequest={this.fetchCommonQueryData.bind(this)}
+                />
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </div>
+      },
+      { menuItem: 
+        { key: 'query_' + utils.CQT_MOST_USEFUL, 
+          content: 'Which <positive,negative> sentiment reviews of <category> were most useful?' },
+      render: () =>
+        <div>
+          <Grid celled className='big-graph-grid'>
+            <Grid.Row className='selection-header'>
+              <Grid.Column width={16} textAlign='center'>
+                <CQPMostUseful
+                  queryData={commonQueryData}
+                  categories={categories}
+                  queryType={utils.CQT_MOST_USEFUL}
+                  onGetCommonQueryRequest={this.fetchCommonQueryData.bind(this)}
+                />
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </div>
       }
     ];
      
@@ -1148,6 +1204,17 @@ class Main extends React.Component {
                         onSentimentTermChanged={this.sentimentTermChanged.bind(this)}
                       />
                     </Grid.Row>
+
+                    <Divider hidden/>
+                    <Divider/>
+                    <Divider hidden/>
+
+                    <Grid.Row>
+                      <KeywordsTagCloud
+                        keywords={keywords}
+                      />
+                    </Grid.Row>
+                    
                   </Grid.Column>
 
                 </Grid.Row>
@@ -1157,7 +1224,7 @@ class Main extends React.Component {
       },
       
       // Graphs Tab
-      { menuItem: { key: 'graphs', icon: 'bar graph', content: 'Custom Queries' },
+      { menuItem: { key: 'graphs', icon: 'bar graph', content: 'Queries' },
         render: () =>
           <Tab.Pane attached='bottom'>
             <div>
@@ -1166,12 +1233,36 @@ class Main extends React.Component {
                 <Grid.Row color={'blue'}>
                   <Grid.Column width={16} verticalAlign='middle' textAlign='center'>
                     <Header className='graph-panel-subheader' as='h3' textAlign='center'>
-                      Custom Queries to Analyze Trends and Formulate Insights
+                      Queries to Analyze Trends and Formulate Insights
                     </Header>
                   </Grid.Column>
                 </Grid.Row>
+
                 <Grid.Row>
+                  <Grid.Column width={16} verticalAlign='middle' textAlign='center'>
+                    <Header className='custom-query-panel-header' as='h2' textAlign='center'>
+                      Custom Query
+                    </Header>
+                  </Grid.Column>
                   <Grid.Column width={16} textAlign='center'>
+                    <CustomQueryPanel
+                      queryData={customQueryData}
+                      products={products}
+                      reviewers={reviewers}
+                      onGetCustomQueryRequest={this.fetchCustomQueryData.bind(this)}
+                    />
+                  </Grid.Column>
+                </Grid.Row>
+
+                <Divider clearing hidden/>
+
+                <Grid.Row>
+                  <Grid.Column width={16} verticalAlign='middle' textAlign='center'>
+                    <Header className='common-query-panel-header' as='h2' textAlign='center'>
+                      Common Queries
+                    </Header>
+                  </Grid.Column>
+                  <Grid.Column className='query-panel' width={16} textAlign='center'>
                     <Tab 
                       className='tab-content' 
                       menu={{ pointing: true, vertical: true, fluid: true, tabular: 'right' }}
@@ -1291,12 +1382,8 @@ Main.propTypes = {
   sentimentFilter: PropTypes.string,
   productIdFilter: PropTypes.string,
   reviewerIdFilter: PropTypes.string,
-  productTrendData: PropTypes.object,
-  productTrendError: PropTypes.object,
-  productTrendProductId: PropTypes.string,
-  trendData: PropTypes.object,
-  trendError: PropTypes.object,
-  trendTerm: PropTypes.string,
+  commonQueryData: PropTypes.array,
+  customQueryData: PropTypes.object,
   sentimentTerm: PropTypes.string,
   error: PropTypes.object
 };
