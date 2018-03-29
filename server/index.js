@@ -24,7 +24,6 @@ require('isomorphic-fetch');
 const Promise = require('bluebird');
 const queryString = require('query-string');
 const queryBuilder = require('./query-builder');
-const queryTrendBuilder = require('./query-builder-trending');
 const queryCustomBuilder = require('./query-builder-custom');
 const WatsonDiscoverySetup = require('../lib/watson-discovery-setup');
 const DiscoveryV1 = require('watson-developer-cloud/discovery/v1');
@@ -85,8 +84,6 @@ const WatsonDiscoServer = new Promise((resolve) => {
       console.log('collection_id: ' + collection_id);
       queryBuilder.setEnvironmentId(environment_id);
       queryBuilder.setCollectionId(collection_id);
-      queryTrendBuilder.setEnvironmentId(environment_id);
-      queryTrendBuilder.setCollectionId(collection_id);
       queryCustomBuilder.setEnvironmentId(environment_id);
       queryCustomBuilder.setCollectionId(collection_id);
 
@@ -133,34 +130,6 @@ function createServer() {
     }
 
     var searchParams = queryCustomBuilder.search(params);
-    discovery.query(searchParams)
-      .then(response => res.json(response))
-      .catch(error => {
-        if (error.message === 'Number of free queries per month exceeded') {
-          res.status(429).json(error);
-        } else {
-          res.status(error.code).json(error);
-        }
-      });
-  });
-
-  // handles search request from search bar
-  server.get('/api/trending', (req, res) => {
-    const { query, filters, count } = req.query;
-
-    console.log('In /api/trending: query = ' + query);
-    
-    // build params for the trending search request
-    var params = {};
-    params.query = query;
-
-    // add any filters and a limit to the number of matches that can be found
-    if (filters) {
-      params.filter = filters;
-    }
-    params.count = count;
-
-    var searchParams = queryTrendBuilder.search(params);
     discovery.query(searchParams)
       .then(response => res.json(response))
       .catch(error => {

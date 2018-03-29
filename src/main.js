@@ -25,12 +25,8 @@ import CategoriesFilter from './components/CategoriesFilter';
 import ConceptsFilter from './components/ConceptsFilter';
 import KeywordsFilter from './components/KeywordsFilter';
 import EntityTypesFilter from './components/EntityTypesFilter';
-import TopRatedChart from './components/TopRatedChart';
-import ProductTrendChart from './components/ProductTrendChart';
-import TrendChart from './components/TrendChart';
 import SentimentChart from './components/SentimentChart';
 import KeywordsTagCloud from './components/KeywordsTagCloud';
-import CommonTopicsChart from './components/CommonTopicsChart';
 import CustomQueryPanel from './components/CustomQueryPanel';
 import CQPHighScore from './components/CQPHighScore';
 import CQPHighSentiment from './components/CQPHighSentiment';
@@ -81,14 +77,6 @@ class Main extends React.Component {
       commonQueryData,
       // custom query panel
       customQueryData,
-      // product trending chart
-      productTrendData,
-      productTrendError,
-      productTrendProductId,
-      // trending chart
-      trendData,
-      trendError,
-      trendTerm,
       // sentiment chart
       sentimentTerm
     } = this.props;
@@ -126,16 +114,6 @@ class Main extends React.Component {
       commonQueryData: commonQueryData,
       // custom query data
       customQueryData: customQueryData,
-      // product trending chart
-      productTrendData: productTrendData || null,
-      productTrendError: productTrendError,
-      productTrendProductId: productTrendProductId || utils.NO_PRODUCT_ITEM,
-      productTrendLoading: false,
-      // trending chart
-      trendData: trendData || null,
-      trendError: trendError,
-      trendTerm: trendTerm || utils.NO_TERM_ITEM,
-      trendLoading: false,
       // sentiment chart
       sentimentTerm: sentimentTerm || utils.ALL_TERM_ITEM,
       // misc panel
@@ -273,7 +251,7 @@ class Main extends React.Component {
   }
 
   /**
-   * fetchTrendData - (callback function)
+   * fetchCustomQueryData - (callback function)
    * User has entered a new search string to query on. 
    * This results in making a new qeury to the disco service.
    * Keep track of the current term value so that main stays
@@ -282,80 +260,6 @@ class Main extends React.Component {
    * NOTE: This function is also called at startup to 
    * display a default graph.
    */
-  fetchTrendData(data) {
-    var { chartType, term } = data;
-
-    // we don't have any data to show for "all" items, so just clear chart
-    if (term === utils.NO_TERM_ITEM) {
-      this.setState(
-        { 
-          trendData: null,
-          trendLoading: false,
-          trendError: null,
-          trendTerm: term
-        });
-      return;
-    } 
-    
-    this.setState({
-      trendLoading: true,
-      trendTerm: term
-    });
-
-    // build query string, with based on filter type
-    var trendQuery = '';
-    if (chartType === utils.ENTITIY_FILTER) {
-      trendQuery = 'enriched_text.entities.text::' + term;
-    } else if (chartType === utils.CATEGORY_FILTER) {
-      trendQuery = 'enriched_text.categories.label::' + term;
-    } else if (chartType === utils.CONCEPT_FILTER) {
-      trendQuery = 'enriched_text.concepts.text::' + term;
-    } else if (chartType === utils.KEYWORD_FILTER) {
-      trendQuery = 'enriched_text.keywords.text::' + term;
-    } else if (chartType === utils.ENTITY_TYPE_FILTER) {
-      trendQuery = 'enriched_text.entities.type::' + term;
-    }
-
-    const qs = queryString.stringify({
-      query: trendQuery,
-      filters: this.buildFilterStringForQuery(),
-      count: 2000
-    });
-
-    // send request
-    fetch(`/api/trending?${qs}`)
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw response;
-        }
-      })
-      .then(json => {
-        // const util = require('util');
-        console.log('+++ DISCO TREND RESULTS +++');
-        // console.log(util.inspect(json.aggregations[0].results, false, null));
-        console.log('numMatches: ' + json.matching_results);
-      
-        this.setState({ 
-          trendData: json,
-          trendLoading: false,
-          trendError: null,
-          trendTerm: term
-        });
-      })
-      .catch(response => {
-        this.setState({
-          trendError: (response.status === 429) ? 'Number of free queries per month exceeded' : 'Error fetching results',
-          trendLoading: false,
-          trendData: null,
-          trendTerm: utils.TRENDING_TERM_ITEM
-        });
-        // eslint-disable-next-line no-console
-        console.error(response);
-      });
-  }
-
   fetchCustomQueryData(data) {
     var { queryData } = data;
 
@@ -444,6 +348,16 @@ class Main extends React.Component {
     });
   }
 
+  /**
+   * fetchCommonQueryData - (callback function)
+   * User has entered a new search string to query on. 
+   * This results in making a new qeury to the disco service.
+   * Keep track of the current term value so that main stays
+   * in sync with the trending chart component.
+   * 
+   * NOTE: This function is also called at startup to 
+   * display a default graph.
+   */
   fetchCommonQueryData(data) {
     var { category, queryType } = data;
     var { commonQueryData } = this.state;
@@ -544,74 +458,6 @@ class Main extends React.Component {
   }
 
   /**
-   * fetchProductTrendData - (callback function)
-   * User has entered a new search string to query on.
-   * This results in making a new qeury to the disco service.
-   * Keep track of the current term value so that main stays
-   * in sync with the trending chart component.
-   *
-   * NOTE: This function is also called at startup to
-   * display a default graph.
-   */
-  fetchProductTrendData(data) {
-    var { productId } = data;
-
-    // we don't have any data to show if no product selected, so just clear chart
-    if (productId === utils.NO_PRODUCT_ITEM) {
-      this.setState({
-        productTrendData: null,
-        productTrendLoading: false,
-        productTrendError: null,
-        productTrendProductId: productId
-      });
-      return;
-    }
-
-    this.setState({
-      productTrendLoading: true,
-      productTrendProductId: productId
-    });
-
-    const qs = queryString.stringify({
-      filters: 'ProductId::' + '"' + productId + '"',
-      count: 2000
-    });
-
-    // send request
-    fetch(`/api/trending?${qs}`)
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw response;
-        }
-      })
-      .then(json => {
-        // const util = require('util');
-        console.log('+++ DISCO PRODUCT TREND RESULTS +++');
-        // console.log(util.inspect(json.aggregations[0].results, false, null));
-        console.log('numMatches: ' + json.matching_results);
-
-        this.setState({
-          productTrendData: json,
-          productTrendLoading: false,
-          productTrendError: null,
-          productTrendProductId: productId
-        });
-      })
-      .catch(response => {
-        this.setState({
-          productTrendError: (response.status === 429) ? 'Number of free queries per month exceeded' : 'Error fetching results',
-          productTrendLoading: false,
-          productTrendData: null,
-          productTrendProductId: utils.NO_PRODUCT_ITEM
-        });
-        // eslint-disable-next-line no-console
-        console.error(response);
-      });
-  }
-
-  /**
    * fetchData - build the query that will be passed to the
    * discovery service.
    */
@@ -698,9 +544,7 @@ class Main extends React.Component {
           numNegative: totals.numNegative,
           numNeutral: totals.numNeutral,
           error: null,
-          trendData: null,
           sentimentTerm: utils.ALL_TERM_ITEM,
-          trendTerm: utils.NO_TERM_ITEM
         });
         scrollToMain();
       })
@@ -1051,8 +895,6 @@ class Main extends React.Component {
       selectedConcepts,selectedKeywords, selectedEntityTypes,
       numMatches, numPositive, numNeutral, numNegative,
       commonQueryData, customQueryData,
-      productTrendData, productTrendLoading, productTrendError, productTrendProductId,
-      trendData, trendLoading, trendError, trendTerm, 
       sentimentTerm, sortOrder } = this.state;
 
     // used for filter accordions
@@ -1169,27 +1011,7 @@ class Main extends React.Component {
               </Grid.Row>
             </Grid>
           </div>
-      },
-      // { menuItem: 
-      //     { key: 'commonChart', 
-      //       content: 'What reviews of <category> have the most positive sentiment?' },
-      //   render: () =>
-      //     <div>
-      //       <Grid celled className='big-graph-grid'>
-      //         <Grid.Row className='selection-header'>
-      //           <Grid.Column width={16} textAlign='center'>
-      //             <CommonTopicsChart
-      //               entities={entities}
-      //               categories={categories}
-      //               concepts={concepts}
-      //               keywords={keywords}
-      //               entityTypes={entityTypes}
-      //             />
-      //           </Grid.Column>
-      //         </Grid.Row>
-      //       </Grid>
-      //     </div>
-      // },
+      }
     ];
      
     const mainTabs = [
@@ -1572,12 +1394,6 @@ Main.propTypes = {
   productIdFilter: PropTypes.string,
   reviewerIdFilter: PropTypes.string,
   commonQueryData: PropTypes.array,
-  productTrendData: PropTypes.object,
-  productTrendError: PropTypes.object,
-  productTrendProductId: PropTypes.string,
-  trendData: PropTypes.object,
-  trendError: PropTypes.object,
-  trendTerm: PropTypes.string,
   sentimentTerm: PropTypes.string,
   error: PropTypes.object
 };

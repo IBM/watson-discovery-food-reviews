@@ -203,10 +203,6 @@ export default class CustomQueryPanel extends React.Component {
   getReviews() {
     const { queryData } = this.state;
 
-    const util = require('util');
-    console.log('+++ DISCO CUSTOM QUERY RESULTS +++');
-    console.log(util.inspect(queryData, false, null));
-    
     // get top reviews
     var reviews = utils.formatData(queryData.data);
 
