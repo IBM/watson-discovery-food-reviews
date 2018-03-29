@@ -801,3 +801,8 @@ div.tag-cloud {
   padding-right: 14px;
   padding-left: 14px;
 }
+
+div.ui.grid.custom-query-results {
+  margin-left: 40px;
+  margin-right: 40px;
+}

@@ -325,7 +325,7 @@ export default class CustomQueryPanel extends React.Component {
           
         ) : queryData.data ? (
           <div>
-            <Grid className='query-data-results'>
+            <Grid className='custom-query-results'>
               <Grid.Row>
                 <Grid.Column width={12}>
                   <Header as='h3' textAlign='center'>
