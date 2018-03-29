@@ -159,42 +159,50 @@ export default class CustomQueryPanel extends React.Component {
   }
 
   /**
-   * getChartData - based on what group filter user has selected, accumulate 
-   * all of the data needed to render the trending chart.
+   * getEntities - return top 5 entities for placement in list.
    */
   getEntities() {
-    const { queryData } = this.state;
+    const { queryData, queryType } = this.state;
     var entities = [];
 
-    if (queryData && queryData.data.matching_results) {
+    if (queryData[queryType] && queryData[queryType].data.matching_results) {
+      const data = queryData[queryType].data.aggregations[utils.ENTITY_DATA_INDEX];
       // get top 5 entities
-      for (var i=0; i<5; i++) {
-        if (queryData.data.aggregations[utils.ENTITY_DATA_INDEX].results[i].key) {
+      var count = 0;
+      data.results.forEach(function(item) {
+        if (count < 5) {
           var entry = { 
-            id: i, 
-            text: queryData.data.aggregations[utils.ENTITY_DATA_INDEX].results[i].key };
+            id: count, 
+            text: item.key };
           entities.push(entry);
-        }      
-      }
+          count = count + 1;
+        }
+      });
     }
 
     return entities;
   }
 
+  /**
+   * getKeywords - return top 10 keywords to display in the tag cloud.
+   */
   getKeywords() {
-    const { queryData } = this.state;
+    const { queryData, queryType } = this.state;
     var keywords = [];
 
-    if (queryData && queryData.data.matching_results) {
+    if (queryData[queryType] && queryData[queryType].data.matching_results) {
+      const data = queryData[queryType].data.aggregations[utils.KEYWORD_DATA_INDEX];
       // get top 10 keywords
-      for (var i=0; i<10; i++) {
-        if (queryData.data.aggregations[utils.KEYWORD_DATA_INDEX].results[i].key) {
+      var count = 0;
+      data.results.forEach(function(item) {
+        if (count < 10) {
           var entry = { 
-            count: i, 
-            value: queryData.data.aggregations[utils.ENTITY_DATA_INDEX].results[i].key };
+            count: count, 
+            value: item.key };
           keywords.push(entry);
-        }      
-      }
+          count = count + 1;
+        }
+      });
     }
 
     return keywords;
