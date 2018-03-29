@@ -632,7 +632,7 @@ input[type=radio]:checked + label.buttons-group--button {
 }
 
 .word-cloud span {
-  text-decoration: underline;
+  /* text-decoration: underline; */
   padding: 6px;
 }
 
@@ -761,6 +761,14 @@ div.ui.compact.sort-dropdown.menu {
   float: right;
 }
 
+div.ui.ui.icon.input.search-input-field {
+  min-width: 22em;
+}
+
+div.ui.ui.icon.input.search-input-field {
+  margin-right: 10px;
+}
+
 div.ui.search.selection.scrolling.dropdown {
   min-width: 22em;
 }
@@ -775,4 +783,21 @@ button.ui.red.tiny.basic.compact.button {
 
 h2.ui.block.inverted.left.aligned.header.graph-header {
   height: 98px;
+}
+
+div.center.aligned.sixteen.wide.column.query-panel {
+  padding-top: 30px;
+  padding-bottom: 30px;
+  padding-left: 30px;
+  padding-right: 30px;
+}
+
+div.ui.grid.query-data-results {
+  padding-top: 20px;
+}
+
+div.tag-cloud {
+  padding-top: 20px;
+  padding-right: 14px;
+  padding-left: 14px;
 }
