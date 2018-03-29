@@ -59,7 +59,7 @@ Use the ``Deploy to IBM Cloud`` button **OR** create the services and run locall
 
 ## Deploy to IBM Cloud
 
-[![Deploy to IBM Cloud](https://metrics-tracker.mybluemix.net/stats/c612c58fcbb9552f348a4e0e5e148846/button.svg)](https://bluemix.net/deploy?repository=https://github.com/IBM/watson-discovery-food-reviews)
+[![Deploy to IBM Cloud](https://metrics-tracker.mybluemix.net/stats/c612c58fcbb9552f348a4e0e5e148846/button.svg)](https://bluemix.net/deploy?repository=https://github.com/IBM/watson-discovery-food-reviews&branch=dev2)
 
 1. Due to the requirement that the Watson Discovery service has to exist before a WKS model can be applied, you must first create the Discovery service manually by going to the following link: [**Watson Discovery**](https://console.ng.bluemix.net/catalog/services/discovery).
 
