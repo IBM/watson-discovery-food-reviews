@@ -28,11 +28,7 @@ import EntityTypesFilter from './components/EntityTypesFilter';
 import SentimentChart from './components/SentimentChart';
 import KeywordsTagCloud from './components/KeywordsTagCloud';
 import CustomQueryPanel from './components/CustomQueryPanel';
-import CQPHighScore from './components/CQPHighScore';
-import CQPHighSentiment from './components/CQPHighSentiment';
-import CQPHighScoreLowSentiment from './components/CQPHighScoreLowSentiment';
-import CQPLowScoreHighSentiment from './components/CQPLowScoreHighSentiment';
-import CQPMostUseful from './components/CQPMostUseful';
+import CommonQueryPanel from './components/CommonQueryPanel';
 import { Tab, Grid, Dimmer, Button, Menu, Dropdown, Divider, Loader, Accordion, Icon, Header, Statistic } from 'semantic-ui-react';
 const utils = require('../lib/utils');
 
@@ -262,7 +258,6 @@ class Main extends React.Component {
 
     // apply user specified filters
     var filterString = '';
-    console.log('sentimentFilter:' + queryData.sentiment);
     if (queryData.sentiment.length > 1) {
       if (queryData.sentiment !== 'ALL') {
         filterString = 'enriched_text.sentiment.document.label::' + queryData.sentiment;
@@ -270,7 +265,6 @@ class Main extends React.Component {
     }
 
     // add any product ID filter, if selected
-    console.log('productIdFilter:' + queryData.product);
     if (queryData.product.length > 1) {
       if (queryData.product !== 'ALL') {
         if (filterString != '') {
@@ -281,7 +275,6 @@ class Main extends React.Component {
     }
     
     // add any reviewer ID filter, if selected
-    console.log('reviewerIdFilter:' + queryData.reviewer);
     if (queryData.reviewer.length > 1) {
       if (queryData.reviewer !== 'ALL') {
         if (filterString != '') {
@@ -291,8 +284,6 @@ class Main extends React.Component {
       }
     }
     
-    console.log('FilterString: ' + filterString);
-
     const qs = queryString.stringify({
       query: queryData.query,
       queryType: 'natural_language_query',
@@ -312,7 +303,7 @@ class Main extends React.Component {
       })
       .then(json => {
         // const util = require('util');
-        console.log('+++ DISCO COMMON QUERY RESULTS +++');
+        console.log('+++ DISCO CUSTOM QUERY RESULTS +++');
         // console.log(util.inspect(json.aggregations[0].results, false, null));
         console.log('numMatches: ' + json.matching_results);
 
@@ -914,7 +905,8 @@ class Main extends React.Component {
           <Grid celled className='big-graph-grid'>
             <Grid.Row className='selection-header'>
               <Grid.Column width={16} textAlign='center'>
-                <CQPHighScore
+                <CommonQueryPanel
+                  key={utils.CQT_HIGH_SCORE}
                   queryData={commonQueryData}
                   categories={categories}
                   queryType={utils.CQT_HIGH_SCORE}
@@ -933,7 +925,8 @@ class Main extends React.Component {
           <Grid celled className='big-graph-grid'>
             <Grid.Row className='selection-header'>
               <Grid.Column width={16} textAlign='center'>
-                <CQPHighSentiment
+                <CommonQueryPanel
+                  key={utils.CQT_HIGH_SENTIMENT}
                   queryData={commonQueryData}
                   categories={categories}
                   queryType={utils.CQT_HIGH_SENTIMENT}
@@ -952,7 +945,8 @@ class Main extends React.Component {
           <Grid celled className='big-graph-grid'>
             <Grid.Row className='selection-header'>
               <Grid.Column width={16} textAlign='center'>
-                <CQPHighScoreLowSentiment
+                <CommonQueryPanel
+                  key={utils.CQT_HIGH_SCORE_LOW_SENTIMENT}
                   queryData={commonQueryData}
                   categories={categories}
                   queryType={utils.CQT_HIGH_SCORE_LOW_SENTIMENT}
@@ -971,7 +965,8 @@ class Main extends React.Component {
           <Grid celled className='big-graph-grid'>
             <Grid.Row className='selection-header'>
               <Grid.Column width={16} textAlign='center'>
-                <CQPLowScoreHighSentiment
+                <CommonQueryPanel
+                  key={utils.CQT_LOW_SCORE_HIGH_SENTIMENT}
                   queryData={commonQueryData}
                   categories={categories}
                   queryType={utils.CQT_LOW_SCORE_HIGH_SENTIMENT}
@@ -990,7 +985,8 @@ class Main extends React.Component {
           <Grid celled className='big-graph-grid'>
             <Grid.Row className='selection-header'>
               <Grid.Column width={16} textAlign='center'>
-                <CQPMostUseful
+                <CommonQueryPanel
+                  key={utils.CQT_MOST_USEFUL}
                   queryData={commonQueryData}
                   categories={categories}
                   queryType={utils.CQT_MOST_USEFUL}
