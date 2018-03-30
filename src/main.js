@@ -395,9 +395,9 @@ class Main extends React.Component {
         sort: '-enriched_text.sentiment.document.score'
       });
       break;
-    case utils.CQT_MOST_USEFUL:
+    case utils.CQT_LOW_SCORE_LOW_SENTIMENT:
       qs = queryString.stringify({
-        query: 'Score>=4.0,enriched_text.sentiment.document.label::"negative",enriched_text.categories.label:"' + category + '"',
+        query: 'enriched_text.sentiment.document.score>=-0.75,HelpfulnessNumerator>=4.0,enriched_text.categories.label:"' + category + '"',
         count: 10,
         sort: 'enriched_text.sentiment.document.score'
       });
@@ -858,7 +858,7 @@ class Main extends React.Component {
       <Grid.Row className='main-panel-header'>
         <Grid.Column width={16} verticalAlign='middle' textAlign='center'>
           <Header as='h1' textAlign='center'>
-            Food Review Data
+            Food Reviews
           </Header>
         </Grid.Column>
       </Grid.Row>
@@ -978,18 +978,18 @@ class Main extends React.Component {
         </div>
       },
       { menuItem: 
-        { key: 'query_' + utils.CQT_MOST_USEFUL, 
-          content: 'Which <positive,negative> sentiment reviews of <category> were most useful?' },
+        { key: 'query_' + utils.CQT_LOW_SCORE_LOW_SENTIMENT, 
+          content: 'Which low scoring reviews of <category> have the most negative sentiment?' },
       render: () =>
         <div>
           <Grid celled className='big-graph-grid'>
             <Grid.Row className='selection-header'>
               <Grid.Column width={16} textAlign='center'>
                 <CommonQueryPanel
-                  key={utils.CQT_MOST_USEFUL}
+                  key={utils.CQT_LOW_SCORE_LOW_SENTIMENT}
                   queryData={commonQueryData}
                   categories={categories}
-                  queryType={utils.CQT_MOST_USEFUL}
+                  queryType={utils.CQT_LOW_SCORE_LOW_SENTIMENT}
                   onGetCommonQueryRequest={this.fetchCommonQueryData.bind(this)}
                 />
               </Grid.Column>
@@ -1220,7 +1220,7 @@ class Main extends React.Component {
       },
       
       // Common Queries Tab
-      { menuItem: { key: 'common-queries', icon: 'bar graph', content: 'Common Queries' },
+      { menuItem: { key: 'common-queries', icon: 'bar graph', content: 'Sample Queries' },
         render: () =>
           <Tab.Pane attached='bottom'>
             <div>
