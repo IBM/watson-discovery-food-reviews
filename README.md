@@ -105,53 +105,42 @@ Create the following services:
 
 Launch the **WKS** tool and create a new **workspace**.
 
+![](doc/source/images/create-wks-workspace.png)
+
+
 ## 4. Upload Type System
 
 A type system allows us to define things that are specific to review documents. The type system controls how content can be annotated by defining the types of entities that can be labeled and how relationships among different entities can be labeled.
 
+To upload our pre-defined type system, from the Access & Tools -> Entity Types panel, press the Upload button to import the Type System file [data/types-2aa46ad0-31da-11e8-89a9-efc0f3b77492.json](data/types-2aa46ad0-31da-11e8-89a9-efc0f3b77492.json) found in the local repository.
+
+![](doc/source/images/upload-type-system.png)
+
+This will upload a set of Entity Types and Relation Types.
+
+![](doc/source/images/entity-types.png)
+
+![](doc/source/images/relation-types.png)
+
 ## 5. Import Corpus Documents
 
-Corpus documents are required to train our machine-learning annotator component. For this Code Pattern, the corpus documents will contain example review documents.
+Corpus documents are required to train our machine-learning annotator component. For this Code Pattern, the corpus documents will contain sample review documents.
 
-## 6. Create an Annotation Set
+From the Access & Tools -> Documents panel, press the Upload Document Sets button to import a Document Set file. Use the corpus documents file data/watson-discovery-food-reviews/data/corpus-2aa46ad0-31da-11e8-89a9-efc0f3b77492.zip found in the local repository.
 
-Once the corpus documents are loaded, we can start the human annotation process. This begins by dividing the corpus into multiple document sets and assigning the document sets to human annotators (for this Code Pattern, we will just be using using one document set and one annotator).
+> NOTE: NOTE: Select the option to "upload the original workspace's type system first".
 
-From the **Access & Tools -> Documents** panel, press the **Create Annotation Sets** button. Select a valid **Annotator** user, and provide a unique name for **Set name**.
+![](doc/source/images/import-corpus.png)
 
-## 7. Create a Task for Human Annotation
-
-Add a task for human annotation by creating a task and assigning it annotation sets.
-
-From the **Access & Tools -> Documents** panel, select the **Task** tab and press the **Add Task** button.
-
-### 7.1 Start the Human Annotation task
-
-Click on the task card to view the task details panel.
-
-Click the **Annotate** button to start the **Human Annotation** task.
-
-If you select any of the documents in the list, the **Document Annotation** panel will be displayed. Since we previously imported the corpus documents, the entity and relationship annotations are already completed (as shown in the following examples). You can annotate mentions (occurrences of words/phrases which can be annotated as an entity) to play around, or you can modify one by annotating mentions with a different entity.
-
-### 7.2 Submit Annotation Set
-
-From the **Task** details panel, press the **Submit All Documents** button.
-
-All documents should change status to **Completed**.
-
-Press the blue "File" icon to toggle back to the **Task** panel, which will show the completion percentage for each task.
-
-From the **Access & Tools -> Documents** panel, select the **Task** tab and select the task to view the details panel.
-
-Select your **Annotation Set Name** and then press the **Accept** button. This step is required to ensure that the annotation set is considered **ground truth**.
-
-> NOTE: The objective of the annotation project is to obtain ground truth, the collection of vetted data that is used to adapt WKS to a particular domain.
-
-**Status** should now be set to **COMPLETED**.
+![](doc/source/images/document-set.png)
 
 ## 8. Create the model
 
 Go to the **Model Management -> Performance** panel, and press the **Train and evaluate** button.
+
+![](doc/source/images/training-sets.png)
+
+![](doc/source/images/performance-page.png)
 
 From the **Document Set** name list, select the **Annotation Set Name** you created previously and press the **Train & Evaluate** button.
 
@@ -167,15 +156,25 @@ You can view the log files of the process by clicking the **View Log** button.
 
 Now we can deploy our new model to the already created **Watson Discovery** service. Navigate to the **Version** menu on the left and press **Take Snapshot**.
 
+![](doc/source/images/snapshot-page.png)
+
 The snapshot version will now be available for deployment to Watson Discovery.
+
+![](doc/source/images/model-versions.png)
 
 To start the process, click the **Deploy** button associated with your snapshot version.
 
 Select the option to deploy to **Discovery**.
 
+![](doc/source/images/deployment-options.png)
+
 Then enter your IBM Cloud account information to locate your **Discovery** service to deploy to.
 
+![](doc/source/images/deployment-location.png)
+
 Once deployed, a **Model ID** will be created. Keep note of this value as it will be required later in this Code Pattern.
+
+![](doc/source/images/deployment-model.png)
 
 > NOTE: You can also view this **Model ID** by pressing the **Discovery** button listed with your snapshot version.
 
