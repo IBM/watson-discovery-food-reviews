@@ -1220,7 +1220,7 @@ class Main extends React.Component {
       },
       
       // Common Queries Tab
-      { menuItem: { key: 'common-queries', icon: 'bar graph', content: 'Sample Queries' },
+      { menuItem: { key: 'common-queries', icon: 'unordered list', content: 'Sample Queries' },
         render: () =>
           <Tab.Pane attached='bottom'>
             <div>
@@ -1273,7 +1273,31 @@ class Main extends React.Component {
               </Grid>
             </div>
           </Tab.Pane>
-      }
+      },
+
+      // Interactive Queries Tab
+      { menuItem: { key: 'compare-wks', icon: 'zoom in', content: 'Compare' },
+      render: () =>
+        <Tab.Pane attached='bottom'>
+          <div>
+            <Grid className='search-grid' celled>
+              { this.getPanelHeader() }
+              <Grid.Row color={'blue'}>
+                <Grid.Column width={16} verticalAlign='middle' textAlign='center'>
+                  <Header className='graph-panel-subheader' as='h3' textAlign='center'>
+                  </Header>
+                </Grid.Column>
+              </Grid.Row>
+
+              <Grid.Row>
+                <Grid.Column  className='query-panel' width={16} textAlign='center'>
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
+          </div>
+        </Tab.Pane>
+    }
+
     ];
 
     return (
