@@ -27,8 +27,9 @@ import KeywordsFilter from './components/KeywordsFilter';
 import EntityTypesFilter from './components/EntityTypesFilter';
 import SentimentChart from './components/SentimentChart';
 import KeywordsTagCloud from './components/KeywordsTagCloud';
-import CustomQueryPanel from './components/CustomQueryPanel';
 import CommonQueryPanel from './components/CommonQueryPanel';
+import CustomQueryPanel from './components/CustomQueryPanel';
+import ComparePanel from './components/ComparePanel';
 import { Tab, Grid, Dimmer, Button, Menu, Dropdown, Divider, Loader, Accordion, Icon, Header, Statistic } from 'semantic-ui-react';
 const utils = require('../lib/utils');
 
@@ -1291,8 +1292,11 @@ class Main extends React.Component {
 
                 <Grid.Row>
                   <Grid.Column  className='query-panel' width={16} textAlign='center'>
+                    <ComparePanel
+                    />
                   </Grid.Column>
                 </Grid.Row>
+              
               </Grid>
             </div>
           </Tab.Pane>

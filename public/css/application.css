@@ -806,3 +806,22 @@ div.ui.grid.custom-query-results {
   margin-left: 40px;
   margin-right: 40px;
 }
+
+div.center.aligned.sixteen.wide.column.compare-panel-table {
+  padding-top: 30px;
+  padding-bottom: 30px;
+  padding-left: 30px;
+  padding-right: 30px;
+}
+
+th.compare-table-header {
+  background: #89C1EC !important;
+}
+
+td.compare-table-row-dark {
+  background: #D3E6F4 !important;
+}
+
+td.compare-table-row-light {
+  background: #E9F2F8 !important;
+}
