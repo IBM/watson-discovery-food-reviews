@@ -1277,26 +1277,26 @@ class Main extends React.Component {
 
       // Interactive Queries Tab
       { menuItem: { key: 'compare-wks', icon: 'zoom in', content: 'Compare' },
-      render: () =>
-        <Tab.Pane attached='bottom'>
-          <div>
-            <Grid className='search-grid' celled>
-              { this.getPanelHeader() }
-              <Grid.Row color={'blue'}>
-                <Grid.Column width={16} verticalAlign='middle' textAlign='center'>
-                  <Header className='graph-panel-subheader' as='h3' textAlign='center'>
-                  </Header>
-                </Grid.Column>
-              </Grid.Row>
+        render: () =>
+          <Tab.Pane attached='bottom'>
+            <div>
+              <Grid className='search-grid' celled>
+                { this.getPanelHeader() }
+                <Grid.Row color={'blue'}>
+                  <Grid.Column width={16} verticalAlign='middle' textAlign='center'>
+                    <Header className='graph-panel-subheader' as='h3' textAlign='center'>
+                    </Header>
+                  </Grid.Column>
+                </Grid.Row>
 
-              <Grid.Row>
-                <Grid.Column  className='query-panel' width={16} textAlign='center'>
-                </Grid.Column>
-              </Grid.Row>
-            </Grid>
-          </div>
-        </Tab.Pane>
-    }
+                <Grid.Row>
+                  <Grid.Column  className='query-panel' width={16} textAlign='center'>
+                  </Grid.Column>
+                </Grid.Row>
+              </Grid>
+            </div>
+          </Tab.Pane>
+      }
 
     ];
 
