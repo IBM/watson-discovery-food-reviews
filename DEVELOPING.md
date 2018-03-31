@@ -12,7 +12,7 @@ Below is a general overview of the most important directories and files in the p
 │       └── *.json # Food review JSON files
 ├── lib # library and utility functions
 │   ├── utils.js # Utility functions/constants used by src and server code
-│   └── watson-discovery-setup.js # Funcions to auto-load data files into Discovery
+│   └── watson-discovery-setup.js # Functions to auto-load data files into Discovery
 ├── public # Public folder contains CSS and JS served on the webpage
 │   ├── css
 │   ├── images
