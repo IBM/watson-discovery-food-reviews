@@ -15,9 +15,7 @@
  */
 
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Grid, Header, Table } from 'semantic-ui-react';
-const utils = require('../../../lib/utils');
 
 /**
  * This object renders a simple table comparing the difference of using
@@ -37,7 +35,7 @@ export default class ComparePanel extends React.Component {
       <div>
         <Grid>
 
-        <Grid.Row>
+          <Grid.Row>
             <Grid.Column width={16} textAlign='center'>
               <Header className='graph-panel-subheader' as='h3' textAlign='center'>
                 A Comparison of Query Results Highlighting WKS-enable Search Result improvement 
@@ -65,7 +63,7 @@ export default class ComparePanel extends React.Component {
                       What are the major side effects of dibetes treatments?
                     </Table.Cell>
                     <Table.Cell className='compare-table-row-dark'>
-                      20 documents with key word hits of "side effects", "diabetes", and "treatments"
+                      {  '20 documents with key word hits of "side effects", "diabetes", and "treatments" '}
                     </Table.Cell>
                     <Table.Cell className='compare-table-row-dark'>
                       Get back 6 documents where WKS identified that there is a side effect with a relation to the treatment
