@@ -55,39 +55,19 @@ When the reader has completed this Code Pattern, they will understand how to:
 
 # Steps
 
-Use the ``Deploy to IBM Cloud`` button **OR** create the services and run locally.
-
-## Deploy to IBM Cloud
-
-[![Deploy to IBM Cloud](https://metrics-tracker.mybluemix.net/stats/c612c58fcbb9552f348a4e0e5e148846/button.svg)](https://bluemix.net/deploy?repository=https://github.com/IBM/watson-discovery-food-reviews)
-
-1. Due to the requirement that the Watson Discovery service has to exist before a WKS model can be applied, you must first create the Discovery service manually by going to the following link: [**Watson Discovery**](https://console.ng.bluemix.net/catalog/services/discovery).
-
-2. Rename your service to: `wdfr-discovery-service`.
-
-3. Press the above ``Deploy to IBM Cloud`` button and then click on ``Deploy``.
-
-4. In Toolchains, click on `Delivery Pipeline` to watch while the app is deployed. Once deployed, the app can be viewed by clicking `View app`.
-
-![](doc/source/images/toolchain-pipeline.png)
-
-5. To see the app created and configured for this journey, use the IBM Cloud dashboard. The app is named `watson-discovery-food-reviews` with a unique suffix. 
-
-## Run locally
-> NOTE: These steps are only needed when running locally instead of using the ``Deploy to IBM Cloud`` button.
+> NOTE: Due to the requirement that the Watson Discovery service has to be configured to run with a specific WKS model, this Code Pattern must be installed locally. 
 
 1. [Clone the repo](#1-clone-the-repo)
 2. [Create IBM Cloud services](#2-create-ibm-cloud-services)
 3. [Create a Watson Knowledge Studio workspace](#3-create-a-watson-knowledge-studio-workspace)
 4. [Upload Type System](#4-upload-type-system)
 5. [Import Corpus Documents](#5-import-corpus-documents)
-6. [Create an Annotation Set](#6-create-an-annotation-set)
-7. [Create a Task for Human Annotation](#7-create-a-task-for-human-annotation)
-8. [Create the model](#8-create-the-model)
-9. [Deploy the machine learning model to Watson Discovery](#9-deploy-the-machine-learning-model-to-watson-discovery)
-10. [Load the Discovery files](#3-load-the-discovery-files)
-11. [Configure credentials](#4-configure-credentials)
-12. [Run the application](#5-run-the-application)
+6. [Create the model](#6-create-the-model)
+7. [Deploy the machine learning model to Watson Discovery](#7-deploy-the-machine-learning-model-to-watson-discovery)
+8. [Create Discovery Collection and Configuration](#8-create-discovery-collection-and-configuration)
+9. [Load the Discovery files](#9-load-the-discovery-files)
+10. [Configure credentials](#10-configure-credentials)
+11. [Run the application](#11-run-the-application)
 
 ### 1. Clone the repo
 ```
@@ -107,10 +87,9 @@ Launch the **WKS** tool and create a new **workspace**.
 
 ![](doc/source/images/create-wks-workspace.png)
 
-
 ## 4. Upload Type System
 
-A type system allows us to define things that are specific to review documents. The type system controls how content can be annotated by defining the types of entities that can be labeled and how relationships among different entities can be labeled.
+A type system allows us to define things that are specific to review documents, such as product and brand names. The type system controls how content can be annotated by defining the types of entities that can be labeled and how relationships among different entities can be labeled.
 
 To upload our pre-defined type system, from the `Access & Tools` -> `Entity Types` panel, press the `Upload` button to import the Type System file [data/types-2aa46ad0-31da-11e8-89a9-efc0f3b77492.json](data/types-2aa46ad0-31da-11e8-89a9-efc0f3b77492.json) found in the local repository.
 
@@ -134,27 +113,25 @@ From the `Access & Tools` -> `Documents` panel, press the `Upload Document` Sets
 
 ![](doc/source/images/document-set.png)
 
-## 8. Create the model
+## 6. Create the model
 
-Go to the **Model Management -> Performance** panel, and press the **Train and evaluate** button.
+Go to the `Model Management` -> `Performance` panel, and press the `Train and evaluate` button.
 
 ![](doc/source/images/training-sets.png)
 
 ![](doc/source/images/performance-page.png)
 
-From the **Document Set** name list, select the **Annotation Set Name** you created previously and press the **Train & Evaluate** button.
+From the **Document Set** name list, select the **Annotation Set Name** you created previously and press the `Train & Evaluate` button.
 
 This process may take several minutes to complete. Progress will be shown in the upper right corner of the panel.
 
-> Note: In practice, you would create separate annotation sets (each containing thousands of messages) for training and evaluation.
-
 Once complete, you will see the results of the train and evaluate process.
 
-You can view the log files of the process by clicking the **View Log** button.
+You can view the log files of the process by clicking the `View Log` button.
 
-## 9. Deploy the machine learning model to Watson Discovery
+## 7. Deploy the machine learning model to Watson Discovery
 
-Now we can deploy our new model to the already created **Watson Discovery** service. Navigate to the **Version** menu on the left and press **Take Snapshot**.
+Now we can deploy our new model to the already created **Watson Discovery** service. Navigate to the `Version` menu on the left and press `Take Snapshot`.
 
 ![](doc/source/images/snapshot-page.png)
 
@@ -162,7 +139,7 @@ The snapshot version will now be available for deployment to Watson Discovery.
 
 ![](doc/source/images/model-versions.png)
 
-To start the process, click the **Deploy** button associated with your snapshot version.
+To start the process, click the `Deploy` button associated with your snapshot version.
 
 Select the option to deploy to **Discovery**.
 
@@ -176,32 +153,42 @@ Once deployed, a **Model ID** will be created. Keep note of this value as it wil
 
 ![](doc/source/images/deployment-model.png)
 
-> NOTE: You can also view this **Model ID** by pressing the **Discovery** button listed with your snapshot version.
+> NOTE: You can also view this **Model ID** by pressing the `Discovery` button listed with your snapshot version.
 
-### 10. Load the Discovery files
+### 8. Create Discovery Collection and Configuration
 
 Launch the **Watson Discovery** tool. Create a **new data collection**
 and give the data collection a unique name.
 
-<p align="center">
-  <img width="600" src="doc/source/images/create-collection.png">
-</p>
+![](doc/source/images/create-collection.png)
 
-From the new collection data panel, under `Configuration` click the `Switch` button to create a new configuration file that will include extracting keywords as a function of data enrichment. Give the configuration file a unique name.
+From the new collection data panel, under `Configuration` click the `Switch` button to switch to a new configuration file. Click `Create a new configuration` option.
 
-![Create config file](doc/source/images/create-keyword-config.gif)
+![](doc/source/images/switch-configuration.png)
 
-> Note: failure to do this will result in no `keywords` being shown in the app. 
+Enter a unique name and press `Create`.
 
-From the new collection data panel, under `Add data to this collection` use `Drag and drop your documents here or browse from computer` to seed the content with the json files extracted from `data/food_reviews/`.
+From the **Configuration Panel**, press the `Add enrichments` option. Ensure that the following **extraction** options are added: **Keyword**, **Entity**, and **Relation**.
+
+Also, assign your **Model ID** to both the **Entity Extraction** and **Relation Extraction**.
+
+> Note: These **Model ID** assignments are required to ensure your review data is properly enriched.
+
+![](doc/source/images/setup-config.png)
+
+Save the configuration by pressing `Apply & Save`, and then `Close`.
+
+### 9. Load the Discovery files
+
+From the new collection data panel, under `Add data to this collection` use `Drag and drop your documents here or browse from computer` to seed the content with the 2000 json files extracted from `data/food_reviews/`.
 
 > Note: If you don't load files, they will be automatically added when you run `npm start`.
 
-![Upload data to collection](doc/source/images/add-docs-to-collection.gif)
+![](doc/source/images/load-docs.png)
 
-> Save the **environment_id** and **collection_id** for your `.env` file in the next step.
+> Save the **environment_id** and **collection_id** for your `.env` file in the next step. You can find this data by clicking on `Use this collection API` under the **Collection Info** header located at the top right portion of the panel.
 
-### 11. Configure credentials
+### 10. Configure credentials
 ```
 cp env.sample .env
 ```
@@ -224,7 +211,7 @@ DISCOVERY_COLLECTION_ID=<add_discovery_collection>
 
 ```
 
-### 12. Run the application
+### 11. Run the application
 1. Install [Node.js](https://nodejs.org/en/) runtime or NPM.
 1. Start the app by running `npm install`, followed by `npm start`.
 1. Access the UI by pointing your browser at `localhost:3000`.
