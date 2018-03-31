@@ -16,7 +16,7 @@ The main benefit of using the Watson Discovery Service is its powerful analytics
 * Entity Types -  the classification of the discovered entities, such as person, location, or job title.
 * Sentiment - the overall positive or negative sentiment of each document.
 
-With Watson Knowledge Studio (WKS), data modeling can be used to inform Watson Discovery of additional entities and relationships that go beyond its default entity extraction and enrichment process. Through the use of annotations, the user can indicate entities and entity relationships on a small subset of documents, which can then be applied to a much larger set of similar documents. This model can then be applied to a Watson Discovery service instance and encorporated into the Discovery enrichment process as documents are uploaded into the service. 
+With Watson Knowledge Studio (WKS), data modeling can be used to inform Watson Discovery of additional entities and relationships that go beyond its default entity extraction and enrichment process. Through the use of annotations, the user can indicate entities and entity relationships on a small subset of documents, which can then be applied to a much larger set of similar documents. This model can then be applied to a Watson Discovery service instance and incorporated into the Discovery enrichment process as documents are uploaded into the service. 
 
 For this Code Pattern, we will be using data that contains food reviews.
 
@@ -48,7 +48,7 @@ When the reader has completed this Code Pattern, they will understand how to:
 ## Featured technologies
 * [Node.js](https://nodejs.org/): An open-source JavaScript run-time environment for executing server-side JavaScript code.
 * [React](https://facebook.github.io/react/): A JavaScript library for building User Interfaces.
-* [Express](https://expressjs.com) - A popular and minimalistic web framework for creating an API and Web server.
+* [Express](https://expressjs.com): A popular and minimalistic web framework for creating an API and Web server.
 * [Semantic UI React](https://react.semantic-ui.com/introduction): React integration of Semantic UI components. 
 * [Chart.js](http://www.chartjs.org/): JavaScript charting package.
 * [Jest](https://facebook.github.io/jest/): A JavaScript test framework.
@@ -67,7 +67,7 @@ Use the ``Deploy to IBM Cloud`` button **OR** create the services and run locall
 
 3. Press the above ``Deploy to IBM Cloud`` button and then click on ``Deploy``.
 
-4. In Toolchains, click on Delivery Pipeline to watch while the app is deployed. Once deployed, the app can be viewed by clicking 'View app'.
+4. In Toolchains, click on `Delivery Pipeline` to watch while the app is deployed. Once deployed, the app can be viewed by clicking `View app`.
 
 ![](doc/source/images/toolchain-pipeline.png)
 
@@ -112,7 +112,7 @@ Launch the **WKS** tool and create a new **workspace**.
 
 A type system allows us to define things that are specific to review documents. The type system controls how content can be annotated by defining the types of entities that can be labeled and how relationships among different entities can be labeled.
 
-To upload our pre-defined type system, from the Access & Tools -> Entity Types panel, press the Upload button to import the Type System file [data/types-2aa46ad0-31da-11e8-89a9-efc0f3b77492.json](data/types-2aa46ad0-31da-11e8-89a9-efc0f3b77492.json) found in the local repository.
+To upload our pre-defined type system, from the `Access & Tools` -> `Entity Types` panel, press the `Upload` button to import the Type System file [data/types-2aa46ad0-31da-11e8-89a9-efc0f3b77492.json](data/types-2aa46ad0-31da-11e8-89a9-efc0f3b77492.json) found in the local repository.
 
 ![](doc/source/images/upload-type-system.png)
 
@@ -126,9 +126,9 @@ This will upload a set of Entity Types and Relation Types.
 
 Corpus documents are required to train our machine-learning annotator component. For this Code Pattern, the corpus documents will contain sample review documents.
 
-From the Access & Tools -> Documents panel, press the Upload Document Sets button to import a Document Set file. Use the corpus documents file data/watson-discovery-food-reviews/data/corpus-2aa46ad0-31da-11e8-89a9-efc0f3b77492.zip found in the local repository.
+From the `Access & Tools` -> `Documents` panel, press the `Upload Document` Sets button to import a Document Set file. Use the corpus documents file `data/watson-discovery-food-reviews/data/corpus-2aa46ad0-31da-11e8-89a9-efc0f3b77492.zip` found in the local repository.
 
-> NOTE: NOTE: Select the option to "upload the original workspace's type system first".
+> NOTE: Select the option to "upload the original workspace's type system first".
 
 ![](doc/source/images/import-corpus.png)
 
@@ -244,7 +244,7 @@ be usable on restart. If you used `Deploy to IBM Cloud` the restart should be au
 
 * Error: Only one free environment is allowed per organization
 
-  > To work with a free trial, a small free Discovery environment is created. If you already have a Discovery environment, this will fail. If you are not using Discovery, check for an old service thay you may want to delete. Otherwise use the .env DISCOVERY_ENVIRONMENT_ID to tell the app which environment you want it to use. A collection will be created in this environment using the default configuration.
+  > To work with a free trial, a small free Discovery environment is created. If you already have a Discovery environment, this will fail. If you are not using Discovery, check for an old service thay you may want to delete. Otherwise use the .env DISCOVERY_ENVIRONMENT_ID to tell the app which environment you want it to use. A collection will be created in this environment using the default configuration.
 
 * Error when loading files into Discovery
 
