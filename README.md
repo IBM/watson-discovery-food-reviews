@@ -1,5 +1,4 @@
 [![Build Status](https://travis-ci.org/IBM/watson-discovery-food-reviews.svg?branch=master)](https://travis-ci.org/IBM/watson-discovery-food-reviews)
-![IBM Cloud Deployments](https://metrics-tracker.mybluemix.net/stats/c612c58fcbb9552f348a4e0e5e148846/badge.svg)
 
 # Discovery customer sentiment from product reviews
 
