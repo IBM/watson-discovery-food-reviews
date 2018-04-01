@@ -8,16 +8,16 @@ This web app contains multiple UI components that you can use as a starting poin
 
 The main benefit of using the Watson Discovery Service is its powerful analytics engine that provides cognitive enrichments and insights into your data. This app provides examples of how to showcase these enrichments through the use of filters, lists and graphs. The key enrichments that we will focus on are:
 
-* Entities - people, companies, organizations, cities, and more.
-* Categories - classification of the data into a hierarchy of categories up to 5 levels deep.
-* Concepts - identified general concepts that aren't necessarily referenced in the data.
-* Keywords - important topics typically used to index or search the data.
-* Entity Types -  the classification of the discovered entities, such as person, location, or job title.
-* Sentiment - the overall positive or negative sentiment of each document.
+* **Entities**: people, companies, organizations, cities, and more.
+* **Categories**: classification of the data into a hierarchy of categories up to 5 levels deep.
+* **Concepts**: identified general concepts that aren't necessarily referenced in the data.
+* **Keywords**: important topics typically used to index or search the data.
+* **Entity Types**: the classification of the discovered entities, such as person, location, or job title.
+* **Sentiment**: the overall positive or negative sentiment of each document.
 
 With Watson Knowledge Studio (WKS), data modeling can be used to inform Watson Discovery of additional entities and relationships that go beyond its default entity extraction and enrichment process. Through the use of annotations, the user can indicate entities and entity relationships on a small subset of documents, which can then be applied to a much larger set of similar documents. This model can then be applied to a Watson Discovery service instance and incorporated into the Discovery enrichment process as documents are uploaded into the service. 
 
-For this Code Pattern, we will be using data that contains food reviews.
+> For this Code Pattern, we will be using data that contains food reviews from Amazon, see the [Kaggle dataset](https://www.kaggle.com/snap/amazon-fine-food-reviews) for further information.
 
 When the reader has completed this Code Pattern, they will understand how to:
 * Use Watson Knowledge Studio to create a data model.
