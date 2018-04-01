@@ -68,12 +68,12 @@ When the reader has completed this Code Pattern, they will understand how to:
 10. [Configure credentials](#10-configure-credentials)
 11. [Run the application](#11-run-the-application)
 
-### 1. Clone the repo
+## 1. Clone the repo
 ```
 $ git clone https://github.com/IBM/watson-discovery-food-reviews
 ```
 
-### 2. Create IBM Cloud services
+## 2. Create IBM Cloud services
 
 Create the following services:
 
@@ -154,7 +154,7 @@ Once deployed, a **Model ID** will be created. Keep note of this value as it wil
 
 > NOTE: You can also view this **Model ID** by pressing the `Discovery` button listed with your snapshot version.
 
-### 8. Create Discovery Collection and Configuration
+## 8. Create Discovery Collection and Configuration
 
 Launch the **Watson Discovery** tool. Create a **new data collection**
 and give the data collection a unique name.
@@ -177,7 +177,7 @@ Also, assign your **Model ID** to both the **Entity Extraction** and **Relation 
 
 Save the configuration by pressing `Apply & Save`, and then `Close`.
 
-### 9. Load the Discovery files
+## 9. Load the Discovery files
 
 From the new collection data panel, under `Add data to this collection` use `Drag and drop your documents here or browse from computer` to seed the content with the 2000 json files extracted from `data/food_reviews/`.
 
@@ -187,7 +187,7 @@ From the new collection data panel, under `Add data to this collection` use `Dra
 
 > Save the **environment_id** and **collection_id** for your `.env` file in the next step. You can find this data by clicking on `Use this collection API` under the **Collection Info** header located at the top right portion of the panel.
 
-### 10. Configure credentials
+## 10. Configure credentials
 ```
 cp env.sample .env
 ```
@@ -210,7 +210,7 @@ DISCOVERY_COLLECTION_ID=<add_discovery_collection>
 
 ```
 
-### 11. Run the application
+## 11. Run the application
 1. Install [Node.js](https://nodejs.org/en/) runtime or NPM.
 1. Start the app by running `npm install`, followed by `npm start`.
 1. Access the UI by pointing your browser at `localhost:3000`.
