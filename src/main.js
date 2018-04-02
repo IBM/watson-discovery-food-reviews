@@ -56,10 +56,6 @@ class Main extends React.Component {
       numNeutral,
       numNegative,
       error,
-      // original collection items
-      // origProducts,
-      // origCategories,
-      // origReviewers,
       // query params
       searchQuery,
       sentimentFilter,
