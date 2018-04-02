@@ -57,7 +57,9 @@ class Main extends React.Component {
       numNegative,
       error,
       // original collection items
-      originalItems,
+      // origProducts,
+      // origCategories,
+      // origReviewers,
       // query params
       searchQuery,
       sentimentFilter,
@@ -848,7 +850,7 @@ class Main extends React.Component {
    * render - return all the home page object to be rendered.
    */
   render() {
-    const { loading, data, error, products, reviewers,
+    const { loading, data, error,
       entities, categories, concepts, keywords, entityTypes,
       origCategories, origProducts, origReviewers,
       selectedEntities, selectedCategories, 
@@ -1372,6 +1374,9 @@ Main.propTypes = {
   concepts: PropTypes.object,
   keywords: PropTypes.object,
   entityTypes: PropTypes.object,
+  origProducts: PropTypes.object,
+  origCategories: PropTypes.object,
+  origReviewers: PropTypes.object,
   searchQuery: PropTypes.string,
   selectedSentiments: PropTypes.object,
   selectedProperties: PropTypes.object,
