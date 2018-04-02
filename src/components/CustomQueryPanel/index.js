@@ -22,15 +22,13 @@ import { Grid, Dimmer, Input, Button, Loader, Dropdown, Header, Divider, List } 
 const utils = require('../../../lib/utils');
 
 /**
- * This object renders a trending chart object that appears at the bottom
- * of the web page. It is composed of multiple objects, the chart,
- * and 2 drop-down menus where the user can select what filter (entities,
- * categories, or concepts) and/or what filter value (referred to as 'term') 
- * to represent. 
- * NOTE: the filter value of 'Term' indicates all values.
- * NOTE: what the user selects to represent in the graph has no effect
- *       on any other objects on the page. It has it's own search
- *       query.
+ * This object serves as the panel containing custom query options and results.
+ *
+ * It provides a tag cloud of top keywords, a top 5 list of entities,
+ * and a list or relevant reviews.
+ *
+ * User can enter a search field, and select from a number of dropdown menus
+ * to limit what results are returned.
  */
 export default class CustomQueryPanel extends React.Component {
   constructor(...props) {
@@ -48,7 +46,7 @@ export default class CustomQueryPanel extends React.Component {
   }
 
   /**
-   * categoryChange - user has selected a new category.
+   * categoryChange - user has selected what type of sentiment to filter on.
    */
   sentimentFilterChanged(event, selection) {
     var { queryData } = this.state;
@@ -60,6 +58,9 @@ export default class CustomQueryPanel extends React.Component {
     });
   }
 
+  /**
+   * productFilterChanged - user has selected a product to filter on.
+   */
   productFilterChanged(event, selection) {
     var { queryData } = this.state;
 
@@ -70,6 +71,9 @@ export default class CustomQueryPanel extends React.Component {
     });
   }
 
+  /**
+   * reviewerFilterChanged - user has selected type of review to filter on.
+   */
   reviewerFilterChanged(event, selection) {
     var { queryData } = this.state;
     queryData.product = selection.value;
@@ -79,6 +83,9 @@ export default class CustomQueryPanel extends React.Component {
     });
   }
 
+  /**
+   * queryChanged - user has changed search query.
+   */
   queryChanged(event, data) {
     var { queryData } = this.state;
     queryData.query = data.value;
@@ -88,6 +95,9 @@ export default class CustomQueryPanel extends React.Component {
     });
   }
 
+  /**
+   * doCustomQuerySearch - tell parent to perform search.
+   */
   doCustomQuerySearch() {
     var { queryData } = this.state;
     this.props.onGetCustomQueryRequest({
@@ -95,6 +105,9 @@ export default class CustomQueryPanel extends React.Component {
     });
   }
 
+  /**
+   * doCustomQueryClear - clear panel and set all options to default values.
+   */
   doCustomQueryClear() {
     var { queryData, clearQuery, clearSentiment, clearProduct, clearReviewer } = this.state;
     queryData.data = null;
@@ -114,6 +127,9 @@ export default class CustomQueryPanel extends React.Component {
     });
   }
 
+  /**
+   * getShowSentimentOptions - return available sentiment type options.
+   */
   getShowSentimentOptions() {
     const reviewSentimentOptions = [
       { key: 'ALL', value: 'ALL', text: 'Show All Reviews' },
@@ -124,6 +140,9 @@ export default class CustomQueryPanel extends React.Component {
     return reviewSentimentOptions;
   }
 
+  /**
+   * getShowProductOptions - return available product IDs.
+   */
   getShowProductOptions() {
     const { products } = this.state;
     var showProductOptions = [
@@ -141,6 +160,9 @@ export default class CustomQueryPanel extends React.Component {
     return showProductOptions;
   }
 
+  /**
+   * getShowReviewerOptions - return available review type options.
+   */
   getShowReviewerOptions() {
     const { reviewers } = this.state;
     var showReviewersOptions = [
@@ -208,6 +230,9 @@ export default class CustomQueryPanel extends React.Component {
     return keywords;
   }
   
+  /**
+   * getReviews - return panel displaying review data.
+   */
   getReviews() {
     const { queryData } = this.state;
 
@@ -222,31 +247,7 @@ export default class CustomQueryPanel extends React.Component {
   }
 
   /**
-   * getCategoryOptions - get the term items available to be selected by the user.
-   */
-  getProductOptions() {
-    const { categories } = this.state;
-    var options = [{ key: -1, value: utils.NO_CATEGORY_SELECTED, text: utils.NO_CATEGORY_SELECTED }];
-
-    if (categories.results) {
-      categories.results.map(item =>
-        options.push({key: item.key, value: item.key, text: item.key})
-      );
-    }
-
-    return options;
-  }
-  
-  // Important - this is needed to ensure changes to main properties
-  // are propagated down to our component. In this case, some other
-  // search or filter event has occured which has changed the list of 
-  // items we are graphing, OR the graph data has arrived.
-  // componentWillReceiveProps(nextProps) {
-  //   this.setState({ queryData: nextProps.queryData });
-  // }
-
-  /**
-   * render - return the trending chart object to render.
+   * render - return the panel object to render.
    */
   render() {
     const { queryData, clearQuery, clearSentiment, clearProduct, clearReviewer } = this.state;
