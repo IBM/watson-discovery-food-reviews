@@ -163,8 +163,12 @@ function createServer() {
     params.count = count;
 
     // turn these off for now
-    //params.passages_count = count;
-    //params.passages = returnPassages;
+    params.passages_count = count;
+    if (returnPassages === 'true') {
+      params.passages = true;
+    } else {
+      params.passages = false;
+    }
 
     if (! sort) {
       params.sort = utils.utils.sortKeys[0].sortBy;
