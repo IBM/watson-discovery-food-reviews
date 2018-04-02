@@ -15,12 +15,12 @@ The main benefit of using the Watson Discovery Service is its powerful analytics
 * **Entity Types**: the classification of the discovered entities, such as person, location, or job title.
 * **Sentiment**: the overall positive or negative sentiment of each document.
 
-With Watson Knowledge Studio (WKS), data modeling can be used to inform Watson Discovery of additional entities and relationships that go beyond its default entity extraction and enrichment process. Through the use of annotations, the user can indicate entities and entity relationships on a small subset of documents, which can then be applied to a much larger set of similar documents. This model can then be applied to a Watson Discovery service instance and incorporated into the Discovery enrichment process as documents are uploaded into the service. 
+With Watson Knowledge Studio (WKS), a machine learning annotator can be trained to recognize mentions of custom entity and relation types which can then be incorporated into the Discovery application enrichment process.
 
 > For this Code Pattern, we will be using data that contains food reviews from Amazon, see the [Kaggle dataset](https://www.kaggle.com/snap/amazon-fine-food-reviews) for further information.
 
 When the reader has completed this Code Pattern, they will understand how to:
-* Use Watson Knowledge Studio to create a data model.
+* Use Watson Knowledge Studio to create a custom annotator.
 * Deploy a WKS model to Watson Discovery.
 * Load and enrich data in the Watson Discovery Service.
 * Query and manipulate data in the Watson Discovery Service.
@@ -106,7 +106,7 @@ Corpus documents are required to train our machine-learning annotator component.
 
 From the `Access & Tools` -> `Documents` panel, press the `Upload Document` Sets button to import a Document Set file. Use the corpus documents file `data/watson-discovery-food-reviews/data/corpus-2aa46ad0-31da-11e8-89a9-efc0f3b77492.zip` found in the local repository.
 
-> NOTE: Select the option to "upload the original workspace's type system first".
+> NOTE: Select the option to "upload corpus documents and include ground truth (upload the original workspace's type system first)"
 
 ![](doc/source/images/import-corpus.png)
 
@@ -114,13 +114,13 @@ From the `Access & Tools` -> `Documents` panel, press the `Upload Document` Sets
 
 ## 6. Create the model
 
+Since the corpus documents that were uploaded were already pre-annotated and included ground truth, it is possible to build the machine learning annotator directly without the need for performing human annotations.
+
 Go to the `Model Management` -> `Performance` panel, and press the `Train and evaluate` button.
 
 ![](doc/source/images/training-sets.png)
 
-![](doc/source/images/performance-page.png)
-
-From the **Document Set** name list, select the **Annotation Set Name** you created previously and press the `Train & Evaluate` button.
+From the **Document Set** name list, select the annotation sets `Docs28.csv` and `Docs122V2.csv`. Also, make sure that the option `Run on existing training, test and blind sets` is checked.  Press the `Train & Evaluate` button.
 
 This process may take several minutes to complete. Progress will be shown in the upper right corner of the panel.
 
@@ -152,7 +152,7 @@ Once deployed, a **Model ID** will be created. Keep note of this value as it wil
 
 ![](doc/source/images/deployment-model.png)
 
-> NOTE: You can also view this **Model ID** by pressing the `Discovery` button listed with your snapshot version.
+> NOTE: You can also view this **Model ID** by clicking the WDS link under 'Status'  against the deployed version.
 
 ## 8. Create Discovery Collection and Configuration
 
@@ -174,6 +174,8 @@ Also, assign your **Model ID** to both the **Entity Extraction** and **Relation 
 > Note: These **Model ID** assignments are required to ensure your review data is properly enriched.
 
 ![](doc/source/images/setup-config.png)
+
+Close the **Add Ennrichments** panel by pressing `Done`.
 
 Save the configuration by pressing `Apply & Save`, and then `Close`.
 
