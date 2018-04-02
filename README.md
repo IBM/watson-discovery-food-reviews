@@ -175,6 +175,8 @@ Also, assign your **Model ID** to both the **Entity Extraction** and **Relation 
 
 ![](doc/source/images/setup-config.png)
 
+Close the **Add Ennrichments** panel by pressing `Done`.
+
 Save the configuration by pressing `Apply & Save`, and then `Close`.
 
 ## 9. Load the Discovery files
