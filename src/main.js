@@ -453,11 +453,12 @@ class Main extends React.Component {
 
     // build query string, with filters and optional params
     const qs = queryString.stringify({
-      //query: searchQuery,
+      query: searchQuery,
       filters: filterString,
       count: 2000,
-      // sort: sortOrder,
-      queryType: 'natural_language_query'
+      sort: sortOrder,
+      queryType: 'natural_language_query',
+      returnPassages: false
     });
 
     // send request
