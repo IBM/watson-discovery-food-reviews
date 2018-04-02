@@ -152,7 +152,7 @@ Once deployed, a **Model ID** will be created. Keep note of this value as it wil
 
 ![](doc/source/images/deployment-model.png)
 
-> NOTE: You can also view this **Model ID** by pressing the `Discovery` button listed with your snapshot version.
+> NOTE: You can also view this **Model ID** by clicking the WDS link under 'Status'  against the deployed version.
 
 ## 8. Create Discovery Collection and Configuration
 
