@@ -2,7 +2,7 @@
 
 # Discovery customer sentiment from product reviews
 
-In this Code Pattern, we walk you through a working example of a web application that queries and manipulates data from the Watson Discovery Service. With the aid of data modeling using the Watson Knowledge Studio service, the data will have additional enrichments that will provide improved insights for user analysis.
+In this Code Pattern, we walk you through a working example of a web application that queries and manipulates data from the Watson Discovery Service. With the aid of a custom model built with Watson Knowledge studio,the data will have additional enrichments that will provide improved insights for user analysis.
 
 This web app contains multiple UI components that you can use as a starting point for developing your own Watson Discovery and Knowledge Studio service applications. 
 
