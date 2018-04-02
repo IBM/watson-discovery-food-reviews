@@ -56,6 +56,8 @@ class Main extends React.Component {
       numNeutral,
       numNegative,
       error,
+      // original collection items
+      originalItems,
       // query params
       searchQuery,
       sentimentFilter,
@@ -95,6 +97,12 @@ class Main extends React.Component {
       numNegative: numNegative || 0,
       loading: false,
       error: error,
+      // original set of items that can be used in common and custom
+      // queries and not be effected by limiting queries performed
+      // on main dashboard.
+      origProducts: products && parseProducts(products),
+      origCategories: categories && parseCategories(categories),
+      origReviewers: reviewers && parseReviewers(reviewers),
       // query params
       searchQuery: searchQuery || '',
       sortOrder: sortOrder || utils.sortKeys[0].sortBy,
@@ -708,7 +716,7 @@ class Main extends React.Component {
   }
 
   /**
-   * getReviewerFilter - return values to be displayed in the review type filter.
+   * getReviewerFilter - return values to be displayed in the reviewers filter.
    */
   getReviewerFilter() {
     const { reviewers, reviewerIdFilter } = this.state;
@@ -842,6 +850,7 @@ class Main extends React.Component {
   render() {
     const { loading, data, error, products, reviewers,
       entities, categories, concepts, keywords, entityTypes,
+      origCategories, origProducts, origReviewers,
       selectedEntities, selectedCategories, 
       selectedConcepts,selectedKeywords, selectedEntityTypes,
       numMatches, numPositive, numNeutral, numNegative,
@@ -879,7 +888,7 @@ class Main extends React.Component {
                 <CommonQueryPanel
                   key={utils.CQT_HIGH_SCORE}
                   queryData={commonQueryData}
-                  categories={categories}
+                  categories={origCategories}
                   queryType={utils.CQT_HIGH_SCORE}
                   onGetCommonQueryRequest={this.fetchCommonQueryData.bind(this)}
                 />
@@ -899,7 +908,7 @@ class Main extends React.Component {
                 <CommonQueryPanel
                   key={utils.CQT_HIGH_SENTIMENT}
                   queryData={commonQueryData}
-                  categories={categories}
+                  categories={origCategories}
                   queryType={utils.CQT_HIGH_SENTIMENT}
                   onGetCommonQueryRequest={this.fetchCommonQueryData.bind(this)}
                 />
@@ -919,7 +928,7 @@ class Main extends React.Component {
                 <CommonQueryPanel
                   key={utils.CQT_HIGH_SCORE_LOW_SENTIMENT}
                   queryData={commonQueryData}
-                  categories={categories}
+                  categories={origCategories}
                   queryType={utils.CQT_HIGH_SCORE_LOW_SENTIMENT}
                   onGetCommonQueryRequest={this.fetchCommonQueryData.bind(this)}
                 />
@@ -939,7 +948,7 @@ class Main extends React.Component {
                 <CommonQueryPanel
                   key={utils.CQT_LOW_SCORE_HIGH_SENTIMENT}
                   queryData={commonQueryData}
-                  categories={categories}
+                  categories={origCategories}
                   queryType={utils.CQT_LOW_SCORE_HIGH_SENTIMENT}
                   onGetCommonQueryRequest={this.fetchCommonQueryData.bind(this)}
                 />
@@ -959,7 +968,7 @@ class Main extends React.Component {
                 <CommonQueryPanel
                   key={utils.CQT_LOW_SCORE_LOW_SENTIMENT}
                   queryData={commonQueryData}
-                  categories={categories}
+                  categories={origCategories}
                   queryType={utils.CQT_LOW_SCORE_LOW_SENTIMENT}
                   onGetCommonQueryRequest={this.fetchCommonQueryData.bind(this)}
                 />
@@ -1235,8 +1244,8 @@ class Main extends React.Component {
                   <Grid.Column  className='query-panel' width={16} textAlign='center'>
                     <CustomQueryPanel
                       queryData={customQueryData}
-                      products={products}
-                      reviewers={reviewers}
+                      products={origProducts}
+                      reviewers={origReviewers}
                       onGetCustomQueryRequest={this.fetchCustomQueryData.bind(this)}
                     />
                   </Grid.Column>
@@ -1246,7 +1255,7 @@ class Main extends React.Component {
           </Tab.Pane>
       },
 
-      // Interactive Queries Tab
+      // Comparison Tab
       { menuItem: { key: 'compare-wks', icon: 'zoom in', content: 'Compare' },
         render: () =>
           <Tab.Pane attached='bottom'>
