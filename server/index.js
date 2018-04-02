@@ -107,7 +107,7 @@ function createServer() {
   server.get('/api/customQuery', (req, res) => {
     const { query, filters, queryType, count, sort } = req.query;
 
-    console.log('In /api/commonQuery: query = ' + query);
+    console.log('In /api/customQuery: query = ' + query);
     
     // build params for the trending search request
     var params = {};
@@ -161,10 +161,13 @@ function createServer() {
     }
 
     params.count = count;
-    params.passages_count = count;
-    params.passages = returnPassages;
+
+    // turn these off for now
+    //params.passages_count = count;
+    //params.passages = returnPassages;
+
     if (! sort) {
-      params.sort = utils.BY_HIGHEST_QUERY;
+      params.sort = utils.utils.sortKeys[0].sortBy;
     } else {
       params.sort = sort;
     }
