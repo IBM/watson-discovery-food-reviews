@@ -134,7 +134,7 @@ class Main extends React.Component {
   /**
    * filtersChanged - (callback function)
    * User has selected one of the values from within
-   * of the filter boxes. This results in making a new qeury to 
+   * one of the filter boxes. This results in making a new qeury to
    * the disco service.
    */
   filtersChanged() {
@@ -162,26 +162,36 @@ class Main extends React.Component {
   }
 
   /**
-   * searchQueryChanged - (callback function)
-   * User has entered a new search string to query on. 
+   * applySentimentFilter - (callback function)
+   * User has selected what type of sentiment to filter on.
    * This results in making a new qeury to the disco service.
    */
-  searchQueryChanged(event, data) {
-    this.state({ searchQuery: data.value });
-  }
-
   applySentimentFilter(event, data) {
     this.setState({ sentimentFilter: data.value });
   }
   
+  /**
+   * applyProductIdFilter - (callback function)
+   * User has selected what product ID filter on.
+   * This results in making a new qeury to the disco service.
+   */
   applyProductIdFilter(event, data) {
     this.setState({ productIdFilter: data.value });
   }
 
+  /**
+   * applyReviewerIdFilter - (callback function)
+   * User has selected what type of review (pos or neg) to filter on.
+   * This results in making a new qeury to the disco service.
+   */
   applyReviewerIdFilter(event, data) {
     this.setState({ reviewerIdFilter: data.value });
   }
 
+  /**
+   * componentDidUpdate - one of the above filters has been changed
+   * so perform a new disco search.
+   */
   componentDidUpdate(prevProps, prevState) {
     const { searchQuery, sentimentFilter, productIdFilter, reviewerIdFilter } = this.state;
     if ((sentimentFilter != prevState.sentimentFilter) || 
@@ -241,13 +251,9 @@ class Main extends React.Component {
 
   /**
    * fetchCustomQueryData - (callback function)
-   * User has entered a new search string to query on. 
-   * This results in making a new qeury to the disco service.
-   * Keep track of the current term value so that main stays
-   * in sync with the trending chart component.
-   * 
-   * NOTE: This function is also called at startup to 
-   * display a default graph.
+   * This builds the query used to perform all of the
+   * custom queries provide to the user in the 'custom queries'
+   * tab panel.
    */
   fetchCustomQueryData(data) {
     var { queryData } = data;
@@ -334,13 +340,9 @@ class Main extends React.Component {
 
   /**
    * fetchCommonQueryData - (callback function)
-   * User has entered a new search string to query on. 
-   * This results in making a new qeury to the disco service.
-   * Keep track of the current term value so that main stays
-   * in sync with the trending chart component.
-   * 
-   * NOTE: This function is also called at startup to 
-   * display a default graph.
+   * This builds the query used to perform all of the
+   * common queries provide to the user in the 'common queries'
+   * tab panel.
    */
   fetchCommonQueryData(data) {
     var { category, queryType } = data;
@@ -366,44 +368,7 @@ class Main extends React.Component {
       commonQueryData: queryData
     });
 
-    var qs;
-    switch (queryType) {
-    case utils.CQT_HIGH_SCORE:
-      qs = queryString.stringify({
-        query: 'Score>=4.0,enriched_text.categories.label:"' + category + '"',
-        count: 10,
-        sort: '-Score'
-      });
-      break;
-    case utils.CQT_HIGH_SENTIMENT:
-      qs = queryString.stringify({
-        query: 'enriched_text.sentiment.document.score>=0.70,enriched_text.categories.label:"' + category + '"',
-        count: 10,
-        sort: '-enriched_text.sentiment.document.score'
-      });
-      break;
-    case utils.CQT_HIGH_SCORE_LOW_SENTIMENT:
-      qs = queryString.stringify({
-        query: 'Score>=4.0,enriched_text.sentiment.document.label::"negative",enriched_text.categories.label:"' + category + '"',
-        count: 10,
-        sort: 'enriched_text.sentiment.document.score'
-      });
-      break;
-    case utils.CQT_LOW_SCORE_HIGH_SENTIMENT:
-      qs = queryString.stringify({
-        query: 'Score<=3.0,enriched_text.sentiment.document.label::"positive",enriched_text.categories.label:"' + category + '"',
-        count: 10,
-        sort: '-enriched_text.sentiment.document.score'
-      });
-      break;
-    case utils.CQT_LOW_SCORE_LOW_SENTIMENT:
-      qs = queryString.stringify({
-        query: 'enriched_text.sentiment.document.score>=-0.75,HelpfulnessNumerator>=4.0,enriched_text.categories.label:"' + category + '"',
-        count: 10,
-        sort: 'enriched_text.sentiment.document.score'
-      });
-      break;
-    }
+    const qs = queryString.stringify(utils.getCommonQueryString(queryType, category));
 
     // send request
     fetch(`/api/customQuery?${qs}`)
@@ -688,7 +653,9 @@ class Main extends React.Component {
     }
   }
 
-
+  /**
+   * getSentimentFilter - return values to be displayed in the sentiment filter.
+   */
   getSentimentFilter() {
     const { sentimentFilter } = this.state;
     const reviewSentimentOptions = [
@@ -711,7 +678,7 @@ class Main extends React.Component {
   }
 
   /**
-   * getProductFilter - return products filter object to be rendered.
+   * getProductFilter - return product IDs to be displayed in the product filter.
    */
   getProductFilter() {
     const { products, productIdFilter } = this.state;
@@ -741,7 +708,7 @@ class Main extends React.Component {
   }
 
   /**
-   * getReviewerFilter - return reviewers filter object to be rendered.
+   * getReviewerFilter - return values to be displayed in the review type filter.
    */
   getReviewerFilter() {
     const { reviewers, reviewerIdFilter } = this.state;
@@ -854,6 +821,9 @@ class Main extends React.Component {
     );
   }
 
+  /**
+   * getPanelHeader - return main panel header object to be rendered.
+   */
   getPanelHeader() {
     return (
       <Grid.Row className='main-panel-header'>

@@ -22,7 +22,7 @@ Below is a general overview of the most important directories and files in the p
 │   ├── express.js # File that configures express
 │   ├── index.js # Configures the endpoint for Discovery API and create express server
 │   ├── query-builder.js # Helper file that generates the search query params passed to Discovery API
-│   ├── query-builder-trending.js # Helper file that generate the trending query params passed to Discovery API 
+│   ├── query-builder-custom.js # Like query-builder, but for custom and sample queries.
 │   └── watson-discovery-service.js # Helper file to promisify Waston SDK APIs
 ├── src # Views that get rendered by the server and the client bundle.js
 │   ├── index.js # HTML view that is rendered
@@ -32,7 +32,10 @@ Below is a general overview of the most important directories and files in the p
 │   │   │    ├── FilterContainer # Base component for all filter continers
 │   │   │    └── FilterItem # Base component for all filter items
 │   │   ├── CategoriesFilter # Filter Component that contains Category items
+│   │   ├── CommonQueryPanel # Tab Panel allowing user to run sample queries
+│   │   ├── ComparePanel # Tab Panel showing diff between using and not using WKS model
 │   |   ├── ConceptsFilter # Filter Component that contains Concept items
+│   │   ├── CustomQueryPanel # Tab Panel allowing user to run custom queries
 │   |   ├── EntitiesFilter # Filter Component that contains Entity text items
 │   |   ├── KeywordsFilter # Filter Component that contains Keyword items
 │   |   ├── EntityTypesFilter # Filter Component that contains Entity type items
