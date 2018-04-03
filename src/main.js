@@ -302,7 +302,8 @@ class Main extends React.Component {
       queryType: 'natural_language_query',
       filters: filterString,
       count: 10,
-      sort: '-Score'
+      // don't sort so we get most relevant results first
+      sort: ''
     });
     
     // send request
