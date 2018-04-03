@@ -984,7 +984,7 @@ class Main extends React.Component {
         render: () =>
           <Tab.Pane attached='bottom'>
             <div>
-              <Grid celled className='search-grid'>
+              <Grid className='search-grid' celled='internally'>
                 { this.getPanelHeader() }
                 <Grid.Row className='selection-header' color={'blue'}>
                   <Grid.Column width={16} textAlign='center'>
@@ -1126,7 +1126,9 @@ class Main extends React.Component {
                           <div className="row">
                             <div>
                               <Statistic.Group
+                                className='stat-group'
                                 size='mini'
+                                color='grey'
                                 items={ stat_items }
                               />
                               <Menu compact className="sort-dropdown">
@@ -1203,7 +1205,7 @@ class Main extends React.Component {
         render: () =>
           <Tab.Pane attached='bottom'>
             <div>
-              <Grid className='search-grid' celled>
+              <Grid className='search-grid' celled='internally'>
                 { this.getPanelHeader() }
                 <Grid.Row color={'blue'}>
                   <Grid.Column width={16} verticalAlign='middle' textAlign='center'>
@@ -1230,7 +1232,7 @@ class Main extends React.Component {
         render: () =>
           <Tab.Pane attached='bottom'>
             <div>
-              <Grid className='search-grid' celled>
+              <Grid className='search-grid' celled='internally'>
                 { this.getPanelHeader() }
                 <Grid.Row color={'blue'}>
                   <Grid.Column width={16} verticalAlign='middle' textAlign='center'>
@@ -1259,7 +1261,7 @@ class Main extends React.Component {
         render: () =>
           <Tab.Pane attached='bottom'>
             <div>
-              <Grid className='search-grid' celled>
+              <Grid className='search-grid' celled='internally'>
                 { this.getPanelHeader() }
                 <Grid.Row color={'blue'}>
                   <Grid.Column width={16} verticalAlign='middle' textAlign='center'>

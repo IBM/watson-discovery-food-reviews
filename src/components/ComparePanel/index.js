@@ -38,7 +38,7 @@ export default class ComparePanel extends React.Component {
           <Grid.Row>
             <Grid.Column width={16} textAlign='center'>
               <Header className='graph-panel-subheader' as='h3' textAlign='center'>
-                A Comparison of Query Results Highlighting WKS-enable Search Result improvement 
+                A Comparison of Query Results Highlighting WKS-enabled Search Result Improvement
               </Header>
             </Grid.Column>
             <Grid.Column className='compare-panel-table' width={16} textAlign='center'>
@@ -60,7 +60,7 @@ export default class ComparePanel extends React.Component {
                 <Table.Body>
                   <Table.Row>
                     <Table.Cell className='compare-table-row-dark'>
-                      What are the major side effects of dibetes treatments?
+                      What are the major side effects of diabetes treatments?
                     </Table.Cell>
                     <Table.Cell className='compare-table-row-dark'>
                       {  '20 documents with key word hits of "side effects", "diabetes", and "treatments" '}

@@ -32,7 +32,7 @@ const Match = props => (
           <List>
             <List.Item className='matches-list-item'>
               <List.Content>
-                <List.Header>
+                <List.Header className='matches-title'>
                   <List.Description>
                     <span dangerouslySetInnerHTML={{__html: props.title}}></span>
                   </List.Description>
