@@ -237,35 +237,19 @@ applications:
 - path: .
   name: watson-discovery-food-reviews
   buildpack: sdk-for-nodejs
-  memory: 640M
+  memory: 1024M
   instances: 1
-  ```
+```
 
-To deploy your application, run the following command. Note that we don't want the app to start initially, as we need to assign some environment variables first.
+Additionally, your environemnt variables must be set in your `.env` file as described previously in step **10. Configure credentials**.
+
+To deploy your application, run the following command.
 
 ```
-$ cf push --no-start
+$ cf push
 ```
 
 > NOTE: The URL route assigned to your application will be displayed as a result of this command. Note this value, as it will be required to access your app.
-
-Set the environment variables to access your **Discovery** service. Substitute in your application name, and your **Discovery** service environment and collection credentials.
-
-```
-$ cf set-env <app name> DISCOVERY_USERNAME '<add_discovery_username>'
-$ cf set-env <app name> DISCOVERY_PASSWORD '<add_discovery_password>'
-$ cf set-env <app name> DISCOVERY_ENVIRONMENT_ID '<add_discovery_environment>'
-$ cf set-env <app name> DISCOVERY_COLLECTION_ID '<add_discovery_collection>'
-
-# to verify your entries, run the following command:
-$ cf env <app name>
-```
-
-Start the application.
-
-```
-$ cf start <app name>
-```
 
 To view the application, go to the IBM Cloud route assigned to your app. Typically, this will take the form `https://<app name>.mybluemix.net`.
 
