@@ -67,6 +67,7 @@ When the reader has completed this Code Pattern, they will understand how to:
 9. [Load the Discovery files](#9-load-the-discovery-files)
 10. [Configure credentials](#10-configure-credentials)
 11. [Run the application](#11-run-the-application)
+12. [Deploy and run the application on IBM Cloud](#12-deploy-and-run-the-application-on-ibm-cloud)
 
 ## 1. Clone the repo
 ```
@@ -213,26 +214,68 @@ DISCOVERY_COLLECTION_ID=<add_discovery_collection>
 ```
 
 ## 11. Run the application
+
 1. Install [Node.js](https://nodejs.org/en/) runtime or NPM.
 1. Start the app by running `npm install`, followed by `npm start`.
 1. Access the UI by pointing your browser at `localhost:3000`.
 > Note: `PORT` can be configured in `.env`.
 
+## 12. Deploy and run the application on IBM Cloud
+
+To deploy to the IBM Cloud, make sure have the [IBM Cloud CLI](https://console.bluemix.net/docs/cli/reference/bluemix_cli/get_started.html#getting-started) tool installed. Then run the following commands to login using your IBM Cloud credentials.
+
+```
+$ cd watson-discovery-food-reviews
+$ cf login
+```
+
+When pushing your app to the IBM Cloud, values are read in from the [manifest.yml](manifest.yml) file. Edit this file if you need to change any of the default settings, such as application name or the amount of memory to allocate.
+
+```
+---
+applications:
+- path: .
+  name: watson-discovery-food-reviews
+  buildpack: sdk-for-nodejs
+  memory: 640M
+  instances: 1
+  ```
+
+To deploy your application, run the following command. Note that we don't want the app to start initially, as we need to assign some environment variables first.
+
+```
+$ cf push --no-start
+```
+
+> NOTE: The URL route assigned to your application will be displayed as a result of this command. Note this value, as it will be required to access your app.
+
+Set the environment variables to access your **Discovery** service. Substitute in your application name, and your **Discovery** service environment and collection credentials.
+
+```
+$ cf set-env <app name> DISCOVERY_USERNAME '<add_discovery_username>'
+$ cf set-env <app name> DISCOVERY_PASSWORD '<add_discovery_password>'
+$ cf set-env <app name> DISCOVERY_ENVIRONMENT_ID '<add_discovery_environment>'
+$ cf set-env <app name> DISCOVERY_COLLECTION_ID '<add_discovery_collection>'
+
+# to verify your entries, run the following command:
+$ cf env <app name>
+```
+
+Start the application.
+
+```
+$ cf start <app name>
+```
+
+To view the application, go to the IBM Cloud route assigned to your app. Typically, this will take the form `https://<app name>.mybluemix.net`.
+
+To view logs, or get overview information about your app, use the IBM Cloud dashboard.
+
 # Sample UI layout
- 
+
 ![](doc/source/images/sample-output.png)
 
 # Troubleshooting
-
-* Error: Environment {GUID} is still not active, retry once status is active
-
-  > This is common during the first run. The app tries to start before the Discovery
-environment is fully created. Allow a minute or two to pass. The environment should
-be usable on restart. If you used `Deploy to IBM Cloud` the restart should be automatic.
-
-* Error: Only one free environment is allowed per organization
-
-  > To work with a free trial, a small free Discovery environment is created. If you already have a Discovery environment, this will fail. If you are not using Discovery, check for an old service thay you may want to delete. Otherwise use the `.env` `DISCOVERY_ENVIRONMENT_ID` to tell the app which environment you want it to use. A collection will be created in this environment using the default configuration.
 
 * Error when loading files into Discovery
 
@@ -241,27 +284,6 @@ be usable on restart. If you used `Deploy to IBM Cloud` the restart should be au
 * No keywords appear in the app
 
   > This can be due to not having a proper configuration file assigned to your data collection. See [Step 3](#3-load-the-discovery-files) above.
-
-# Privacy Notice
-
-If using the `Deploy to IBM Cloud` button some metrics are tracked, the following information is sent to a [Deployment Tracker](https://github.com/IBM/metrics-tracker-service) service on each deployment:
-
-* Node.js package version
-* Node.js repository URL
-* Application Name (`application_name`)
-* Application GUID (`application_id`)
-* Application instance index number (`instance_index`)
-* Space ID (`space_id`)
-* Application Version (`application_version`)
-* Application URIs (`application_uris`)
-* Labels of bound services
-* Number of instances for each bound service and associated plan information
-
-This data is collected from the `package.json` and `repository.yaml` file in the sample application and the ``VCAP_APPLICATION`` and ``VCAP_SERVICES`` environment variables in IBM Cloud and other Cloud Foundry platforms. This data is used by IBM to track metrics around deployments of sample applications to IBM Cloud to measure the usefulness of our examples, so that we can continuously improve the content we offer to you. Only deployments of sample applications that include code to ping the Deployment Tracker service will be tracked.
-
-## Disabling Deployment Tracking
-
-To disable tracking, simply remove `require("metrics-tracker-client").track();` from the ``index.js`` file in the ``server`` directory.
 
 # Links
 

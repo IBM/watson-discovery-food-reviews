@@ -1,13 +1,7 @@
 ---
-declared-services:
-  wdfr-discovery-service:
-    label: discovery
-    plan: lite
 applications:
 - path: .
   name: watson-discovery-food-reviews
   buildpack: sdk-for-nodejs
-  memory: 512M
+  memory: 640M
   instances: 1
-  services:
-  - wdfr-discovery-service
