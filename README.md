@@ -241,7 +241,7 @@ applications:
   instances: 1
 ```
 
-Additionally, your environemnt variables must be set in your `.env` file as described previously in step **10. Configure credentials**.
+Additionally, your environment variables must be set in your `.env` file as described previously in step **10. Configure credentials**.
 
 To deploy your application, run the following command.
 
