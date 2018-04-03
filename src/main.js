@@ -29,7 +29,6 @@ import SentimentChart from './components/SentimentChart';
 import KeywordsTagCloud from './components/KeywordsTagCloud';
 import CommonQueryPanel from './components/CommonQueryPanel';
 import CustomQueryPanel from './components/CustomQueryPanel';
-import ComparePanel from './components/ComparePanel';
 import { Tab, Grid, Dimmer, Button, Menu, Dropdown, Divider, Loader, Accordion, Icon, Header, Statistic } from 'semantic-ui-react';
 const utils = require('../lib/utils');
 
@@ -1252,32 +1251,6 @@ class Main extends React.Component {
                     />
                   </Grid.Column>
                 </Grid.Row>
-              </Grid>
-            </div>
-          </Tab.Pane>
-      },
-
-      // Comparison Tab
-      { menuItem: { key: 'compare-wks', icon: 'zoom in', content: 'Compare' },
-        render: () =>
-          <Tab.Pane attached='bottom'>
-            <div>
-              <Grid className='search-grid' celled='internally'>
-                { this.getPanelHeader() }
-                <Grid.Row color={'blue'}>
-                  <Grid.Column width={16} verticalAlign='middle' textAlign='center'>
-                    <Header className='graph-panel-subheader' as='h3' textAlign='center'>
-                    </Header>
-                  </Grid.Column>
-                </Grid.Row>
-
-                <Grid.Row>
-                  <Grid.Column  className='query-panel' width={16} textAlign='center'>
-                    <ComparePanel
-                    />
-                  </Grid.Column>
-                </Grid.Row>
-              
               </Grid>
             </div>
           </Tab.Pane>

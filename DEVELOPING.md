@@ -33,7 +33,6 @@ Below is a general overview of the most important directories and files in the p
 │   │   │    └── FilterItem # Base component for all filter items
 │   │   ├── CategoriesFilter # Filter Component that contains Category items
 │   │   ├── CommonQueryPanel # Tab Panel allowing user to run sample queries
-│   │   ├── ComparePanel # Tab Panel showing diff between using and not using WKS model
 │   |   ├── ConceptsFilter # Filter Component that contains Concept items
 │   │   ├── CustomQueryPanel # Tab Panel allowing user to run custom queries
 │   |   ├── EntitiesFilter # Filter Component that contains Entity text items
