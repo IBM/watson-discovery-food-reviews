@@ -261,16 +261,6 @@ export default class CustomQueryPanel extends React.Component {
       <div className="query-results-panel">
         <Grid className='custom-query-controls'>
           <Grid.Column width={16} textAlign='center'>
-            <Grid.Row>
-              <Button onClick={ this.doCustomQuerySearch.bind(this) }>
-                Submit
-              </Button>
-              <Button onClick={ this.doCustomQueryClear.bind(this) }>
-                Clear
-              </Button>
-            </Grid.Row>
-
-            <Divider clearing hidden/>
 
             <Grid.Row>
               <Input
@@ -311,9 +301,21 @@ export default class CustomQueryPanel extends React.Component {
               />
             </Grid.Row>
             
+            <Divider clearing hidden/>
+
+            <Grid.Row>
+              <Button onClick={ this.doCustomQuerySearch.bind(this) }>
+                Submit
+              </Button>
+              <Button onClick={ this.doCustomQueryClear.bind(this) }>
+                Clear
+              </Button>
+            </Grid.Row>
+
           </Grid.Column>
         </Grid>
   
+        <Divider clearing hidden/>
         <Divider clearing hidden/>
         
         { queryData.loading ? (
@@ -334,6 +336,7 @@ export default class CustomQueryPanel extends React.Component {
           
         ) : queryData.data ? (
           <div>
+            <Divider clearing/>
             <Grid className='custom-query-results'>
               <Grid.Row>
                 <Grid.Column width={12}>

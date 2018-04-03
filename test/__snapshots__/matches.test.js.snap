@@ -36,7 +36,7 @@ exports[`renders correctly 1`] = `
                       className="content"
                     >
                       <div
-                        className="header"
+                        className="header matches-title"
                       >
                         <div
                           className="description"

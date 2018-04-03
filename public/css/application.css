@@ -648,6 +648,10 @@ div.match-entry-list {
   padding-top: 20px;
 }
 
+div.header.matches-title {
+  margin-bottom: 8px !important;
+}
+
 .ui.centered.fluid.card {
   background: #d9e5ef;
 }
@@ -681,7 +685,7 @@ div.row.matches-grid-row {
 }
 
 div.ui.celled.grid.search-grid {
-  margin-top: 0px;
+  margin-top: 1px;
 }
 
 div.ui.inverted.menu {
@@ -711,15 +715,19 @@ div.ui.celled.grid.big-graph-grid {
 }
 
 h1.ui.center.aligned.header {
-  color: rgb(203, 199, 199);
+  color: rgb(232, 228, 228);
 }
 
 h3.ui.center.aligned.header {
   color: rgb(70,70,70);
 }
 
-div.ui.mini.statistics {
-  color: rgb(70,70,70);
+div.ui.grey.mini.statistics.stat-group div.value {
+  color:  #787272;
+}
+
+div.ui.grey.mini.statistics.stat-group div.label {
+  color:  #787272;
 }
 
 .sort.large.bordered.inverted.icon {
