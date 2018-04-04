@@ -34,8 +34,6 @@ const utils = require('../lib/utils');
  * service, and setting up route methods to handle client requests.
  */
 
-require('metrics-tracker-client').track();
-
 var environment_id;
 var collection_id;
 const DEFAULT_NAME = 'food-reviews';
@@ -46,7 +44,7 @@ var arrayOfFiles = fs.readdirSync('./data/food_reviews/');
 arrayOfFiles.forEach(function(file) {
   discoveryDocs.push(path.join('./data/food_reviews/', file));
 });
-// shorten the list if we are loading - trail version of IBM Cloud 
+// shorten the list if we are loading - trail version of IBM Cloud
 // is limited to 256MB application size, so use this if you get
 // out of memory errors.
 //discoveryDocs = discoveryDocs.slice(0,100);
@@ -60,8 +58,8 @@ const discovery = new DiscoveryV1({
 discovery.query = Promise.promisify(discovery.query);
 
 const discoverySetup = new WatsonDiscoverySetup(discovery);
-const discoverySetupParams = { 
-  default_name: DEFAULT_NAME, 
+const discoverySetupParams = {
+  default_name: DEFAULT_NAME,
   config_name: 'foodie-keyword-extraction'   // instead of 'Default Configuration'
 };
 
@@ -73,7 +71,7 @@ const WatsonDiscoServer = new Promise((resolve) => {
       console.log('Discovery is ready!');
       // now load data into discovery service collection
       var collectionParams = data;
-    
+
       // set collection creds - at this point the collectionParams
       // will point to the actual credentials, whether the user
       // entered them in .env for an existing collection, or if
@@ -88,7 +86,7 @@ const WatsonDiscoServer = new Promise((resolve) => {
       queryCustomBuilder.setCollectionId(collection_id);
 
       collectionParams.documents = discoveryDocs;
-      console.log('Begin loading ' + discoveryDocs.length + 
+      console.log('Begin loading ' + discoveryDocs.length +
         ' json files into discovery. Please be patient as this can take several minutes.');
       discoverySetup.loadCollectionFiles(collectionParams);
       resolve(createServer());
@@ -108,7 +106,7 @@ function createServer() {
     const { query, filters, queryType, count, sort } = req.query;
 
     console.log('In /api/customQuery: query = ' + query);
-    
+
     // build params for the trending search request
     var params = {};
     if (queryType == 'natural_language_query') {
@@ -154,7 +152,7 @@ function createServer() {
     } else {
       params.query = query;
     }
-    
+
     // add any filters and a limit to the number of matches that can be found
     if (filters) {
       params.filter = filters;
@@ -175,7 +173,7 @@ function createServer() {
     } else {
       params.sort = sort;
     }
-    
+
     var searchParams = queryBuilder.search(params);
     discovery.query(searchParams)
       .then(response => res.json(response))
@@ -191,7 +189,7 @@ function createServer() {
   // handles search string appened to url
   server.get('/:searchQuery', function(req, res){
     var searchQuery = req.params.searchQuery.replace(/\+/g, ' ');
-    const qs = queryString.stringify({ 
+    const qs = queryString.stringify({
       query: searchQuery,
       count: 2000,
       returnPassages: false,
@@ -248,7 +246,7 @@ function createServer() {
 
     // this is the inital query to the discovery service
     console.log('Initial Search Query at start-up');
-    const params = queryBuilder.search({ 
+    const params = queryBuilder.search({
       natural_language_query: '',
       count: 2000,
       sort: '-Score',
@@ -288,8 +286,8 @@ function createServer() {
             sentiment: 'ALL',
             placeHolder: 'Enter search string...'
           };
-      
-          res.render('index', { 
+
+          res.render('index', {
             data: matches,
             products: results,
             reviewers: results,
@@ -305,7 +303,7 @@ function createServer() {
             commonQueryData: commonQueryData,
             customQueryData: customQueryData
           });
-    
+
           resolve(results);
         })
         .catch(error => {
@@ -313,7 +311,7 @@ function createServer() {
           reject(error);
         });
     });
-    
+
   });
 
   return server;
