@@ -54,8 +54,6 @@ When the reader has completed this Code Pattern, they will understand how to:
 
 # Steps
 
-> NOTE: Due to the requirement that the Watson Discovery service has to be configured to run with a specific WKS model, this Code Pattern must be installed locally. 
-
 1. [Clone the repo](#1-clone-the-repo)
 2. [Create IBM Cloud services](#2-create-ibm-cloud-services)
 3. [Create a Watson Knowledge Studio workspace](#3-create-a-watson-knowledge-studio-workspace)
@@ -71,7 +69,7 @@ When the reader has completed this Code Pattern, they will understand how to:
 
 ## 1. Clone the repo
 ```
-$ git clone https://github.com/IBM/watson-discovery-food-reviews
+git clone https://github.com/IBM/watson-discovery-food-reviews
 ```
 
 ## 2. Create IBM Cloud services
@@ -210,7 +208,6 @@ DISCOVERY_COLLECTION_ID=<add_discovery_collection>
 
 # Run locally on a non-default port (default is 3000)
 # PORT=3000
-
 ```
 
 ## 11. Run the application
@@ -225,8 +222,8 @@ DISCOVERY_COLLECTION_ID=<add_discovery_collection>
 To deploy to the IBM Cloud, make sure have the [IBM Cloud CLI](https://console.bluemix.net/docs/cli/reference/bluemix_cli/get_started.html#getting-started) tool installed. Then run the following commands to login using your IBM Cloud credentials.
 
 ```
-$ cd watson-discovery-food-reviews
-$ cf login
+cd watson-discovery-food-reviews
+cf login
 ```
 
 When pushing your app to the IBM Cloud, values are read in from the [manifest.yml](manifest.yml) file. Edit this file if you need to change any of the default settings, such as application name or the amount of memory to allocate.
@@ -241,7 +238,7 @@ applications:
   instances: 1
 ```
 
-Additionally, your environment variables must be set in your `.env` file as described previously in step **10. Configure credentials**.
+Additionally, your environment variables must be set in your `.env` file as described previously in [Step 10. Configure credentials](#10-configure-credentials).
 
 To deploy your application, run the following command.
 
@@ -273,6 +270,8 @@ To view logs, or get overview information about your app, use the IBM Cloud dash
 
 * [Demo on Youtube](https://www.youtube.com/watch?v=todo): Watch the video
 * [Watson Node.js SDK](https://github.com/watson-developer-cloud/node-sdk): Download the Watson Node SDK.
+* [Discovery Search UI](https://github.com/IBM/watson-discovery-ui): A sample UI that this repo is based on.
+* [Kaggle dataset](https://www.kaggle.com/snap/amazon-fine-food-reviews): A dataset of Amazon reviews.
 
 # Learn more
 
