@@ -16,9 +16,8 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import Matches from '../Matches';
-import { TagCloud } from 'react-tagcloud';
-import { Grid, Menu, Dimmer, Loader, Dropdown, Header, Divider, List } from 'semantic-ui-react';
+import QueryResultsPanel from '../QueryResultsPanel';
+import { Grid, Tab, Dropdown, Divider } from 'semantic-ui-react';
 const utils = require('../../../lib/utils');
 
 /**
@@ -34,8 +33,9 @@ export default class CommonQueryPanel extends React.Component {
 
     this.state = {
       queryData: this.props.queryData,
-      queryType: this.props.queryType,
-      categories: this.props.categories 
+      categories: this.props.categories,
+      queryType: utils.CQT_HIGH_SCORE,
+      category: utils.NO_CATEGORY_SELECTED
     };
   }
 
@@ -43,86 +43,52 @@ export default class CommonQueryPanel extends React.Component {
    * categoryChange - user has selected a new category.
    */
   categoryChange(event, selection) {
-    var { queryType, queryData } = this.state;
+    var { category, queryType, queryData } = this.state;
 
-    queryData[queryType].category = utils.NO_CATEGORY_SELECTED;
-    queryData[queryType].data = null;
+    if (category !== selection.value) {
+      queryData[queryType].category = selection.value;
+      queryData[queryType].data = null;
+  
+      this.setState({
+        queryData: queryData,
+        category: selection.value
+      });
+  
+      // inform parent
+      this.props.onGetCommonQueryRequest({
+        category: selection.value,
+        queryType: queryType
+      });
+    }
+  }
+
+  /**
+   * categoryChange - user has selected a new category.
+   */
+  tabChange(event, selection) {
+    const { queryData, category } = this.state;
+    var selectedQueryType = selection.activeIndex;
 
     this.setState({
-      queryData: queryData
+      queryType: selectedQueryType
     });
 
-    // inform parent
-    this.props.onGetCommonQueryRequest({
-      category: selection.value,
-      queryType: queryType
-    });
-  }
+    // fetch data associated with this query if we don't currently 
+    // have results for this category
+    if (queryData[selectedQueryType].category != category) {
+      queryData[selectedQueryType].category = category;
+      queryData[selectedQueryType].data = null;
+  
+      this.setState({
+        queryData: queryData
+      });
 
-  /**
-   * getEntities - return top 5 entities for placement in list.
-   */
-  getEntities() {
-    const { queryData, queryType } = this.state;
-    var entities = [];
-
-    if (queryData[queryType] && queryData[queryType].data.matching_results) {
-      const data = queryData[queryType].data.aggregations[utils.ENTITY_DATA_INDEX];
-      // get top 5 entities
-      var count = 0;
-      data.results.forEach(function(item) {
-        if (count < 5) {
-          var entry = { 
-            id: count, 
-            text: item.key };
-          entities.push(entry);
-          count = count + 1;
-        }
+      // inform parent
+      this.props.onGetCommonQueryRequest({
+        category: category,
+        queryType: selectedQueryType
       });
     }
-
-    return entities;
-  }
-
-  /**
-   * getKeywords - return top 10 keywords to display in the tag cloud.
-   */
-  getKeywords() {
-    const { queryData, queryType } = this.state;
-    var keywords = [];
-
-    if (queryData[queryType] && queryData[queryType].data.matching_results) {
-      const data = queryData[queryType].data.aggregations[utils.KEYWORD_DATA_INDEX];
-      // get top 10 keywords
-      var count = 0;
-      data.results.forEach(function(item) {
-        if (count < 10) {
-          var entry = { 
-            count: count, 
-            value: item.key };
-          keywords.push(entry);
-          count = count + 1;
-        }
-      });
-    }
-
-    return keywords;
-  }
-
-  /**
-   * getReviews - return panel displaying review data.
-   */
-  getReviews() {
-    const { queryData, queryType } = this.state;
-
-    // get top reviews
-    var reviews = utils.formatData(queryData[queryType].data);
-
-    return (
-      <Matches 
-        matches={ reviews.results }
-      />
-    );
   }
 
   /**
@@ -147,87 +113,134 @@ export default class CommonQueryPanel extends React.Component {
   render() {
     const { queryData, queryType } = this.state;
 
-    const tagCloudOptions = {
-      luminosity: 'light',
-      hue: 'blue'
-    };
+    const queryTabs = [
+      { menuItem: 
+        { key: 'query_' + utils.CQT_HIGH_SCORE, 
+          content: 'What reviews of <category> have the highest scores?',
+          className: 'common-tab-item' },
+      render: () =>
+        <div>
+          <Grid celled className='big-graph-grid'>
+            <Grid.Row className='selection-header'>
+              <Grid.Column width={16} textAlign='center'>
+                <QueryResultsPanel
+                  key={utils.CQT_HIGH_SCORE}
+                  queryData={queryData}
+                  queryType={utils.CQT_HIGH_SCORE}
+                />
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </div>
+      },
+      { menuItem: 
+        { key: 'query_' + utils.CQT_HIGH_SENTIMENT, 
+          content: 'What reviews of <category> have the most positive sentiment?',
+          className: 'common-tab-item' },
+      render: () =>
+        <div>
+          <Grid celled className='big-graph-grid'>
+            <Grid.Row className='selection-header'>
+              <Grid.Column width={16} textAlign='center'>
+                <QueryResultsPanel
+                  key={utils.CQT_HIGH_SENTIMENT}
+                  queryData={queryData}
+                  queryType={utils.CQT_HIGH_SENTIMENT}
+                />
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </div>
+      },
+      { menuItem: 
+        { key: 'query_' + utils.CQT_HIGH_SCORE_LOW_SENTIMENT, 
+          content: 'Which top scoring reviews of <category> have the most negative sentiment?',
+          className: 'common-tab-item' },
+      render: () =>
+        <div>
+          <Grid celled className='big-graph-grid'>
+            <Grid.Row className='selection-header'>
+              <Grid.Column width={16} textAlign='center'>
+                <QueryResultsPanel
+                  key={utils.CQT_HIGH_SCORE_LOW_SENTIMENT}
+                  queryData={queryData}
+                  queryType={utils.CQT_HIGH_SCORE_LOW_SENTIMENT}
+                />
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </div>
+      },
+      { menuItem: 
+        { key: 'query_' + utils.CQT_LOW_SCORE_HIGH_SENTIMENT, 
+          content: 'Which low scoring reviews of <category> have the most positive sentiment?',
+          className: 'common-tab-item' },
+      render: () =>
+        <div>
+          <Grid celled className='big-graph-grid'>
+            <Grid.Row className='selection-header'>
+              <Grid.Column width={16} textAlign='center'>
+                <QueryResultsPanel
+                  key={utils.CQT_LOW_SCORE_HIGH_SENTIMENT}
+                  queryData={queryData}
+                  queryType={utils.CQT_LOW_SCORE_HIGH_SENTIMENT}
+                />
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </div>
+      },
+      { menuItem: 
+        { key: 'query_' + utils.CQT_LOW_SCORE_LOW_SENTIMENT, 
+          content: 'Which low scoring reviews of <category> have the most negative sentiment?',
+          className: 'common-tab-item' },
+      render: () =>
+        <div>
+          <Grid celled className='big-graph-grid'>
+            <Grid.Row className='selection-header'>
+              <Grid.Column width={16} textAlign='center'>
+                <QueryResultsPanel
+                  key={utils.CQT_LOW_SCORE_LOW_SENTIMENT}
+                  queryData={queryData}
+                  queryType={utils.CQT_LOW_SCORE_LOW_SENTIMENT}
+                />
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </div>
+      }
+    ];
     
     return (
-      <div className="query-results-panel">
-        <Menu  className='term-menu' compact floated={true}>
-          <Dropdown 
-            item
-            scrolling
-            value={ queryData[queryType].category }
-            onChange={ this.categoryChange.bind(this) }
-            options={ this.getCategoryOptions() }
-          />
-        </Menu>
+      <div className='query-results-panel'>
+        <Grid.Column width={16} textAlign='center'>
+          <Grid.Row>
+            <label className='categories-label'>
+              Selected Category:
+              <Dropdown
+                className='category-dropdown' 
+                item
+                scrolling
+                selection
+                value={ queryData[queryType].category }
+                onChange={ this.categoryChange.bind(this) }
+                options={ this.getCategoryOptions() }
+              />
+            </label>
+          </Grid.Row>
 
-        <Divider clearing hidden/>
-        
-        { queryData[queryType].loading ? (
-          <div>
-            <div className="loader--container" style={{height: 572}}>
-              <Dimmer active inverted>
-                <Loader>Loading</Loader>
-              </Dimmer>
-            </div>
-          </div>
+          <Divider hidden/>
+          <Divider/>
+          <Divider hidden/>
 
-        ) : queryData[queryType].data ? (
-          <div>
-            <Grid className='query-data-results'>
-              <Grid.Row>
-                <Grid.Column width={12}>
-                  <Header as='h3' textAlign='center'>
-                    Keyword Cloud
-                  </Header>
-                  <TagCloud 
-                    tags={ this.getKeywords() }
-                    minSize={16}
-                    maxSize={64}
-                    colorOptions={tagCloudOptions}
-                  />
-                </Grid.Column>
-                <Grid.Column width={4} textAlign='left'>
-                  <Header as='h3'>
-                    Top Entities
-                  </Header>
-                  <List ordered>
-                    { this.getEntities().map(item => 
-                      <List.Item key={item.id}>
-                        { item.text }
-                      </List.Item>
-                    ) 
-                    }
-                  </List>
-                </Grid.Column>
-              </Grid.Row>
-
-              <Divider clearing/>
-
-              <Grid.Row>
-                <Grid.Column width={16} textAlign='center'>
-                  <Header as='h3' textAlign='center'>
-                    Relevant Customer Reviews
-                  </Header>
-                  <div>
-                    {this.getReviews()}
-                  </div>
-                </Grid.Column>
-              </Grid.Row>
-            </Grid>
-          </div>
-        ) : queryData[queryType].error ? (
-          <div className="results">
-            <div className="_container _container_large">
-              <div className="row">
-                {JSON.stringify(queryData[queryType].error)}
-              </div>
-            </div>
-          </div>
-        ) : null}
+          <Grid.Row className='common-query-data'>
+            <Tab 
+              className='tab-content' 
+              menu={{ vertical: true, fluid: true }}
+              panes={queryTabs}
+              onTabChange={this.tabChange.bind(this)} />
+          </Grid.Row>
+        </Grid.Column>
       </div>
     );
   }
@@ -235,7 +248,6 @@ export default class CommonQueryPanel extends React.Component {
 
 // type check to ensure we are called correctly
 CommonQueryPanel.propTypes = {
-  queryType: PropTypes.number,
   categories: PropTypes.object,
   queryData: PropTypes.array,
   onGetCommonQueryRequest: PropTypes.func.isRequired

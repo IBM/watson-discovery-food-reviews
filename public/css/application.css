@@ -814,3 +814,36 @@ div.ui.grid.custom-query-results {
   margin-left: 40px;
   margin-right: 40px;
 }
+
+a.active.item.common-tab-item {
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
+
+a.item.common-tab-item {
+  padding-top: 30px !important;
+  padding-bottom: 30px !important;
+}
+
+.ui.vertical.menu .active.item {
+  background: #D5D7D5 !important;
+}
+
+div.ui.grid.query-data-no-results {
+  padding-top: 30px;
+  padding-bottom: 500px;
+}
+
+div.row.common-query-data {
+  padding-top: 30px;
+}
+
+div.ui.item.selection.scrolling.dropdown.category-dropdown {
+  margin-left: 10px;
+  min-width: 22em;
+}
+
+label.categories-label {
+  margin-top: 0px;
+  margin-bottom: 50px;
+}
