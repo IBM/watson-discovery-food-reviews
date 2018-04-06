@@ -34,8 +34,8 @@ export default class CommonQueryPanel extends React.Component {
     this.state = {
       queryData: this.props.queryData,
       categories: this.props.categories,
-      queryType: utils.CQT_HIGH_SCORE,
-      category: utils.NO_CATEGORY_SELECTED
+      category: this.props.category,
+      queryType: this.props.queryType
     };
   }
 
@@ -111,7 +111,12 @@ export default class CommonQueryPanel extends React.Component {
    * render - return the panel object to render.
    */
   render() {
-    const { queryData, queryType } = this.state;
+    const { queryData, category, queryType } = this.state;
+
+    var defaultCategory = category;
+    if (defaultCategory === utils.NO_CATEGORY_SELECTED) {
+      defaultCategory = null;
+    }
 
     const queryTabs = [
       { menuItem: 
@@ -224,6 +229,7 @@ export default class CommonQueryPanel extends React.Component {
                 scrolling
                 selection
                 placeholder='No category selected'
+                defaultValue={ defaultCategory }
                 onChange={ this.categoryChange.bind(this) }
                 options={ this.getCategoryOptions() }
               />
@@ -239,6 +245,7 @@ export default class CommonQueryPanel extends React.Component {
               className='tab-content' 
               menu={{ vertical: true, fluid: true }}
               panes={queryTabs}
+              activeIndex={queryType}
               onTabChange={this.tabChange.bind(this)} />
           </Grid.Row>
         </Grid.Column>
@@ -251,5 +258,7 @@ export default class CommonQueryPanel extends React.Component {
 CommonQueryPanel.propTypes = {
   categories: PropTypes.object,
   queryData: PropTypes.array,
+  category: PropTypes.string,
+  queryType: PropTypes.number,
   onGetCommonQueryRequest: PropTypes.func.isRequired
 };

@@ -100,7 +100,6 @@ export default class CustomQueryPanel extends React.Component {
    * Pass on to the parent object.
    */
   handleKeyPress(event) {
-    const searchValue = event.target.value;
     if (event.key === 'Enter') {
       this.doCustomQuerySearch();
     }

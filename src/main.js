@@ -71,6 +71,8 @@ class Main extends React.Component {
       currentPage,
       // common query panel
       commonQueryData,
+      currentCommonQueryCategory,   // eslint-disable-line no-unused-vars
+      currentCommonQueryType,       // eslint-disable-line no-unused-vars
       // custom query panel
       customQueryData,
       // sentiment chart
@@ -114,6 +116,8 @@ class Main extends React.Component {
       selectedEntityTypes: selectedEntityTypes || new Set(),
       // common query data
       commonQueryData: commonQueryData,
+      currentCommonQueryCategory: utils.NO_CATEGORY_SELECTED,
+      currentCommonQueryType: 0,
       // custom query data
       customQueryData: customQueryData,
       // sentiment chart
@@ -363,7 +367,9 @@ class Main extends React.Component {
       queryData[queryType].error = null;
       queryData[queryType].category = category;
       this.setState({
-        commonQueryData: queryData
+        commonQueryData: queryData,
+        currentCommonQueryCategory: category,
+        currentCommonQueryType: queryType
       });
       return;
     }
@@ -371,7 +377,9 @@ class Main extends React.Component {
     queryData[queryType].loading = true;
     queryData[queryType].category = category;
     this.setState({
-      commonQueryData: queryData
+      commonQueryData: queryData,
+      currentCommonQueryCategory: category,
+      currentCommonQueryType: queryType
     });
 
     const qs = queryString.stringify(utils.getCommonQueryString(queryType, category));
@@ -853,7 +861,7 @@ class Main extends React.Component {
       selectedEntities, selectedCategories, 
       selectedConcepts,selectedKeywords, selectedEntityTypes,
       numMatches, numPositive, numNeutral, numNegative,
-      commonQueryData, customQueryData,
+      commonQueryData, currentCommonQueryCategory, currentCommonQueryType, customQueryData,
       sentimentTerm, sortOrder } = this.state;
 
     // used for filter accordions
@@ -874,7 +882,7 @@ class Main extends React.Component {
       selectedEntityTypes.size > 0) {
       filtersOn = true;
     }
-     
+
     const mainTabs = [
       // dashboard tab
       { menuItem: { key: 'dashboard', icon: 'dashboard', content: 'Dashboard' },
@@ -1116,6 +1124,8 @@ class Main extends React.Component {
                     <CommonQueryPanel
                       queryData={commonQueryData}
                       categories={origCategories}
+                      category={currentCommonQueryCategory}
+                      queryType={currentCommonQueryType}
                       onGetCommonQueryRequest={this.fetchCommonQueryData.bind(this)}
                     />
                   </Grid.Column>
@@ -1267,6 +1277,8 @@ Main.propTypes = {
   productIdFilter: PropTypes.string,
   reviewerIdFilter: PropTypes.string,
   commonQueryData: PropTypes.array,
+  currentCommonQueryCategory: PropTypes.string,
+  currentCommonQueryType: PropTypes.number,
   customQueryData: PropTypes.object,
   sentimentTerm: PropTypes.string,
   error: PropTypes.object
