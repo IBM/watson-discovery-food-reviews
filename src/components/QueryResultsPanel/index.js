@@ -22,11 +22,10 @@ import { Grid, Dimmer, Loader, Header, Divider, List } from 'semantic-ui-react';
 const utils = require('../../../lib/utils');
 
 /**
- * This object serves as the panel containing all common queries and results.
+ * This object serves as the panel containing all common query results.
  *
  * It provides a tag cloud of top keywords, a top 5 list of entities,
- * and a list or relevant reviews. A dropdown will allow the user
- * to select which category data will be shown.
+ * and a list or relevant reviews.
  */
 export default class QueryResultsPanel extends React.Component {
   constructor(...props) {

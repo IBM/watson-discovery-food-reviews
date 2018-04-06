@@ -838,7 +838,7 @@ div.row.common-query-data {
   padding-top: 30px;
 }
 
-div.ui.item.selection.scrolling.dropdown.category-dropdown {
+div.ui.selection.scrolling.dropdown.category-dropdown {
   margin-left: 10px;
   min-width: 22em;
 }

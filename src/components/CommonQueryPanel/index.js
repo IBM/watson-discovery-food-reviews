@@ -96,7 +96,7 @@ export default class CommonQueryPanel extends React.Component {
    */
   getCategoryOptions() {
     const { categories } = this.state;
-    var options = [{ key: -1, value: utils.NO_CATEGORY_SELECTED, text: utils.NO_CATEGORY_SELECTED }];
+    var options = [];
 
     if (categories.results) {
       categories.results.map(item =>
@@ -218,11 +218,12 @@ export default class CommonQueryPanel extends React.Component {
             <label className='categories-label'>
               Selected Category:
               <Dropdown
-                className='category-dropdown' 
+                key='category'
+                className='category-dropdown'
                 item
                 scrolling
                 selection
-                value={ queryData[queryType].category }
+                placeholder='No category selected'
                 onChange={ this.categoryChange.bind(this) }
                 options={ this.getCategoryOptions() }
               />
