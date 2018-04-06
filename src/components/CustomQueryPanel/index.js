@@ -96,6 +96,16 @@ export default class CustomQueryPanel extends React.Component {
   }
 
   /**
+   * handleKeyPress - user has entered a new search value. 
+   * Pass on to the parent object.
+   */
+  handleKeyPress(event) {
+    if (event.key === 'Enter') {
+      this.doCustomQuerySearch();
+    }
+  }
+
+  /**
    * doCustomQuerySearch - tell parent to perform search.
    */
   doCustomQuerySearch() {
@@ -268,6 +278,7 @@ export default class CustomQueryPanel extends React.Component {
                 className='search-input-field'
                 icon='search' 
                 placeholder={ queryData.placeHolder }
+                onKeyPress={this.handleKeyPress.bind(this)}
                 onChange={ this.queryChanged.bind(this) }
               />
               <Dropdown 
@@ -311,7 +322,6 @@ export default class CustomQueryPanel extends React.Component {
                 Clear
               </Button>
             </Grid.Row>
-
           </Grid.Column>
         </Grid>
   

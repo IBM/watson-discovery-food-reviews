@@ -71,6 +71,8 @@ class Main extends React.Component {
       currentPage,
       // common query panel
       commonQueryData,
+      currentCommonQueryCategory,   // eslint-disable-line no-unused-vars
+      currentCommonQueryType,       // eslint-disable-line no-unused-vars
       // custom query panel
       customQueryData,
       // sentiment chart
@@ -114,6 +116,8 @@ class Main extends React.Component {
       selectedEntityTypes: selectedEntityTypes || new Set(),
       // common query data
       commonQueryData: commonQueryData,
+      currentCommonQueryCategory: utils.NO_CATEGORY_SELECTED,
+      currentCommonQueryType: 0,
       // custom query data
       customQueryData: customQueryData,
       // sentiment chart
@@ -363,7 +367,9 @@ class Main extends React.Component {
       queryData[queryType].error = null;
       queryData[queryType].category = category;
       this.setState({
-        commonQueryData: queryData
+        commonQueryData: queryData,
+        currentCommonQueryCategory: category,
+        currentCommonQueryType: queryType
       });
       return;
     }
@@ -371,7 +377,9 @@ class Main extends React.Component {
     queryData[queryType].loading = true;
     queryData[queryType].category = category;
     this.setState({
-      commonQueryData: queryData
+      commonQueryData: queryData,
+      currentCommonQueryCategory: category,
+      currentCommonQueryType: queryType
     });
 
     const qs = queryString.stringify(utils.getCommonQueryString(queryType, category));
@@ -853,7 +861,7 @@ class Main extends React.Component {
       selectedEntities, selectedCategories, 
       selectedConcepts,selectedKeywords, selectedEntityTypes,
       numMatches, numPositive, numNeutral, numNegative,
-      commonQueryData, customQueryData,
+      commonQueryData, currentCommonQueryCategory, currentCommonQueryType, customQueryData,
       sentimentTerm, sortOrder } = this.state;
 
     // used for filter accordions
@@ -875,109 +883,6 @@ class Main extends React.Component {
       filtersOn = true;
     }
 
-    const queryTabs = [
-      { menuItem: 
-        { key: 'query_' + utils.CQT_HIGH_SCORE, 
-          content: 'What reviews of <category> have the highest scores?' },
-      render: () =>
-        <div>
-          <Grid celled className='big-graph-grid'>
-            <Grid.Row className='selection-header'>
-              <Grid.Column width={16} textAlign='center'>
-                <CommonQueryPanel
-                  key={utils.CQT_HIGH_SCORE}
-                  queryData={commonQueryData}
-                  categories={origCategories}
-                  queryType={utils.CQT_HIGH_SCORE}
-                  onGetCommonQueryRequest={this.fetchCommonQueryData.bind(this)}
-                />
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>
-        </div>
-      },
-      { menuItem: 
-        { key: 'query_' + utils.CQT_HIGH_SENTIMENT, 
-          content: 'What reviews of <category> have the most positive sentiment?' },
-      render: () =>
-        <div>
-          <Grid celled className='big-graph-grid'>
-            <Grid.Row className='selection-header'>
-              <Grid.Column width={16} textAlign='center'>
-                <CommonQueryPanel
-                  key={utils.CQT_HIGH_SENTIMENT}
-                  queryData={commonQueryData}
-                  categories={origCategories}
-                  queryType={utils.CQT_HIGH_SENTIMENT}
-                  onGetCommonQueryRequest={this.fetchCommonQueryData.bind(this)}
-                />
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>
-        </div>
-      },
-      { menuItem: 
-        { key: 'query_' + utils.CQT_HIGH_SCORE_LOW_SENTIMENT, 
-          content: 'Which top scoring reviews of <category> have the most negative sentiment?' },
-      render: () =>
-        <div>
-          <Grid celled className='big-graph-grid'>
-            <Grid.Row className='selection-header'>
-              <Grid.Column width={16} textAlign='center'>
-                <CommonQueryPanel
-                  key={utils.CQT_HIGH_SCORE_LOW_SENTIMENT}
-                  queryData={commonQueryData}
-                  categories={origCategories}
-                  queryType={utils.CQT_HIGH_SCORE_LOW_SENTIMENT}
-                  onGetCommonQueryRequest={this.fetchCommonQueryData.bind(this)}
-                />
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>
-        </div>
-      },
-      { menuItem: 
-        { key: 'query_' + utils.CQT_LOW_SCORE_HIGH_SENTIMENT, 
-          content: 'Which low scoring reviews of <category> have the most positive sentiment?' },
-      render: () =>
-        <div>
-          <Grid celled className='big-graph-grid'>
-            <Grid.Row className='selection-header'>
-              <Grid.Column width={16} textAlign='center'>
-                <CommonQueryPanel
-                  key={utils.CQT_LOW_SCORE_HIGH_SENTIMENT}
-                  queryData={commonQueryData}
-                  categories={origCategories}
-                  queryType={utils.CQT_LOW_SCORE_HIGH_SENTIMENT}
-                  onGetCommonQueryRequest={this.fetchCommonQueryData.bind(this)}
-                />
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>
-        </div>
-      },
-      { menuItem: 
-        { key: 'query_' + utils.CQT_LOW_SCORE_LOW_SENTIMENT, 
-          content: 'Which low scoring reviews of <category> have the most negative sentiment?' },
-      render: () =>
-        <div>
-          <Grid celled className='big-graph-grid'>
-            <Grid.Row className='selection-header'>
-              <Grid.Column width={16} textAlign='center'>
-                <CommonQueryPanel
-                  key={utils.CQT_LOW_SCORE_LOW_SENTIMENT}
-                  queryData={commonQueryData}
-                  categories={origCategories}
-                  queryType={utils.CQT_LOW_SCORE_LOW_SENTIMENT}
-                  onGetCommonQueryRequest={this.fetchCommonQueryData.bind(this)}
-                />
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>
-        </div>
-      }
-    ];
-     
     const mainTabs = [
       // dashboard tab
       { menuItem: { key: 'dashboard', icon: 'dashboard', content: 'Dashboard' },
@@ -1215,11 +1120,14 @@ class Main extends React.Component {
                 </Grid.Row>
 
                 <Grid.Row>
-                  <Grid.Column className='query-panel' width={16} textAlign='center'>
-                    <Tab 
-                      className='tab-content' 
-                      menu={{ pointing: true, vertical: true, fluid: true, tabular: 'right' }}
-                      panes={queryTabs} />
+                  <Grid.Column  className='query-panel' width={16} textAlign='center'>
+                    <CommonQueryPanel
+                      queryData={commonQueryData}
+                      categories={origCategories}
+                      category={currentCommonQueryCategory}
+                      queryType={currentCommonQueryType}
+                      onGetCommonQueryRequest={this.fetchCommonQueryData.bind(this)}
+                    />
                   </Grid.Column>
                 </Grid.Row>
               </Grid>
@@ -1369,6 +1277,8 @@ Main.propTypes = {
   productIdFilter: PropTypes.string,
   reviewerIdFilter: PropTypes.string,
   commonQueryData: PropTypes.array,
+  currentCommonQueryCategory: PropTypes.string,
+  currentCommonQueryType: PropTypes.number,
   customQueryData: PropTypes.object,
   sentimentTerm: PropTypes.string,
   error: PropTypes.object
