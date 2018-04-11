@@ -52,6 +52,10 @@ When the reader has completed this Code Pattern, they will understand how to:
 * [Chart.js](http://www.chartjs.org/): JavaScript charting package.
 * [Jest](https://facebook.github.io/jest/): A JavaScript test framework.
 
+# Watch the Video
+
+[![](http://img.youtube.com/vi/gzlUSyLccSg/0.jpg)](https://youtu.be/gzlUSyLccSg)
+
 # Steps
 
 1. [Clone the repo](#1-clone-the-repo)
