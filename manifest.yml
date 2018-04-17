@@ -1,7 +1,8 @@
 ---
 applications:
 - path: .
-  name: watson-discovery-food-reviews
+  name: watson-discovery-food-reviews-demo
   buildpack: sdk-for-nodejs
-  memory: 1024M
+  memory: 2048M
+  random-route: false
   instances: 1

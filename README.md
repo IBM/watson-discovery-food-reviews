@@ -65,11 +65,10 @@ When the reader has completed this Code Pattern, they will understand how to:
 5. [Import Corpus Documents](#5-import-corpus-documents)
 6. [Create the model](#6-create-the-model)
 7. [Deploy the machine learning model to Watson Discovery](#7-deploy-the-machine-learning-model-to-watson-discovery)
-8. [Create Discovery Collection and Configuration](#8-create-discovery-collection-and-configuration)
-9. [Load the Discovery files](#9-load-the-discovery-files)
-10. [Configure credentials](#10-configure-credentials)
-11. [Run the application](#11-run-the-application)
-12. [Deploy and run the application on IBM Cloud](#12-deploy-and-run-the-application-on-ibm-cloud)
+8. [Create Discovery Collection](#8-create-discovery-collection)
+9. [Configure credentials](#90-configure-credentials)
+10. [Run the application](#10-run-the-application)
+11. [Deploy and run the application on IBM Cloud](#11-deploy-and-run-the-application-on-ibm-cloud)
 
 ## 1. Clone the repo
 ```
@@ -151,48 +150,22 @@ Then enter your IBM Cloud account information to locate your **Discovery** servi
 
 ![](doc/source/images/deployment-location.png)
 
-Once deployed, a **Model ID** will be created. Keep note of this value as it will be required later in this Code Pattern.
+Once deployed, a **Model ID** will be created. Keep note of this value as it will be required later when configuring your credentials.
 
 ![](doc/source/images/deployment-model.png)
 
 > NOTE: You can also view this **Model ID** by clicking the WDS link under 'Status'  against the deployed version.
 
-## 8. Create Discovery Collection and Configuration
+## 8. Create Discovery Collection
 
 Launch the **Watson Discovery** tool. Create a **new data collection**
 and give the data collection a unique name.
 
 ![](doc/source/images/create-collection.png)
 
-From the new collection data panel, under `Configuration` click the `Switch` button to switch to a new configuration file. Click `Create a new configuration` option.
-
-![](doc/source/images/switch-configuration.png)
-
-Enter a unique name and press `Create`.
-
-From the **Configuration Panel**, press the `Add enrichments` option. Ensure that the following **extraction** options are added: **Keyword**, **Entity**, and **Relation**.
-
-Also, assign your **Model ID** to both the **Entity Extraction** and **Relation Extraction**.
-
-> Note: These **Model ID** assignments are required to ensure your review data is properly enriched.
-
-![](doc/source/images/setup-config.png)
-
-Close the **Add Ennrichments** panel by pressing `Done`.
-
-Save the configuration by pressing `Apply & Save`, and then `Close`.
-
-## 9. Load the Discovery files
-
-From the new collection data panel, under `Add data to this collection` use `Drag and drop your documents here or browse from computer` to seed the content with the 2000 json files extracted from `data/food_reviews/`.
-
-> Note: If you don't load files, they will be automatically added when you run `npm start`.
-
-![](doc/source/images/load-docs.png)
-
 > Save the **environment_id** and **collection_id** for your `.env` file in the next step. You can find this data by clicking on `Use this collection API` under the **Collection Info** header located at the top right portion of the panel.
 
-## 10. Configure credentials
+## 9. Configure credentials
 ```
 cp env.sample .env
 ```
@@ -209,19 +182,20 @@ DISCOVERY_USERNAME=<add_discovery_username>
 DISCOVERY_PASSWORD=<add_discovery_password>
 DISCOVERY_ENVIRONMENT_ID=<add_discovery_environment>
 DISCOVERY_COLLECTION_ID=<add_discovery_collection>
+WKS_MODEL_ID=<add_wks_model_id>
 
 # Run locally on a non-default port (default is 3000)
 # PORT=3000
 ```
 
-## 11. Run the application
+## 10. Run the application
 
 1. Install [Node.js](https://nodejs.org/en/) runtime or NPM.
-1. Start the app by running `npm install`, followed by `npm start`.
+1. Start the app by running `npm install`, followed by `npm start`. If running for the first time, please be patient as the initialization process needs to load 2000 json files into your **Watson Discovery Collection** and may take several minutes.
 1. Access the UI by pointing your browser at `localhost:3000`.
 > Note: `PORT` can be configured in `.env`.
 
-## 12. Deploy and run the application on IBM Cloud
+## 11. Deploy and run the application on IBM Cloud
 
 To deploy to the IBM Cloud, make sure have the [IBM Cloud CLI](https://console.bluemix.net/docs/cli/reference/bluemix_cli/get_started.html#getting-started) tool installed. Then run the following commands to login using your IBM Cloud credentials.
 
@@ -259,6 +233,41 @@ To view logs, or get overview information about your app, use the IBM Cloud dash
 # Sample UI layout
 
 ![](doc/source/images/sample-output.png)
+
+# Discovery collection configuration details
+
+For reference, the following screen-shots detail how to set-up a collection configuration and load data files. In this Code Pattern, this process is completed for you when the applicatioon is initially started, but it is important to know what is happening in the background.
+
+If you were to create the configuration manually, these are the steps you would take:
+
+Launch the **Watson Discovery** tool. Create a **new data collection**
+and give the data collection a unique name.
+
+![](doc/source/images/create-collection.png)
+
+From the new collection data panel, under `Configuration` click the `Switch` button to switch to a new configuration file. Click `Create a new configuration` option.
+
+![](doc/source/images/switch-configuration.png)
+
+Enter the name `food-review-config` and press `Create`.
+
+From the **Configuration Panel**, press the `Add enrichments` option. Ensure that the following **extraction** options are added: **Keyword**, **Entity**, and **Relation**.
+
+Also, assign your **Model ID** to both the **Entity Extraction** and **Relation Extraction**.
+
+> Note: These **Model ID** assignments are required to ensure your review data is properly enriched.
+
+![](doc/source/images/setup-config.png)
+
+Close the **Add Ennrichments** panel by pressing `Done`.
+
+Save the configuration by pressing `Apply & Save`, and then `Close`.
+
+Once the configuration is created, you can proceed with loading discovery files.
+
+From the new collection data panel, under `Add data to this collection` use `Drag and drop your documents here or browse from computer` to seed the content with the 2000 json files extracted from `data/food_reviews/`.
+
+![](doc/source/images/load-docs.png)
 
 # Troubleshooting
 
