@@ -66,7 +66,7 @@ When the reader has completed this Code Pattern, they will understand how to:
 6. [Create the model](#6-create-the-model)
 7. [Deploy the machine learning model to Watson Discovery](#7-deploy-the-machine-learning-model-to-watson-discovery)
 8. [Create Discovery Collection](#8-create-discovery-collection)
-9. [Configure credentials](#90-configure-credentials)
+9. [Configure credentials](#9-configure-credentials)
 10. [Run the application](#10-run-the-application)
 11. [Deploy and run the application on IBM Cloud](#11-deploy-and-run-the-application-on-ibm-cloud)
 
