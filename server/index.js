@@ -36,6 +36,8 @@ const utils = require('../lib/utils');
 
 var environment_id;
 var collection_id;
+const model_id = process.env.WKS_MODEL_ID;
+
 const DEFAULT_NAME = 'food-reviews';
 var discoveryDocs = [];
 const fs = require('fs');
@@ -60,7 +62,8 @@ discovery.query = Promise.promisify(discovery.query);
 const discoverySetup = new WatsonDiscoverySetup(discovery);
 const discoverySetupParams = {
   default_name: DEFAULT_NAME,
-  config_name: 'foodie-keyword-extraction'   // instead of 'Default Configuration'
+  config_name: 'food-review-config',   // instead of 'Default Configuration',
+  model_id: model_id
 };
 
 const WatsonDiscoServer = new Promise((resolve) => {
@@ -80,6 +83,7 @@ const WatsonDiscoServer = new Promise((resolve) => {
       collection_id = collectionParams.collection_id;
       console.log('environment_id: ' + environment_id);
       console.log('collection_id: ' + collection_id);
+      console.log('model_id: ' + model_id);
       queryBuilder.setEnvironmentId(environment_id);
       queryBuilder.setCollectionId(collection_id);
       queryCustomBuilder.setEnvironmentId(environment_id);
