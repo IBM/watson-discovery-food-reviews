@@ -51,9 +51,14 @@ arrayOfFiles.forEach(function(file) {
 // out of memory errors.
 //discoveryDocs = discoveryDocs.slice(0,100);
 
+var version_date = '2018-03-05';
+if (process.env.DISCOVERY_VERSION_DATE !== undefined) {
+  // if defined, override with value from .env
+  version_date = process.env.DISCOVERY_VERSION_DATE;
+}
+
 const discovery = new DiscoveryV1({
-  // uname/pwd will be pulled in from VCAP_SERVICES or .env
-  version_date: '2017-11-07'
+  version: version_date
 });
 
 // make 'query' a promise function
@@ -246,8 +251,6 @@ function createServer() {
 
   // initial start-up request
   server.get('/*', function(req, res) {
-    console.log('In /*');
-
     // this is the inital query to the discovery service
     console.log('Initial Search Query at start-up');
     const params = queryBuilder.search({
