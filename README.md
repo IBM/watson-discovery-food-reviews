@@ -79,8 +79,8 @@ git clone https://github.com/IBM/watson-discovery-food-reviews
 
 Create the following services:
 
-* [**Watson Discovery**](https://console.ng.bluemix.net/catalog/services/discovery)
-* [**Watson Knowledge Studio**](https://console.bluemix.net/catalog/services/knowledge-studio)
+* [**Watson Discovery**](https://cloud.ibm.com/catalog/services/discovery)
+* [**Watson Knowledge Studio**](https://cloud.ibm.com/catalog/services/knowledge-studio)
 
 ## 3. Create a Watson Knowledge Studio workspace
 
@@ -204,7 +204,7 @@ WKS_MODEL_ID=<add_wks_model_id>
 
 ## 11. Deploy and run the application on IBM Cloud
 
-To deploy to the IBM Cloud, make sure have the [IBM Cloud CLI](https://console.bluemix.net/docs/cli/reference/bluemix_cli/get_started.html#getting-started) tool installed. Then run the following commands to login using your IBM Cloud credentials.
+To deploy to the IBM Cloud, make sure have the [IBM Cloud CLI](https://cloud.ibm.com/docs/cli/reference/bluemix_cli/get_started.html#getting-started) tool installed. Then run the following commands to login using your IBM Cloud credentials.
 
 ```
 cd watson-discovery-food-reviews
