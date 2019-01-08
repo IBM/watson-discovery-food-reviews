@@ -16,7 +16,7 @@
 
 const path = require('path');
 const express = require('express');
-const expressBrowserify = require('express-browserify');
+const browserify = require('browserify-middleware');
 
 // Express app
 const app = express();
@@ -31,20 +31,7 @@ app.use('/css', express.static(path.resolve(__dirname, '..', 'public/css')));
 app.use('/images', express.static(path.resolve(__dirname, '..', 'public/images')));
 app.use(express.static(path.join(__dirname, '..', 'node_modules/semantic-ui/dist')));
 
-const isDev = (app.get('env') === 'development');
-console.log('isDev: ' + isDev);
-const browserifier = expressBrowserify(path.resolve(__dirname, '..', 'public/js/bundle.js'), {
-  watch: isDev,
-  debug: isDev,
-  extension: ['js'],
-  transform: ['babelify'],
-});
-
-if (!isDev) {
-  browserifier.browserify.transform('uglifyify', { global: true });
-}
-
 // Client Side Bundle route
-app.get('/js/bundle.js', browserifier);
+app.get('/js/bundle.js', browserify(path.resolve(__dirname, '..', 'public/js/bundle.js')));
 
 module.exports = app;
