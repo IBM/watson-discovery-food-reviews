@@ -8,11 +8,9 @@ extends:
   - 'plugin:react/recommended'
 parserOptions:
   ecmaFeatures:
-    experimentalObjectRestSpread: true
+    ecmaVersion: 2018
     jsx: true
   sourceType: module
-plugins:
-  - react
 rules:
   indent:
     - error
