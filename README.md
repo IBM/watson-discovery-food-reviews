@@ -215,7 +215,8 @@ To deploy to the IBM Cloud, make sure have the [IBM Cloud CLI](https://cloud.ibm
 
 ```bash
 cd watson-discovery-food-reviews
-cf login
+ibmcloud login
+ibmcloud target --cf
 ```
 
 When pushing your app to the IBM Cloud, values are read in from the [manifest.yml](manifest.yml) file. Edit this file if you need to change any of the default settings, such as application name or the amount of memory to allocate.
@@ -235,7 +236,7 @@ Additionally, your environment variables must be set in your `.env` file as desc
 To deploy your application, run the following command.
 
 ```bash
-cf push
+ibmcloud cf push
 ```
 
 > NOTE: The URL route assigned to your application will be displayed as a result of this command. Note this value, as it will be required to access your app.
