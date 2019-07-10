@@ -26,7 +26,7 @@ const queryString = require('query-string');
 const queryBuilder = require('./query-builder');
 const queryCustomBuilder = require('./query-builder-custom');
 const WatsonDiscoverySetup = require('../lib/watson-discovery-setup');
-const DiscoveryV1 = require('watson-developer-cloud/discovery/v1');
+const DiscoveryV1 = require('ibm-watson/discovery/v1');
 const utils = require('../lib/utils');
 
 /**
@@ -51,7 +51,7 @@ arrayOfFiles.forEach(function(file) {
 // out of memory errors.
 //discoveryDocs = discoveryDocs.slice(0,100);
 
-var version_date = '2018-03-05';
+var version_date = '2019-03-25';
 if (process.env.DISCOVERY_VERSION_DATE !== undefined) {
   // if defined, override with value from .env
   version_date = process.env.DISCOVERY_VERSION_DATE;
@@ -200,7 +200,7 @@ function createServer() {
     var searchQuery = req.params.searchQuery.replace(/\+/g, ' ');
     const qs = queryString.stringify({
       query: searchQuery,
-      count: 2000,
+      count: 1000,
       returnPassages: false,
       queryType: 'natural_language_query'
     });
@@ -255,7 +255,7 @@ function createServer() {
     console.log('Initial Search Query at start-up');
     const params = queryBuilder.search({
       natural_language_query: '',
-      count: 2000,
+      count: 1000,
       sort: '-Score',
       passages: false
     });
