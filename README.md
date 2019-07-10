@@ -15,14 +15,14 @@ The main benefit of using the Watson Discovery Service is its powerful analytics
 * **Entity Types**: the classification of the discovered entities, such as person, location, or job title.
 * **Sentiment**: the overall positive or negative sentiment of each document.
 
-With Watson Knowledge Studio (WKS), a machine learning annotator can be trained to recognize mentions of custom entity and relation types which can then be incorporated into the Discovery application enrichment process.
+With Watson Knowledge Studio, a machine learning annotator can be trained to recognize mentions of custom entity and relation types which can then be incorporated into the Discovery application enrichment process.
 
 > For this code pattern, we will be using data that contains food reviews from Amazon, see the [Kaggle dataset](https://www.kaggle.com/snap/amazon-fine-food-reviews) for further information.
 
 When the reader has completed this code pattern, they will understand how to:
 
 * Use Watson Knowledge Studio to create a custom annotator.
-* Deploy a WKS model to Watson Discovery.
+* Deploy a Watson Knowledge Studio model to Watson Discovery.
 * Load and enrich data in the Watson Discovery Service.
 * Query and manipulate data in the Watson Discovery Service.
 * Create UI components to represent enriched data created by the Watson Discovery Service.
@@ -32,9 +32,9 @@ When the reader has completed this code pattern, they will understand how to:
 
 ## Flow
 
-1. A sample set of review documents are loaded into WKS for annotation.
-1. A WKS model is created.
-1. The WKS model is applied to a Watson Discovery service instance.
+1. A sample set of review documents are loaded into Watson Knowledge Studio for annotation.
+1. A Watson Knowledge Studio model is created.
+1. The Watson Knowledge Studio model is applied to a Watson Discovery service instance.
 1. The food review json files are added to the Discovery collection.
 1. The user interacts with the backend server via the app UI. The frontend app UI uses React to render search results and can reuse all of the views that are used by the backend for server side rendering. The frontend is using semantic-ui-react components and is responsive.
 1. User input is processed and routed to the backend server, which is responsible for server side rendering of the views to be displayed on the browser. The backend server is written using express and uses express-react-views engine to render views written using React.
