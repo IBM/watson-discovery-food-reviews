@@ -1,6 +1,6 @@
 [![Build Status](https://api.travis-ci.org/IBM/watson-discovery-food-reviews.svg?branch=master)](https://travis-ci.org/IBM/watson-discovery-food-reviews)
 
-# Discovery customer sentiment from product reviews
+# Discover customer sentiment from product reviews
 
 In this code pattern, we walk you through a working example of a web application that queries and manipulates data from the Watson Discovery Service. With the aid of a custom model built with Watson Knowledge studio, the data will have additional enrichments that will provide improved insights for user analysis.
 
