@@ -15,14 +15,14 @@ The main benefit of using the Watson Discovery Service is its powerful analytics
 * **Entity Types**: the classification of the discovered entities, such as person, location, or job title.
 * **Sentiment**: the overall positive or negative sentiment of each document.
 
-With Watson Knowledge Studio (WKS), a machine learning annotator can be trained to recognize mentions of custom entity and relation types which can then be incorporated into the Discovery application enrichment process.
+With Watson Knowledge Studio, a machine learning annotator can be trained to recognize mentions of custom entity and relation types which can then be incorporated into the Discovery application enrichment process.
 
 > For this code pattern, we will be using data that contains food reviews from Amazon, see the [Kaggle dataset](https://www.kaggle.com/snap/amazon-fine-food-reviews) for further information.
 
 When the reader has completed this code pattern, they will understand how to:
 
 * Use Watson Knowledge Studio to create a custom annotator.
-* Deploy a WKS model to Watson Discovery.
+* Deploy a Watson Knowledge Studio model to Watson Discovery.
 * Load and enrich data in the Watson Discovery Service.
 * Query and manipulate data in the Watson Discovery Service.
 * Create UI components to represent enriched data created by the Watson Discovery Service.
@@ -32,9 +32,9 @@ When the reader has completed this code pattern, they will understand how to:
 
 ## Flow
 
-1. A sample set of review documents are loaded into WKS for annotation.
-1. A WKS model is created.
-1. The WKS model is applied to a Watson Discovery service instance.
+1. A sample set of review documents are loaded into Watson Knowledge Studio for annotation.
+1. A Watson Knowledge Studio model is created.
+1. The Watson Knowledge Studio model is applied to a Watson Discovery service instance.
 1. The food review json files are added to the Discovery collection.
 1. The user interacts with the backend server via the app UI. The frontend app UI uses React to render search results and can reuse all of the views that are used by the backend for server side rendering. The frontend is using semantic-ui-react components and is responsive.
 1. User input is processed and routed to the backend server, which is responsible for server side rendering of the views to be displayed on the browser. The backend server is written using express and uses express-react-views engine to render views written using React.
@@ -89,19 +89,21 @@ Create the following services:
 
 ## 3. Create a Watson Knowledge Studio workspace
 
-Launch the **WKS** tool and create a new **workspace**.
+Launch the **Watson Knowledge Studio** tool and click on **Create entities and relations workspace**.
 
 ![create_wks_workspace](doc/source/images/create-wks-workspace.png)
+
+Enter a unique name and press **Create**.
 
 ## 4. Upload Type System
 
 A type system allows us to define things that are specific to review documents, such as product and brand names. The type system controls how content can be annotated by defining the types of entities that can be labeled and how relationships among different entities can be labeled.
 
-To upload our pre-defined type system, from the `Access & Tools` -> `Entity Types` panel, press the `Upload` button to import the Type System file [data/types-2aa46ad0-31da-11e8-89a9-efc0f3b77492.json](data/types-2aa46ad0-31da-11e8-89a9-efc0f3b77492.json) found in the local repository.
+To upload our pre-defined type system, from the **Assets** -> **Entity Types** panel, press the **Upload** button to import the Type System file [data/types-2aa46ad0-31da-11e8-89a9-efc0f3b77492.json](data/types-2aa46ad0-31da-11e8-89a9-efc0f3b77492.json) found in the local repository.
 
 ![upload_type_system](doc/source/images/upload-type-system.png)
 
-This will upload a set of Entity Types and Relation Types.
+Press the **Upload** button. This will upload a set of Entity Types and Relation Types:
 
 ![wks_entity_types](doc/source/images/entity-types.png)
 
@@ -111,11 +113,13 @@ This will upload a set of Entity Types and Relation Types.
 
 Corpus documents are required to train our machine-learning annotator component. For this code pattern, the corpus documents will contain sample review documents.
 
-From the `Access & Tools` -> `Documents` panel, press the `Upload Document` Sets button to import a Document Set file. Use the corpus documents file `data/watson-discovery-food-reviews/data/corpus-2aa46ad0-31da-11e8-89a9-efc0f3b77492.zip` found in the local repository.
+From the **Assets** -> **Documents** panel, press the **Upload Document Sets** button to import a Document Set file. Use the corpus documents file [data/watson-discovery-food-reviews/data/corpus-2aa46ad0-31da-11e8-89a9-efc0f3b77492.zip](data/watson-discovery-food-reviews/data/corpus-2aa46ad0-31da-11e8-89a9-efc0f3b77492.zip) found in the local repository.
 
 > NOTE: Select the option to "upload corpus documents and include ground truth (upload the original workspace's type system first)"
 
 ![import_corpus](doc/source/images/import-corpus.png)
+
+Once uploaded, you should see a set of documents:
 
 ![wks_document_set](doc/source/images/document-set.png)
 
@@ -123,52 +127,61 @@ From the `Access & Tools` -> `Documents` panel, press the `Upload Document` Sets
 
 Since the corpus documents that were uploaded were already pre-annotated and included ground truth, it is possible to build the machine learning annotator directly without the need for performing human annotations.
 
-Go to the `Model Management` -> `Performance` panel, and press the `Train and evaluate` button.
+Go to the **Machine Learning Model** -> **Performance** panel, and press the **Train and Evaluate** button.
 
 ![wks_training_sets](doc/source/images/training-sets.png)
 
-From the **Document Set** name list, select the annotation sets `Docs28.csv` and `Docs122V2.csv`. Also, make sure that the option `Run on existing training, test and blind sets` is checked.  Press the `Train & Evaluate` button.
+From the **Document Set** name list, select the annotation sets **Docs28.csv** and **Docs122V2.csv**. Also, make sure that the option **Run on existing training, test and blind sets** is checked.  Press the **Train & Evaluate** button.
 
 This process may take several minutes to complete. Progress will be shown in the upper right corner of the panel.
 
-Once complete, you will see the results of the train and evaluate process.
+You can view the log files of the process by clicking the **View Log** button.
 
-You can view the log files of the process by clicking the `View Log` button.
+Once complete, you will see the results of the train and evaluate process:
+
+![wks_training_complete](doc/source/images/training-complete.png)
 
 ## 7. Deploy the machine learning model to Watson Discovery
 
-Now we can deploy our new model to the already created **Watson Discovery** service. Navigate to the `Version` menu on the left and press `Take Snapshot`.
+Now we can deploy our new model to the already created **Watson Discovery** service. Navigate to the **Versions** menu on the left and press **Create Version**.
 
 ![wks_snapshot_page](doc/source/images/snapshot-page.png)
 
-The snapshot version will now be available for deployment to Watson Discovery.
+The new version will now be available for deployment to Watson Discovery.
 
 ![wks_model_version](doc/source/images/model-versions.png)
 
-To start the process, click the `Deploy` button associated with your snapshot version.
-
-Select the option to deploy to **Discovery**.
+To start the process, click the **Deploy** button associated with your version.
 
 ![wks_deployment_options](doc/source/images/deployment-options.png)
 
-Then enter your IBM Cloud account information to locate your **Discovery** service to deploy to.
+Select the option to deploy to **Discovery**.
 
 ![wks_deployment_location](doc/source/images/deployment-location.png)
+
+Enter your IBM Cloud account information to locate your **Discovery** service to deploy to.
 
 Once deployed, a **Model ID** will be created. Keep note of this value as it will be required later when configuring your credentials.
 
 ![wks_deployment_model](doc/source/images/deployment-model.png)
 
-> NOTE: You can also view this **Model ID** by clicking the WDS link under 'Status'  against the deployed version.
+> NOTE: You can also view this **Model ID** by clicking the **Deployed Models** link under the model version.
 
 ## 8. Create Discovery Collection
 
-Launch the **Watson Discovery** tool. Create a **new data collection**
-and give the data collection a unique name.
+Launch the **Watson Discovery** tool. Create a new data collection by clicking the **Upload you own data** button. Enter a unique name to create your collection.
 
 ![disco_create_collection](doc/source/images/create-collection.png)
 
-> Save the **environment_id** and **collection_id** for your `.env` file in the next step. You can find this data by clicking on `Use this collection API` under the **Collection Info** header located at the top right portion of the panel.
+Creating the **Discovery Collection** and populating the .env file (see next step) with the appropriate credentials is all that is required to run the app. Once started, the app will load all of the data files into your collection. For details on how to do this manually, go to the [Discovery collection configuration details](#discovery-collection-configuration-details) section below.
+
+To locate your `environment_id` and `collection_id` values for your collection, click the drop-down button at the top of your collection panel.
+
+![find_disco_ids](doc/source/images/find-disco-ids.png)
+
+To locate the service credentials for your discovery service, click on the **Service Credentials** tab.
+
+![get_disco_creds](doc/source/images/get-disco-creds.png)
 
 ## 9. Configure credentials
 
@@ -176,7 +189,7 @@ and give the data collection a unique name.
 cp env.sample .env
 ```
 
-Edit the `.env` file with the necessary settings.
+Edit the .env file with the necessary settings.
 
 #### `env.sample:`
 
@@ -184,19 +197,14 @@ Edit the `.env` file with the necessary settings.
 # Copy this file to .env and replace the credentials with
 # your own before starting the app.
 
-# Copy this file to .env and replace the credentials with
-# your own before starting the app.
-
 # Watson Discovery
-DISCOVERY_VERSION_DATE="2018-03-05"
 DISCOVERY_URL=<add_discovery_url>
+DISCOVERY_IAM_APIKEY=<add_discovery_iam_apikey>
 DISCOVERY_ENVIRONMENT_ID=<add_discovery_environment_id>
 DISCOVERY_COLLECTION_ID=<add_discovery_collection_id>
+
+# Watson Knowledge Studio
 WKS_MODEL_ID=<add_wks_model_id>
-## Un-comment and use either username+password or IAM apikey.
-# DISCOVERY_IAM_APIKEY=<add_discovery_iam_apikey>
-# DISCOVERY_USERNAME=<add_discovery_username>
-# DISCOVERY_PASSWORD=<add_discovery_password>
 
 # Run locally on a non-default port (default is 3000)
 # PORT=3000
@@ -205,9 +213,9 @@ WKS_MODEL_ID=<add_wks_model_id>
 ## 10. Run the application
 
 1. Install [Node.js](https://nodejs.org/en/) runtime or NPM.
-1. Start the app by running `npm install`, followed by `npm start`. If running for the first time, please be patient as the initialization process needs to load 2000 json files into your **Watson Discovery Collection** and may take several minutes.
+1. Start the app by running `npm install`, followed by `npm start`. If running for the first time, please be patient as the initialization process needs to load 1000 json files into your **Watson Discovery Collection** and may take several minutes.
 1. Access the UI by pointing your browser at `localhost:3000`.
-> Note: `PORT` can be configured in `.env`.
+> Note: `PORT` can be configured in the .env file.
 
 ## 11. Deploy and run the application on IBM Cloud
 
@@ -255,40 +263,39 @@ For reference, the following screen-shots detail how to set-up a collection conf
 
 If you were to create the configuration manually, these are the steps you would take:
 
-Launch the **Watson Discovery** tool. Create a **new data collection**
-and give the data collection a unique name.
+Launch the **Watson Discovery** tool. Create a new data collection by clicking the **Upload you own data** button. Enter a unique name to create your collection.
 
 ![disco_create_collection](doc/source/images/create-collection.png)
 
-From the new collection data panel, under `Configuration` click the `Switch` button to switch to a new configuration file. Click `Create a new configuration` option.
+From the new collection data panel, click the **Configure Data** button at the top of the panel. Then select the **Enrich fields** tab.
 
-![disco_switch_configuration](doc/source/images/switch-configuration.png)
+![enrich_fields_panel](doc/source/images/enrich-fields-panel.png)
 
-Enter the name `food-review-config` and press `Create`.
+You can see that as a default, there are several enrichments that will be applied to your data collection. But we need to add to this list.
 
-From the **Configuration Panel**, press the `Add enrichments` option. Ensure that the following **extraction** options are added: **Keyword**, **Entity**, and **Relation**.
+Click on **Add enrichments**.
 
-Also, assign your **Model ID** to both the **Entity Extraction** and **Relation Extraction**.
+At the top of the list, select **Keyword Extraction**.
 
-> Note: These **Model ID** assignments are required to ensure your review data is properly enriched.
+![keyword_extraction](doc/source/images/keyword-extraction.png)
 
-![disco_setup_config](doc/source/images/setup-config.png)
+At the bottom of the list, select both **Entity Extraction** and **Relation Extraction**. Enter the **Model ID** that we created in **Watson Knowledge Studio**.
 
-Close the **Add Ennrichments** panel by pressing `Done`.
+Close the enrichments window.
 
-Save the configuration by pressing `Apply & Save`, and then `Close`.
+Click **Apply changes to collection** to start the process of loading the discovery files.
 
-Once the configuration is created, you can proceed with loading discovery files.
+![select_disco_files](doc/source/images/select-disco-files.png)
 
-From the new collection data panel, under `Add data to this collection` use `Drag and drop your documents here or browse from computer` to seed the content with the 2000 json files extracted from `data/food_reviews/`.
+Drag and drop your documents here or browse to your local computer files to load the collection with the json files located in [data/food_reviews](data/food_reviews/).
 
-![disco_load_docs](doc/source/images/load-docs.png)
+> NOTE: If using the **Discovery Lite** plan, you are limited to loading up to 1000 files into your discovery service. This limit is not per collection, but the combined number for all collections in your service.
 
 # Troubleshooting
 
 * Error when loading files into Discovery
 
-  > Loading all 2000 document files at one time into Discovery can sometimes lead to "busy" errors. If this occurs, start over and load a small number of files at a time.
+  > Loading all 1000 document files at one time into Discovery can sometimes lead to "busy" errors. If this occurs, start over and load a small number of files at a time.
 
 * No keywords appear in the app
 

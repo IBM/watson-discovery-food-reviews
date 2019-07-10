@@ -463,7 +463,7 @@ class Main extends React.Component {
     const qs = queryString.stringify({
       query: searchQuery,
       filters: filterString,
-      count: 2000,
+      count: 1000,
       sort: sortOrder,
       queryType: 'natural_language_query',
       returnPassages: false
