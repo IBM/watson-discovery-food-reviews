@@ -259,7 +259,7 @@ To view logs, or get overview information about your app, use the IBM Cloud dash
 
 # Discovery collection configuration details
 
-For reference, the following screen-shots detail how to set-up a collection configuration and load data files. In this code pattern, this process is completed for you when the applicatioon is initially started, but it is important to know what is happening in the background.
+For reference, the following screen-shots detail how to set-up a collection configuration and load data files. In this code pattern, this process is completed for you when the application is initially started, but it is important to know what is happening in the background.
 
 If you were to create the configuration manually, these are the steps you would take:
 
