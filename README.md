@@ -70,9 +70,7 @@ When the reader has completed this code pattern, they will understand how to:
 1. [Create the model](#6-create-the-model)
 1. [Deploy the machine learning model to Watson Discovery](#7-deploy-the-machine-learning-model-to-watson-discovery)
 1. [Create Discovery Collection](#8-create-discovery-collection)
-1. [Configure credentials](#9-configure-credentials)
-1. [Run the application](#10-run-the-application)
-1. [Deploy and run the application on IBM Cloud](#11-deploy-and-run-the-application-on-ibm-cloud)
+1. [Deploy the application](#9-deploy-the-application)
 
 ## 1. Clone the repo
 
@@ -173,7 +171,7 @@ Launch the **Watson Discovery** tool. Create a new data collection by clicking t
 
 ![disco_create_collection](doc/source/images/create-collection.png)
 
-Creating the **Discovery Collection** and populating the .env file (see next step) with the appropriate credentials is all that is required to run the app. Once started, the app will load all of the data files into your collection. For details on how to do this manually, go to the [Discovery collection configuration details](#discovery-collection-configuration-details) section below.
+Creating the **Discovery Collection** and populating the .env file with the appropriate credentials is all that is required to deploy and run the app. Once started, the app will load all of the data files into your collection. For details on how to do this manually, go to the [Discovery collection configuration details](#discovery-collection-configuration-details) section below.
 
 To locate your `environment_id` and `collection_id` values for your collection, click the drop-down button at the top of your collection panel.
 
@@ -183,75 +181,15 @@ To locate the service credentials for your discovery service, click on the **Ser
 
 ![get_disco_creds](doc/source/images/get-disco-creds.png)
 
-## 9. Configure credentials
+## 9. Deploy the application
 
-```bash
-cp env.sample .env
-```
+There are several ways to deploy the app. Each requires that you provide the necessary credentials for both your Watson Discovery and Watson Knowledge Studio services (see above for how to retrieve the credentials).
 
-Edit the .env file with the necessary settings.
+Click on one of the options below for instructions on deploying the app.
 
-#### `env.sample:`
-
-```bash
-# Copy this file to .env and replace the credentials with
-# your own before starting the app.
-
-# Watson Discovery
-DISCOVERY_URL=<add_discovery_url>
-DISCOVERY_IAM_APIKEY=<add_discovery_iam_apikey>
-DISCOVERY_ENVIRONMENT_ID=<add_discovery_environment_id>
-DISCOVERY_COLLECTION_ID=<add_discovery_collection_id>
-
-# Watson Knowledge Studio
-WKS_MODEL_ID=<add_wks_model_id>
-
-# Run locally on a non-default port (default is 3000)
-# PORT=3000
-```
-
-## 10. Run the application
-
-1. Install [Node.js](https://nodejs.org/en/) runtime or NPM.
-1. Start the app by running `npm install`, followed by `npm start`. If running for the first time, please be patient as the initialization process needs to load 1000 json files into your **Watson Discovery Collection** and may take several minutes.
-1. Access the UI by pointing your browser at `localhost:3000`.
-> Note: `PORT` can be configured in the .env file.
-
-## 11. Deploy and run the application on IBM Cloud
-
-To deploy to the IBM Cloud, make sure have the [IBM Cloud CLI](https://cloud.ibm.com/docs/cli/reference/bluemix_cli/get_started.html#getting-started) tool installed. Then run the following commands to login using your IBM Cloud credentials.
-
-```bash
-cd watson-discovery-food-reviews
-ibmcloud login
-ibmcloud target --cf
-```
-
-When pushing your app to the IBM Cloud, values are read in from the [manifest.yml](manifest.yml) file. Edit this file if you need to change any of the default settings, such as application name or the amount of memory to allocate.
-
-```bash
----
-applications:
-- path: .
-  name: watson-discovery-food-reviews
-  buildpack: sdk-for-nodejs
-  memory: 1024M
-  instances: 1
-```
-
-Additionally, your environment variables must be set in your `.env` file as described previously in [Step 9. Configure credentials](#9-configure-credentials).
-
-To deploy your application, run the following command.
-
-```bash
-ibmcloud cf push
-```
-
-> NOTE: The URL route assigned to your application will be displayed as a result of this command. Note this value, as it will be required to access your app.
-
-To view the application, go to the IBM Cloud route assigned to your app. Typically, this will take the form `https://<app name>.mybluemix.net`.
-
-To view logs, or get overview information about your app, use the IBM Cloud dashboard.
+|   |   |   |
+| - | - | - |
+| [![openshift](https://raw.githubusercontent.com/IBM/pattern-utils/master/deploy-buttons/openshift.png)](doc/source/openshift.md) | [![public](https://raw.githubusercontent.com/IBM/pattern-utils/master/deploy-buttons/cf.png)](doc/source/cf.md) | [![local](https://raw.githubusercontent.com/IBM/pattern-utils/master/deploy-buttons/local.png)](doc/source/local.md) |
 
 # Sample UI layout
 
