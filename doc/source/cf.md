@@ -72,4 +72,4 @@ To view the application, go to the IBM Cloud route assigned to your app. Typical
 
 To view logs, or get overview information about your app, use the IBM Cloud dashboard.
 
-[![return](https://raw.githubusercontent.com/IBM/pattern-utils/master/deploy-buttons/return.png)](https://github.com/IBM/watson-discovery-food-reviews#deployment-options)
+[![return](https://raw.githubusercontent.com/IBM/pattern-utils/master/deploy-buttons/return.png)](https://github.com/IBM/watson-discovery-food-reviews#sample-ui-layout)

@@ -62,4 +62,4 @@ Go to the `Applications` tab, choose `Deployments` to view the status of your ap
 * From the OpenShift or OKD UI, under `Applications` -> `Routes` you will see your app. Click on the `Hostname`to see your Watson Discovery Food Reviews app in action.
 * Save this URL.
 
-[![return](https://raw.githubusercontent.com/IBM/pattern-utils/master/deploy-buttons/return.png)](https://github.com/IBM/watson-discovery-food-reviews#deployment-options)
+[![return](https://raw.githubusercontent.com/IBM/pattern-utils/master/deploy-buttons/return.png)](https://github.com/IBM/watson-discovery-food-reviews#sample-ui-layout)

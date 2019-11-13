@@ -41,4 +41,4 @@ WKS_MODEL_ID=<add_wks_model_id>
 1. Access the UI by pointing your browser at `localhost:3000`.
 > Note: `PORT` can be configured in the .env file.
 
-[![return](https://raw.githubusercontent.com/IBM/pattern-utils/master/deploy-buttons/return.png)](https://github.com/IBM/watson-discovery-food-reviews#deployment-options)
+[![return](https://raw.githubusercontent.com/IBM/pattern-utils/master/deploy-buttons/return.png)](https://github.com/IBM/watson-discovery-food-reviews#sample-ui-layout)
