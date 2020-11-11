@@ -17,16 +17,16 @@
 const util = require('util');
 
 module.exports = {
-  setEnvironmentId(environmentId) {
-    this.environment_id = environmentId;
+  setProjectId(projectId) {
+    this.project_id = projectId;
   },
   setCollectionId(collectionId) {
     this.collection_id = collectionId;
   },
   search(queryOpts) {
     const params = Object.assign({
-      environment_id: this.environment_id,
-      collection_id: this.collection_id,
+      projectId: this.project_id,
+      // collection_id: this.collection_id,
       passages: false,
       highlight: true,
       aggregation:

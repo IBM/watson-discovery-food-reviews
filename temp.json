@@ -1,0 +1,25 @@
+"+++++++++++++++ V1 RESULTS ++++++++++++++++++++",
+{"type": "term", "field": "enriched_text.entities.text",
+"results": [{
+    "key": "Greenies",
+    "matching_results": 2,
+    "aggregations": [{
+        "type": "term",
+        "field": "enriched_text.sentiment.document.label",
+        "results": [{
+            "key": "negative",
+            "matching_results": 1
+          },{
+            "key": "positive",
+            "matching_results": 1
+          }]
+
+"+++++++++++++++ V2 RESULTS ++++++++++++++++++++",
+{"type": "term", "field": "enriched_text.entities.text",
+"results": [{
+    "key": "Greenies",
+    "matching_results": 5,
+    "aggregations": [{
+        "type": "term",
+        "field": "enriched_text.sentiment.document.label"
+      }]

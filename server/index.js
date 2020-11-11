@@ -26,15 +26,21 @@ const queryString = require('query-string');
 const queryBuilder = require('./query-builder');
 const queryCustomBuilder = require('./query-builder-custom');
 const WatsonDiscoverySetup = require('../lib/watson-discovery-setup');
-const DiscoveryV1 = require('ibm-watson/discovery/v1');
+const DiscoveryV2 = require('ibm-watson/discovery/v2');
+const { CloudPakForDataAuthenticator } = require('ibm-watson/auth');
+const { getAuthenticatorFromEnvironment } = require('ibm-watson/auth');
+
 const utils = require('../lib/utils');
 
 /**
  * Back end server which handles initializing the Watson Discovery
  * service, and setting up route methods to handle client requests.
  */
+let auth = getAuthenticatorFromEnvironment('DISCOVERY');
+console.log('Discovery auth:', JSON.stringify(auth, null, 2));
 
-var environment_id;
+
+var project_id;
 var collection_id;
 const model_id = process.env.WKS_MODEL_ID;
 
@@ -57,8 +63,11 @@ if (process.env.DISCOVERY_VERSION_DATE !== undefined) {
   version_date = process.env.DISCOVERY_VERSION_DATE;
 }
 
-const discovery = new DiscoveryV1({
-  version: version_date
+const discovery = new DiscoveryV2({
+  version: '2020-07-07',
+  authenticator: auth,
+  serviceUrl: process.env.DISCOVERY_URL,
+  disableSslVerification: true,
 });
 
 // make 'query' a promise function
@@ -66,9 +75,10 @@ discovery.query = Promise.promisify(discovery.query);
 
 const discoverySetup = new WatsonDiscoverySetup(discovery);
 const discoverySetupParams = {
-  default_name: DEFAULT_NAME,
-  config_name: 'food-review-config',   // instead of 'Default Configuration',
-  model_id: model_id
+  //default_name: DEFAULT_NAME,
+  //config_name: 'food-review-config',   // instead of 'Default Configuration',
+  //model_id: model_id,
+  projectId: process.env.DISCOVERY_PROJECT_ID
 };
 
 const WatsonDiscoServer = new Promise((resolve) => {
@@ -84,20 +94,22 @@ const WatsonDiscoServer = new Promise((resolve) => {
       // will point to the actual credentials, whether the user
       // entered them in .env for an existing collection, or if
       // we had to create them from scratch.
-      environment_id = collectionParams.environment_id;
-      collection_id = collectionParams.collection_id;
-      console.log('environment_id: ' + environment_id);
-      console.log('collection_id: ' + collection_id);
-      console.log('model_id: ' + model_id);
-      queryBuilder.setEnvironmentId(environment_id);
-      queryBuilder.setCollectionId(collection_id);
-      queryCustomBuilder.setEnvironmentId(environment_id);
-      queryCustomBuilder.setCollectionId(collection_id);
+      // environment_id = collectionParams.environment_id;
+      // collection_id = collectionParams.collection_id;
+      // console.log('environment_id: ' + environment_id);
+      // console.log('collection_id: ' + collection_id);
+      // console.log('model_id: ' + model_id);
+      project_id = collectionParams.projectId;
+      console.log('project_id: ' + project_id);
+      queryBuilder.setProjectId(project_id);
+      // queryBuilder.setCollectionId(collection_id);
+      queryCustomBuilder.setProjectId(project_id);
+      // queryCustomBuilder.setCollectionId(collection_id);
 
       collectionParams.documents = discoveryDocs;
       console.log('Begin loading ' + discoveryDocs.length +
         ' json files into discovery. Please be patient as this can take several minutes.');
-      discoverySetup.loadCollectionFiles(collectionParams);
+      // discoverySetup.loadCollectionFiles(collectionParams);
       resolve(createServer());
     }
   });
@@ -257,7 +269,7 @@ function createServer() {
       natural_language_query: '',
       count: 1000,
       sort: '-Score',
-      passages: false
+      // passages: false
     });
     return new Promise((resolve, reject) => {
       discovery.query(params)
@@ -268,9 +280,8 @@ function createServer() {
           matches = utils.formatData(matches, []);
           var totals = utils.getTotals(matches);
 
-          // const util = require('util');
           // console.log('++++++++++++ DISCO RESULTS ++++++++++++++++++++');
-          // console.log(util.inspect(results, false, null));
+          // console.log(JSON.stringify(results, null, 2));
 
           // first time init of data needed for common and custom queries
           var commonQueryData = [];
@@ -294,6 +305,22 @@ function createServer() {
             placeHolder: 'Enter search string...'
           };
 
+          const util = require('util');
+          console.log('++++++++++++ DISCO 1 RESULTS ++++++++++++++++++++');
+          console.log(util.inspect(results.result.aggregations, false, null));
+          console.log('++++++++++++ ENTITIES ++++++++++++++++++++');
+          console.log(util.inspect(results.result.aggregations[0], false, null));
+          console.log('++++++++++++ CATEGORIES ++++++++++++++++++++');
+          console.log(util.inspect(results.result.aggregations[3], false, null));
+          console.log('++++++++++++ CONCEPTS ++++++++++++++++++++');
+          console.log(util.inspect(results.result.aggregations[4], false, null));
+          console.log('++++++++++++ KEYWORDS ++++++++++++++++++++');
+          console.log(util.inspect(results.result.aggregations[5], false, null));
+          console.log('++++++++++++ ENTITY TYPES ++++++++++++++++++++');
+          console.log(util.inspect(results.result.aggregations[6], false, null));
+          // console.log('numMatches: ' + matches.results.length);
+          // console.log('totals: ' + JSON.stringify(totals, null, 2));
+        
           res.render('index', {
             data: matches,
             products: results,

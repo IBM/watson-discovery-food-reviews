@@ -75,9 +75,11 @@ export default class SentimentChart extends React.Component {
     this.totals.negativeNum = 0;
 
     if (collection.results) {
+      console.log('COLLECTION: ' + JSON.stringify(collection.results, null, 2));
       for (var item of collection.results) {
         if (termValue === '' || termValue === utils.ALL_TERM_ITEM || termValue === item.key) {
           this.totals.matches = this.totals.matches + item.matching_results;
+          // if (item.aggregations[])
           for (var sentiment of item.aggregations[0].results) {
             if (sentiment.key === 'positive') {
               this.totals.positiveNum = this.totals.positiveNum + sentiment.matching_results;
@@ -101,18 +103,18 @@ export default class SentimentChart extends React.Component {
       chartType,
       termValue,
       entities,
-      categories,
-      concepts,
+      // categories,
+      // concepts,
       keywords,
       entityTypes
     } = this.state;
     
     if (chartType === utils.ENTITY_FILTER) {
       this.getTotals(entities, termValue);
-    } else if (chartType === utils.CATEGORY_FILTER) {
-      this.getTotals(categories, termValue);
-    } else if (chartType === utils.CONCEPT_FILTER) {
-      this.getTotals(concepts, termValue);
+    // } else if (chartType === utils.CATEGORY_FILTER) {
+    //   this.getTotals(categories, termValue);
+    // } else if (chartType === utils.CONCEPT_FILTER) {
+    //   this.getTotals(concepts, termValue);
     } else if (chartType === utils.KEYWORD_FILTER) {
       this.getTotals(keywords, termValue);
     } else if (chartType === utils.ENTITY_TYPE_FILTER) {

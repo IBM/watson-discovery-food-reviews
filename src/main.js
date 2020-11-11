@@ -489,8 +489,9 @@ class Main extends React.Component {
         var totals = utils.getTotals(data);
 
         console.log('+++ DISCO RESULTS +++');
-        // const util = require('util');
+        const util = require('util');
         // console.log(util.inspect(data.results, false, null));
+        console.log(util.inspect(json, false, null));
         console.log('numMatches: ' + data.results.length);
 
         this.setState({
@@ -672,6 +673,7 @@ class Main extends React.Component {
    * getSentimentFilter - return values to be displayed in the sentiment filter.
    */
   getSentimentFilter() {
+    console.log('getSentimentFilter');
     const { sentimentFilter } = this.state;
     const reviewSentimentOptions = [
       { key: 'ALL', value: 'ALL', text: 'Show All Reviews' },
@@ -696,6 +698,7 @@ class Main extends React.Component {
    * getProductFilter - return product IDs to be displayed in the product filter.
    */
   getProductFilter() {
+    console.log('getProductFilter');
     const { products, productIdFilter } = this.state;
     var showProductOptions = [
       { key: 'ALL', value: 'ALL', text: 'For All Products' }
@@ -726,6 +729,7 @@ class Main extends React.Component {
    * getReviewerFilter - return values to be displayed in the reviewers filter.
    */
   getReviewerFilter() {
+    console.log('getReviewerFilter');
     const { reviewers, reviewerIdFilter } = this.state;
     var showReviewersOptions = [
       { key: 'ALL', value: 'ALL', text: 'For All Reviewers' }
@@ -755,6 +759,7 @@ class Main extends React.Component {
    * getEntitiesFilter - return entities filter object to be rendered.
    */
   getEntitiesFilter() {
+    console.log('getEntitiesFilter');
     const { entities, selectedEntities } = this.state;
     if (!entities) {
       return null;
@@ -772,6 +777,7 @@ class Main extends React.Component {
    * getCategoriesFilter - return categories filter object to be rendered.
    */
   getCategoriesFilter() {
+    console.log('getCategoriesFilter');
     const { categories, selectedCategories } = this.state;
     if (!categories) {
       return null;
@@ -789,6 +795,7 @@ class Main extends React.Component {
    * getConceptsFilter - return concepts filter object to be rendered.
    */
   getConceptsFilter() {
+    console.log('getConceptsFilter');
     const { concepts, selectedConcepts } = this.state;
     if (!concepts) {
       return null;
@@ -806,6 +813,7 @@ class Main extends React.Component {
    * getKeywordsFilter - return keywords filter object to be rendered.
    */
   getKeywordsFilter() {
+    console.log('getKeywordsFilter');
     const { keywords, selectedKeywords } = this.state;
     if (!keywords) {
       return null;
@@ -823,6 +831,7 @@ class Main extends React.Component {
    * getEntityTypeFilter - return entity types filter object to be rendered.
    */
   getEntityTypesFilter() {
+    console.log('getEntityTypesFilter');
     const { entityTypes, selectedEntityTypes } = this.state;
     if (!entityTypes) {
       return null;
@@ -882,6 +891,12 @@ class Main extends React.Component {
       selectedEntityTypes.size > 0) {
       filtersOn = true;
     }
+
+    // console.log('entities: ' + JSON.stringify(entities, null, 2));
+    // console.log('categories: ' + JSON.stringify(categories, null, 2));
+    // console.log('concepts: ' + JSON.stringify(concepts, null, 2));
+    // console.log('keywords: ' + JSON.stringify(keywords, null, 2));
+    // console.log('entityTypes: ' + JSON.stringify(entityTypes, null, 2));
 
     const mainTabs = [
       // dashboard tab
@@ -943,7 +958,7 @@ class Main extends React.Component {
                       </Accordion.Content>
                     </Accordion>
                     
-                    <Accordion styled>
+                    {/* <Accordion styled>
                       <Accordion.Title
                         active={activeFilterIndex == utils.CATEGORY_DATA_INDEX}
                         index={utils.CATEGORY_DATA_INDEX}
@@ -956,9 +971,9 @@ class Main extends React.Component {
                         style={{maxHeight: 350, overflow: 'auto'}}>
                         {this.getCategoriesFilter()}
                       </Accordion.Content>
-                    </Accordion>
+                    </Accordion> */}
                     
-                    <Accordion styled>
+                    {/* <Accordion styled>
                       <Accordion.Title
                         active={activeFilterIndex == utils.CONCEPT_DATA_INDEX}
                         index={utils.CONCEPT_DATA_INDEX}
@@ -971,7 +986,7 @@ class Main extends React.Component {
                         style={{maxHeight: 350, overflow: 'auto'}}>
                         {this.getConceptsFilter()}
                       </Accordion.Content>
-                    </Accordion>
+                    </Accordion> */}
                     
                     <Accordion styled>
                       <Accordion.Title
@@ -1078,8 +1093,8 @@ class Main extends React.Component {
                     <Grid.Row className='rrr'>
                       <SentimentChart
                         entities={entities}
-                        categories={categories}
-                        concepts={concepts}
+                        // categories={categories}
+                        // concepts={concepts}
                         keywords={keywords}
                         entityTypes={entityTypes}
                         term={sentimentTerm}
@@ -1182,7 +1197,7 @@ class Main extends React.Component {
  */
 const parseProducts = data => ({
   rawResponse: Object.assign({}, data),
-  results: data.aggregations[utils.PRODUCT_DATA_INDEX].results
+  results: data.result.aggregations[utils.PRODUCT_DATA_INDEX].results
 });
 
 /**
@@ -1190,7 +1205,7 @@ const parseProducts = data => ({
  */
 const parseReviewers = data => ({
   rawResponse: Object.assign({}, data),
-  results: data.aggregations[utils.REVIEWER_DATA_INDEX].results
+  results: data.result.aggregations[utils.REVIEWER_DATA_INDEX].results
 });
 
 /**
@@ -1198,7 +1213,7 @@ const parseReviewers = data => ({
  */
 const parseEntities = data => ({
   rawResponse: Object.assign({}, data),
-  results: data.aggregations[utils.ENTITY_DATA_INDEX].results
+  results: data.result.aggregations[utils.ENTITY_DATA_INDEX].results
 });
 
 /**
@@ -1206,7 +1221,7 @@ const parseEntities = data => ({
  */
 const parseCategories = data => ({
   rawResponse: Object.assign({}, data),
-  results: data.aggregations[utils.CATEGORY_DATA_INDEX].results
+  results: data.result.aggregations[utils.CATEGORY_DATA_INDEX].results
 });
 
 /**
@@ -1214,7 +1229,7 @@ const parseCategories = data => ({
  */
 const parseConcepts = data => ({
   rawResponse: Object.assign({}, data),
-  results: data.aggregations[utils.CONCEPT_DATA_INDEX].results
+  results: data.result.aggregations[utils.CONCEPT_DATA_INDEX].results
 });
 
 /**
@@ -1222,7 +1237,7 @@ const parseConcepts = data => ({
  */
 const parseKeywords = data => ({
   rawResponse: Object.assign({}, data),
-  results: data.aggregations[utils.KEYWORD_DATA_INDEX].results
+  results: data.result.aggregations[utils.KEYWORD_DATA_INDEX].results
 });
 
 /**
@@ -1230,7 +1245,7 @@ const parseKeywords = data => ({
  */
 const parseEntityTypes = data => ({
   rawResponse: Object.assign({}, data),
-  results: data.aggregations[utils.ENTITY_TYPE_DATA_INDEX].results
+  results: data.result.aggregations[utils.ENTITY_TYPE_DATA_INDEX].results
 });
 
 /**
