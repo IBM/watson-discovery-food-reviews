@@ -49,6 +49,7 @@ class Main extends React.Component {
       concepts, 
       keywords,
       entityTypes,
+      productNames,
       data,
       numMatches,
       numPositive,
@@ -89,6 +90,7 @@ class Main extends React.Component {
       concepts: concepts && parseConcepts(concepts),
       keywords: keywords && parseKeywords(keywords),
       entityTypes: entityTypes && parseEntityTypes(entityTypes),
+      productNames: productNames && parseProductNames(productNames),
       data: data,   // data should already be formatted
       numMatches: numMatches || 0,
       numPositive: numPositive || 0,
@@ -101,6 +103,7 @@ class Main extends React.Component {
       // on main dashboard.
       origProducts: products && parseProducts(products),
       origCategories: categories && parseCategories(categories),
+      origProductNames: productNames && parseProductNames(productNames),
       origReviewers: reviewers && parseReviewers(reviewers),
       // query params
       searchQuery: searchQuery || '',
@@ -267,6 +270,8 @@ class Main extends React.Component {
   fetchCustomQueryData(data) {
     var { queryData } = data;
 
+    console.log('CUSTOM DATA: ' + JSON.stringify(data, null, 2));
+
     queryData.loading = true;
     this.setState({
       customQueryData: queryData
@@ -289,7 +294,13 @@ class Main extends React.Component {
         filterString = filterString + 'ProductId::' + queryData.product;
       }
     }
-    
+
+    if (queryData.productName.length > 1) {
+      if (queryData.productName !== 'ALL') {
+        queryData.query = 'enriched_text.entities.type::Product,enriched_text.entities.text::' + queryData.productName;
+      }
+    }
+
     // add any reviewer ID filter, if selected
     if (queryData.reviewer.length > 1) {
       if (queryData.reviewer !== 'ALL') {
@@ -302,7 +313,7 @@ class Main extends React.Component {
     
     const qs = queryString.stringify({
       query: queryData.query,
-      queryType: 'natural_language_query',
+      queryType: 'query',
       filters: filterString,
       count: 10,
       // don't sort so we get most relevant results first
@@ -320,11 +331,13 @@ class Main extends React.Component {
       })
       .then(json => {
         // const util = require('util');
-        console.log('+++ DISCO CUSTOM QUERY RESULTS +++');
+        console.log('+++ DISCO CUSTOM 1 QUERY RESULTS +++');
         // console.log(util.inspect(json.aggregations[0].results, false, null));
-        console.log('numMatches: ' + json.matching_results);
+        console.log('numMatches: ' + json.result.matching_results);
 
-        queryData.data = json;
+        let rawData = {};
+        rawData['rawResponse'] = json;
+        queryData.data = rawData;
         queryData.loading = false;
         queryData.error = null;
         this.setState({
@@ -395,11 +408,13 @@ class Main extends React.Component {
       })
       .then(json => {
         // const util = require('util');
-        console.log('+++ DISCO COMMON QUERY RESULTS +++');
+        console.log('+++ DISCO COMMON 2 QUERY RESULTS +++');
         // console.log(util.inspect(json.aggregations[0].results, false, null));
-        console.log('numMatches: ' + json.matching_results);
+        console.log('numMatches: ' + json.result.matching_results);
 
-        queryData[queryType].data = json;
+        let rawData = {};
+        rawData['rawResponse'] = json;
+        queryData[queryType].data = rawData;
         queryData[queryType].loading = false;
         queryData[queryType].error = null;
         queryData[queryType].category = category;
@@ -433,6 +448,7 @@ class Main extends React.Component {
       selectedKeywords,
       selectedEntityTypes,
       sortOrder,
+      origProductNames
     } = this.state;
 
     // clear filters if this a new text search
@@ -502,6 +518,7 @@ class Main extends React.Component {
           concepts: parseConcepts(json),
           keywords: parseKeywords(json),
           entityTypes: parseEntityTypes(json),
+          productNames: parseProductNames(json),
           loading: false,
           numMatches: data.results.length,
           numPositive: totals.numPositive,
@@ -857,7 +874,7 @@ class Main extends React.Component {
   render() {
     const { loading, data, error,
       entities, categories, concepts, keywords, entityTypes,
-      origCategories, origProducts, origReviewers,
+      origCategories, origProducts, origProductNames, origReviewers,
       selectedEntities, selectedCategories, 
       selectedConcepts,selectedKeywords, selectedEntityTypes,
       numMatches, numPositive, numNeutral, numNegative,
@@ -1154,6 +1171,7 @@ class Main extends React.Component {
                     <CustomQueryPanel
                       queryData={customQueryData}
                       products={origProducts}
+                      productNames={origProductNames}
                       reviewers={origReviewers}
                       onGetCustomQueryRequest={this.fetchCustomQueryData.bind(this)}
                     />
@@ -1182,7 +1200,7 @@ class Main extends React.Component {
  */
 const parseProducts = data => ({
   rawResponse: Object.assign({}, data),
-  results: data.aggregations[utils.PRODUCT_DATA_INDEX].results
+  results: data.result.aggregations[utils.PRODUCT_DATA_INDEX].results
 });
 
 /**
@@ -1190,7 +1208,7 @@ const parseProducts = data => ({
  */
 const parseReviewers = data => ({
   rawResponse: Object.assign({}, data),
-  results: data.aggregations[utils.REVIEWER_DATA_INDEX].results
+  results: data.result.aggregations[utils.REVIEWER_DATA_INDEX].results
 });
 
 /**
@@ -1198,7 +1216,7 @@ const parseReviewers = data => ({
  */
 const parseEntities = data => ({
   rawResponse: Object.assign({}, data),
-  results: data.aggregations[utils.ENTITY_DATA_INDEX].results
+  results: data.result.aggregations[utils.ENTITY_DATA_INDEX].results
 });
 
 /**
@@ -1206,7 +1224,7 @@ const parseEntities = data => ({
  */
 const parseCategories = data => ({
   rawResponse: Object.assign({}, data),
-  results: data.aggregations[utils.CATEGORY_DATA_INDEX].results
+  results: data.result.aggregations[utils.CATEGORY_DATA_INDEX].results
 });
 
 /**
@@ -1214,7 +1232,7 @@ const parseCategories = data => ({
  */
 const parseConcepts = data => ({
   rawResponse: Object.assign({}, data),
-  results: data.aggregations[utils.CONCEPT_DATA_INDEX].results
+  results: data.result.aggregations[utils.CONCEPT_DATA_INDEX].results
 });
 
 /**
@@ -1222,7 +1240,7 @@ const parseConcepts = data => ({
  */
 const parseKeywords = data => ({
   rawResponse: Object.assign({}, data),
-  results: data.aggregations[utils.KEYWORD_DATA_INDEX].results
+  results: data.result.aggregations[utils.KEYWORD_DATA_INDEX].results
 });
 
 /**
@@ -1230,8 +1248,17 @@ const parseKeywords = data => ({
  */
 const parseEntityTypes = data => ({
   rawResponse: Object.assign({}, data),
-  results: data.aggregations[utils.ENTITY_TYPE_DATA_INDEX].results
+  results: data.result.aggregations[utils.ENTITY_TYPE_DATA_INDEX].results
 });
+
+/**
+ * parseProductName - convert raw search results into collection of product names.
+ */
+const parseProductNames = data => ({
+  rawResponse: Object.assign({}, data),
+  results: data.result.aggregations[utils.PRODUCT_NAME_INDEX].aggregations[0].aggregations[0].results
+});
+
 
 /**
  * scrollToMain - scroll window to show 'main' rendered object.
@@ -1255,9 +1282,11 @@ Main.propTypes = {
   concepts: PropTypes.object,
   keywords: PropTypes.object,
   entityTypes: PropTypes.object,
+  productNames: PropTypes.object,
   origProducts: PropTypes.object,
   origCategories: PropTypes.object,
   origReviewers: PropTypes.object,
+  origProductNames: PropTypes.object,
   searchQuery: PropTypes.string,
   selectedSentiments: PropTypes.object,
   selectedProperties: PropTypes.object,

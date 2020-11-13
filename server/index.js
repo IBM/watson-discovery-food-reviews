@@ -34,8 +34,8 @@ const utils = require('../lib/utils');
  * service, and setting up route methods to handle client requests.
  */
 
-var environment_id;
-var collection_id;
+var environmentId;
+var collectionId;
 const model_id = process.env.WKS_MODEL_ID;
 
 const DEFAULT_NAME = 'food-reviews';
@@ -51,14 +51,14 @@ arrayOfFiles.forEach(function(file) {
 // out of memory errors.
 //discoveryDocs = discoveryDocs.slice(0,100);
 
-var version_date = '2019-03-25';
+var version_date = '2020-11-11';
 if (process.env.DISCOVERY_VERSION_DATE !== undefined) {
   // if defined, override with value from .env
   version_date = process.env.DISCOVERY_VERSION_DATE;
 }
 
 const discovery = new DiscoveryV1({
-  version: version_date
+  version: version_date,
 });
 
 // make 'query' a promise function
@@ -84,15 +84,15 @@ const WatsonDiscoServer = new Promise((resolve) => {
       // will point to the actual credentials, whether the user
       // entered them in .env for an existing collection, or if
       // we had to create them from scratch.
-      environment_id = collectionParams.environment_id;
-      collection_id = collectionParams.collection_id;
-      console.log('environment_id: ' + environment_id);
-      console.log('collection_id: ' + collection_id);
+      environmentId = collectionParams.environmentId;
+      collectionId = collectionParams.collectionId;
+      console.log('environmentId: ' + environmentId);
+      console.log('collectionId: ' + collectionId);
       console.log('model_id: ' + model_id);
-      queryBuilder.setEnvironmentId(environment_id);
-      queryBuilder.setCollectionId(collection_id);
-      queryCustomBuilder.setEnvironmentId(environment_id);
-      queryCustomBuilder.setCollectionId(collection_id);
+      queryBuilder.setEnvironmentId(environmentId);
+      queryBuilder.setCollectionId(collectionId);
+      queryCustomBuilder.setEnvironmentId(environmentId);
+      queryCustomBuilder.setCollectionId(collectionId);
 
       collectionParams.documents = discoveryDocs;
       console.log('Begin loading ' + discoveryDocs.length +
@@ -157,7 +157,7 @@ function createServer() {
 
     // add query and the type of query
     if (queryType == 'natural_language_query') {
-      params.natural_language_query = query;
+      params.naturalLanguageQuery = query;
     } else {
       params.query = query;
     }
@@ -178,7 +178,7 @@ function createServer() {
     }
 
     if (! sort) {
-      params.sort = utils.utils.sortKeys[0].sortBy;
+      params.sort = utils.sortKeys[0].sortBy;
     } else {
       params.sort = sort;
     }
@@ -233,6 +233,7 @@ function createServer() {
             concepts: json,
             keywords: json,
             entityTypes: json,
+            productNames: json,
             searchQuery,
             numMatches: matches.results.length,
             numPositive: totals.numPositive,
@@ -289,6 +290,7 @@ function createServer() {
             error: null,
             query: '',
             product: 'ALL',
+            productName: 'ALL',
             reviewer: 'ALL',
             sentiment: 'ALL',
             placeHolder: 'Enter search string...'
@@ -303,6 +305,7 @@ function createServer() {
             concepts: results,
             keywords: results,
             entityTypes: results,
+            productNames: results,
             numMatches: matches.results.length,
             numPositive: totals.numPositive,
             numNeutral: totals.numNeutral,

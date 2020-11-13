@@ -38,9 +38,11 @@ export default class CustomQueryPanel extends React.Component {
       queryData: this.props.queryData,
       products: this.props.products,
       reviewers: this.props.reviewers,
+      productNames: this.props.productNames,
       clearQuery: 'queryKey1',
       clearSentiment: 'sentimentKey1',
       clearProduct: 'productKey1',
+      clearProductName: 'productNameKey1',
       clearReviewer: 'reviewerKey1'
     };
   }
@@ -65,6 +67,19 @@ export default class CustomQueryPanel extends React.Component {
     var { queryData } = this.state;
 
     queryData.product = selection.value;
+
+    this.setState({
+      queryData: queryData
+    });
+  }
+
+  /**
+   * productNameFilterChanged - user has selected a product name to filter on.
+   */
+  productNameFilterChanged(event, selection) {
+    var { queryData } = this.state;
+
+    queryData.productName = selection.value;
 
     this.setState({
       queryData: queryData
@@ -119,13 +134,14 @@ export default class CustomQueryPanel extends React.Component {
    * doCustomQueryClear - clear panel and set all options to default values.
    */
   doCustomQueryClear() {
-    var { queryData, clearQuery, clearSentiment, clearProduct, clearReviewer } = this.state;
+    var { queryData, clearQuery, clearSentiment, clearProduct, clearProductName, clearReviewer } = this.state;
     queryData.data = null;
     queryData.loading = false;
     queryData.error = null;
     queryData.query = '';
     queryData.sentiment = 'ALL';
     queryData.product = 'ALL';
+    queryData.productName = 'ALL';
     queryData.reviewer = 'ALL';
     queryData.placeHolder = 'Enter search string...';
     this.setState({
@@ -133,6 +149,7 @@ export default class CustomQueryPanel extends React.Component {
       clearQuery: (clearQuery == 'queryKey1' ? 'queryKey2' : 'queryKey1'),
       clearSentiment: (clearSentiment == 'sentimentKey1' ? 'sentimentKey2' : 'sentimentKey1'),
       clearProduct: (clearProduct == 'productKey1' ? 'productKey2' : 'productKey1'),
+      clearProductName: (clearProductName == 'productNameKey1' ? 'productNameKey2' : 'productNameKey1'),
       clearReviewer: (clearReviewer == 'reviewerKey1' ? 'reviewerKey2' : 'reviewerKey1')
     });
   }
@@ -153,21 +170,45 @@ export default class CustomQueryPanel extends React.Component {
   /**
    * getShowProductOptions - return available product IDs.
    */
-  getShowProductOptions() {
-    const { products } = this.state;
-    var showProductOptions = [
-      { key: 'ALL', value: 'ALL', text: 'For All Products' }
+  // getShowProductOptions() {
+  //   const { products } = this.state;
+  //   var showProductOptions = [
+  //     { key: 'ALL', value: 'ALL', text: 'For All Products' }
+  //   ];
+
+  //   products.results.forEach(function(entry) {
+  //     showProductOptions.push({
+  //       key: entry.key,
+  //       value: entry.key,
+  //       text: 'For Product: ' + entry.key + ' (' + entry.matching_results + ')'
+  //     });
+  //   });
+
+  //   return showProductOptions;
+  // }
+
+  /**
+   * getShowProductNameOptions - return available product names.
+   */
+  getShowProductNameOptions() {
+    const { productNames } = this.state;
+    var showProductNameOptions = [
+      { key: 'ALL', value: 'ALL', text: 'For All Product Names' }
     ];
 
-    products.results.forEach(function(entry) {
-      showProductOptions.push({
-        key: entry.key,
-        value: entry.key,
-        text: 'For Product: ' + entry.key + ' (' + entry.matching_results + ')'
-      });
+    const badValues = ['product', 'food', 'this', 'these', 'it'];
+    console.log('Product NamesXXXXX: ' + JSON.stringify(productNames, null, 2));
+    productNames.results.forEach(function(entry) {
+      if (! badValues.includes(entry.key)) {
+        showProductNameOptions.push({
+          key: entry.key,
+          value: entry.key,
+          text: 'For Product Name: ' + entry.key + ' (' + entry.matching_results + ')'
+        });
+      }
     });
 
-    return showProductOptions;
+    return showProductNameOptions;
   }
 
   /**
@@ -260,7 +301,7 @@ export default class CustomQueryPanel extends React.Component {
    * render - return the panel object to render.
    */
   render() {
-    const { queryData, clearQuery, clearSentiment, clearProduct, clearReviewer } = this.state;
+    const { queryData, clearQuery, clearSentiment, clearProduct, clearProductName, clearReviewer } = this.state;
 
     const tagCloudOptions = {
       luminosity: 'light',
@@ -292,14 +333,14 @@ export default class CustomQueryPanel extends React.Component {
                 onChange={ this.sentimentFilterChanged.bind(this) }
               />
               <Dropdown 
-                key={ clearProduct }
+                key={ clearProductName }
                 className='top-filter-class'
-                defaultValue={ queryData.product }
+                defaultValue={ queryData.productNames }
                 search
                 selection
                 scrolling
-                options={ this.getShowProductOptions() }
-                onChange={ this.productFilterChanged.bind(this) }
+                options={ this.getShowProductNameOptions() }
+                onChange={ this.productNameFilterChanged.bind(this) }
               />
               <Dropdown 
                 key={ clearReviewer }
@@ -408,6 +449,7 @@ export default class CustomQueryPanel extends React.Component {
 CustomQueryPanel.propTypes = {
   products: PropTypes.object,
   reviewers: PropTypes.object,
+  productNames: PropTypes.object,
   queryData: PropTypes.object,
   onGetCustomQueryRequest: PropTypes.func.isRequired
 };
