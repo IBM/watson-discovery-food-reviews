@@ -283,19 +283,12 @@ class Main extends React.Component {
       }
     }
 
-    // add any product ID filter, if selected
-    if (queryData.product.length > 1) {
-      if (queryData.product !== 'ALL') {
+    if (queryData.productName.length > 1) {
+      if (queryData.productName !== 'ALL') {
         if (filterString != '') {
           filterString = filterString + ',';
         }
-        filterString = filterString + 'ProductId::' + queryData.product;
-      }
-    }
-
-    if (queryData.productName.length > 1) {
-      if (queryData.productName !== 'ALL') {
-        queryData.query = 'enriched_text.entities.type::Product,enriched_text.entities.text::' + queryData.productName;
+        filterString = filterString + 'enriched_text.entities.type::Product,enriched_text.entities.text::' + queryData.productName;
       }
     }
 
@@ -305,15 +298,15 @@ class Main extends React.Component {
         if (filterString != '') {
           filterString = filterString + ',';
         }
-        filterString = filterString + 'UserId::' + queryData.reviewer;
+        filterString = filterString + 'UserId::' + queryData.reviewer;  // ex: 'A3PIHY8BD4AF7D'
       }
     }
     
     const qs = queryString.stringify({
       query: queryData.query,
-      queryType: 'query',
+      queryType: 'natural_language_query',
       filters: filterString,
-      count: 10,
+      count: 1000,
       // don't sort so we get most relevant results first
       sort: ''
     });
@@ -348,7 +341,7 @@ class Main extends React.Component {
         queryData.error = (response.status === 429) ? 'Number of free queries per month exceeded' : 'Error fetching results';
         queryData.query = '';
         queryData.sentiment = 'ALL';
-        queryData.product = 'ALL';
+        queryData.productName = 'ALL';
         queryData.reviewer = 'ALL';
         queryData.placeHolder = 'Enter search string...';
         this.setState({

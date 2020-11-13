@@ -76,7 +76,7 @@ export default class CustomQueryPanel extends React.Component {
    */
   reviewerFilterChanged(event, selection) {
     var { queryData } = this.state;
-    queryData.product = selection.value;
+    queryData.reviewer = selection.value;
 
     this.setState({
       queryData: queryData
@@ -202,8 +202,8 @@ export default class CustomQueryPanel extends React.Component {
     const { queryData } = this.state;
     var entities = [];
 
-    if (queryData && queryData.data.matching_results) {
-      const data = queryData.data.aggregations[utils.ENTITY_DATA_INDEX];
+    if (queryData && queryData.data.rawResponse.result.matching_results) {
+      const data = queryData.data.rawResponse.result.aggregations[utils.ENTITY_DATA_INDEX];
       // get top 5 entities
       var count = 0;
       data.results.forEach(function(item) {
@@ -227,8 +227,8 @@ export default class CustomQueryPanel extends React.Component {
     const { queryData } = this.state;
     var keywords = [];
 
-    if (queryData && queryData.data.matching_results) {
-      const data = queryData.data.aggregations[utils.KEYWORD_DATA_INDEX];
+    if (queryData && queryData.data.rawResponse.result.matching_results) {
+      const data = queryData.data.rawResponse.result.aggregations[utils.KEYWORD_DATA_INDEX];
       // get top 10 keywords
       var count = 0;
       data.results.forEach(function(item) {
