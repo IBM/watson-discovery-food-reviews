@@ -270,8 +270,6 @@ class Main extends React.Component {
   fetchCustomQueryData(data) {
     var { queryData } = data;
 
-    console.log('CUSTOM DATA: ' + JSON.stringify(data, null, 2));
-
     queryData.loading = true;
     this.setState({
       customQueryData: queryData
@@ -448,7 +446,6 @@ class Main extends React.Component {
       selectedKeywords,
       selectedEntityTypes,
       sortOrder,
-      origProductNames
     } = this.state;
 
     // clear filters if this a new text search
@@ -874,7 +871,7 @@ class Main extends React.Component {
   render() {
     const { loading, data, error,
       entities, categories, concepts, keywords, entityTypes,
-      origCategories, origProducts, origProductNames, origReviewers,
+      origCategories, origProductNames, origReviewers,
       selectedEntities, selectedCategories, 
       selectedConcepts,selectedKeywords, selectedEntityTypes,
       numMatches, numPositive, numNeutral, numNegative,
@@ -1170,7 +1167,6 @@ class Main extends React.Component {
                   <Grid.Column  className='query-panel' width={16} textAlign='center'>
                     <CustomQueryPanel
                       queryData={customQueryData}
-                      products={origProducts}
                       productNames={origProductNames}
                       reviewers={origReviewers}
                       onGetCustomQueryRequest={this.fetchCustomQueryData.bind(this)}
@@ -1253,6 +1249,8 @@ const parseEntityTypes = data => ({
 
 /**
  * parseProductName - convert raw search results into collection of product names.
+ * NOTE product names requires a multiple nested query to find:
+ * nested(enriched_text.entities).filter(enriched_text.entities.type:Product).term(enriched_text.entities.text)
  */
 const parseProductNames = data => ({
   rawResponse: Object.assign({}, data),
