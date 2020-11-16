@@ -16,6 +16,7 @@
 
 import PropTypes from 'prop-types';
 import FilterContainer from '../FilterBase/FilterContainer';
+var _ = require('lodash');
 
 /**
  * CategoriesFilter - A container component for Category objects.
@@ -63,9 +64,15 @@ class CategoriesFilter extends FilterContainer {
   // are propagated down to our component. In this case, some other
   // search or filter event has occured which has changed the list of 
   // cateories, or which categories are selected.
-  componentWillReceiveProps(nextProps) {
-    this.setState({ categories: nextProps.categories });
-    this.setState({ selectedCategories: nextProps.selectedCategories });
+  static getDerivedStateFromProps(props, state) {
+    if (!(_.isEqual(props.categories != state.categories))) {
+      return {
+        categories: props.categories,
+        selectedCategories: props.selectedCategories,
+      };
+    }
+    // Return null to indicate no change to state.
+    return null;
   }
 }
 

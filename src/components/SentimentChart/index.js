@@ -19,6 +19,7 @@ import PropTypes from 'prop-types';
 import { Menu, Dropdown, Divider, Header, Icon } from 'semantic-ui-react';
 import { Doughnut } from 'react-chartjs-2';
 const utils = require('../../../lib/utils');
+var _ = require('lodash');
 
 /**
  * This object renders a sentiment graph object that appears at the bottom
@@ -207,13 +208,19 @@ export default class SentimentChart extends React.Component {
   // are propagated down to our component. In this case, some other
   // search or filter event has occured which has changed the list of 
   // items we are graphing.
-  componentWillReceiveProps(nextProps) {
-    this.setState({ entities: nextProps.entities });
-    this.setState({ categories: nextProps.categories });
-    this.setState({ concepts: nextProps.concepts });
-    this.setState({ keywords: nextProps.keywords });
-    this.setState({ entityTypes: nextProps.entityTypes });
-    this.setState({ termValue: nextProps.term });
+  static getDerivedStateFromProps(props, state) {
+    if (!(_.isEqual(props.entities != state.entities))) {
+      return {
+        entities: props.entities,
+        categories: props.categories,
+        concepts: props.concepts,
+        keywords: props.keywords,
+        entityTypes: props.entityTypes,
+        termValue: props.term,
+      };
+    }
+    // Return null to indicate no change to state.
+    return null;
   }
 
   /**

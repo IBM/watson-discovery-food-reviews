@@ -19,6 +19,7 @@ import PropTypes from 'prop-types';
 import { Menu, Icon } from 'semantic-ui-react';
 const utils = require('../../../lib/utils');
 const MAX_MENU_ITEMS = 9;
+var _ = require('lodash');
 
 /**
  * This object renders a pagination menu at the bottom of the results
@@ -200,14 +201,15 @@ export default class PaginationMenu extends React.Component {
   // are propagated down to our component. In this case, a new search
   // was conducted resulting in a new set of matches, so we need
   // to reset our current page to '1'.
-  componentWillReceiveProps(nextProps) {
-    const { numMatches } = this.state;
-    if (numMatches != nextProps.numMatches) {
-      this.setState({
-        numMatches: nextProps.numMatches,
+  static getDerivedStateFromProps(props, state) {
+    if (props.numMatches != state.numMatches) {
+      return {
+        numMatches: props.numMatches,
         currentPage: '1'
-      });
+      };
     }
+    // Return null to indicate no change to state.
+    return null;
   }
 
   /**

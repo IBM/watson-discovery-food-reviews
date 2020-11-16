@@ -16,6 +16,7 @@
 
 import PropTypes from 'prop-types';
 import FilterContainer from '../FilterBase/FilterContainer';
+var _ = require('lodash');
 
 /**
  * EntityTypesFilter - A container component for Entity Type objects.
@@ -63,9 +64,15 @@ class EntityTypesFilter extends FilterContainer {
   // are propagated down to our component. In this case, some other
   // search or filter event has occured which has changed the list of 
   // entities, or which entities are selected.
-  componentWillReceiveProps(nextProps) {
-    this.setState({ entityTypes: nextProps.entityTypes });
-    this.setState({ selectedEntityTypes: nextProps.selectedEntityTypes });
+  static getDerivedStateFromProps(props, state) {
+    if (!(_.isEqual(props.entityTypes != state.entityTypes))) {
+      return {
+        entityTypes: props.entityTypes,
+        selectedEntityTypes: props.selectedEntityTypes,
+      };
+    }
+    // Return null to indicate no change to state.
+    return null;
   }
 }
 

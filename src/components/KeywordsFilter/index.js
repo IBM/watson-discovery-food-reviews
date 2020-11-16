@@ -16,6 +16,7 @@
 
 import PropTypes from 'prop-types';
 import FilterContainer from '../FilterBase/FilterContainer';
+var _ = require('lodash');
 
 /**
  * KeywordsFilter - A container component for Keyword objects.
@@ -63,9 +64,15 @@ class KeywordsFilter extends FilterContainer {
   // are propagated down to our component. In this case, some other
   // search or filter event has occured which has changed the list of 
   // keywords, or which keywords are selected.
-  componentWillReceiveProps(nextProps) {
-    this.setState({ keywords: nextProps.keywords });
-    this.setState({ selectedKeywords: nextProps.selectedKeywords });
+  static getDerivedStateFromProps(props, state) {
+    if (!(_.isEqual(props.keywords != state.keywords))) {
+      return {
+        keywords: props.keywords,
+        selectedKeywords: props.selectedKeywords,
+      };
+    }
+    // Return null to indicate no change to state.
+    return null;
   }
 }
 
