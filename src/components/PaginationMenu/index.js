@@ -19,7 +19,6 @@ import PropTypes from 'prop-types';
 import { Menu, Icon } from 'semantic-ui-react';
 const utils = require('../../../lib/utils');
 const MAX_MENU_ITEMS = 9;
-var _ = require('lodash');
 
 /**
  * This object renders a pagination menu at the bottom of the results
