@@ -18,15 +18,15 @@ const util = require('util');
 
 module.exports = {
   setEnvironmentId(environmentId) {
-    this.environment_id = environmentId;
+    this.environmentId = environmentId;
   },
   setCollectionId(collectionId) {
-    this.collection_id = collectionId;
+    this.collectionId = collectionId;
   },
   search(queryOpts) {
     const params = Object.assign({
-      environment_id: this.environment_id,
-      collection_id: this.collection_id,
+      environmentId: this.environmentId,
+      collectionId: this.collectionId,
       highlight: true,
       aggregation:
         '[term(enriched_text.entities.text).term(enriched_text.sentiment.document.label),' +
@@ -34,7 +34,8 @@ module.exports = {
         'term(enriched_text.concepts.text).term(enriched_text.sentiment.document.label),' +
         'term(enriched_text.keywords.text).term(enriched_text.sentiment.document.label),' +
         'term(enriched_text.entities.type).term(enriched_text.sentiment.document.label),' +
-        'term(ProductId,count:100).average(Score),term(UserId,count:100)]'
+        'term(UserId,count:100),' +
+        'nested(enriched_text.entities).filter(enriched_text.entities.type:Product).term(enriched_text.entities.text)]'
     }, queryOpts);
 
     console.log('Discovery Search Query Params: ');

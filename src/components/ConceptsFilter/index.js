@@ -16,6 +16,7 @@
 
 import PropTypes from 'prop-types';
 import FilterContainer from '../FilterBase/FilterContainer';
+var _ = require('lodash');
 
 /**
  * ConceptsFilter - A container component for Concept objects.
@@ -63,9 +64,15 @@ class ConceptsFilter extends FilterContainer {
   // are propagated down to our component. In this case, some other
   // search or filter event has occured which has changed the list of 
   // concepts, or which concepts are selected.
-  componentWillReceiveProps(nextProps) {
-    this.setState({ concepts: nextProps.concepts });
-    this.setState({ selectedConcepts: nextProps.selectedConcepts });
+  static getDerivedStateFromProps(props, state) {
+    if (!(_.isEqual(props.concepts != state.concepts))) {
+      return {
+        concepts: props.concepts,
+        selectedConcepts: props.selectedConcepts,
+      };
+    }
+    // Return null to indicate no change to state.
+    return null;
   }
 }
 

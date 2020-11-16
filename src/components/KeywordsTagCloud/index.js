@@ -19,8 +19,6 @@ import PropTypes from 'prop-types';
 import { TagCloud } from 'react-tagcloud';
 import { Header, Icon } from 'semantic-ui-react';
 
-var _gDoUpdate = true;    // determines if we render update or not
-
 /**
  * This object renders a tag cloud object that appears in the right column
  * of the home page. It contains selectable terms that the user can use
@@ -64,52 +62,22 @@ export default class KeywordsTagCloud extends React.Component {
     return newArray;
   }
 
-  /**
-   * setsAreEqual - shallow test to see if two data sets are equal.
-   */
-  setsAreEqual(arr1, arr2) {
-    if (arr1.length != arr2.length) {
-      return false;
-    }
-
-    for (var i=0; i<arr1.length; i++) {
-      if ((arr1[i].key != arr2[i].key) ||
-          (arr1[i].matching_results != arr2[i].matching_results)) {
-        return false;
-      }
-    } 
-    return true;
-  }
-  
   // Important - this is needed to ensure changes to main properties
   // are propagated down to our component. In this case, some other
   // search or filter event has occurred which has changed the list 
   // items we are showing.
-  componentWillReceiveProps(nextProps) {
-    const { 
-      keywords,
-    } = this.state;
+  static getDerivedStateFromProps(props, state) {
+    for (var i=0; i<props.keywords.results.length; i++) {
+      if ((props.keywords.results[i].key != state.keywords.results[i].key) ||
+          (props.keywords.results[i].matching_results != state.keywords.results[i].matching_results)) {
+        return {
+          keywords: props.keywords,
+        };
+      }
+    } 
 
-    _gDoUpdate = false;
-    
-    if (! this.setsAreEqual(keywords.results, nextProps.keywords.results)) {
-      this.setState({ keywords: nextProps.keywords });
-      _gDoUpdate = true;
-    }
-  }
-
-  // Only do update if something has changed
-  // NOTE: we need to do this for this specific component because it
-  // draws itself randomly each time, which we want to avoid when
-  // nothing has changed.
-  /*eslint no-unused-vars: ["error", { "args": "none" }]*/
-  shouldComponentUpdate(nextProps, nextState) {
-    if (_gDoUpdate) {
-      return true;
-    } else {
-      _gDoUpdate = true;
-      return false;
-    }
+    // Return null to indicate no change to state.
+    return null;
   }
 
   /**

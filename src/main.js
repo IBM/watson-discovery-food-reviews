@@ -42,13 +42,13 @@ class Main extends React.Component {
     super(...props);
     const { 
       // query data
-      products,
       reviewers,
       entities, 
       categories, 
       concepts, 
       keywords,
       entityTypes,
+      productNames,
       data,
       numMatches,
       numPositive,
@@ -58,7 +58,7 @@ class Main extends React.Component {
       // query params
       searchQuery,
       sentimentFilter,
-      productIdFilter,
+      productNameFilter,
       reviewerIdFilter,
       sortOrder,
       // for filters
@@ -82,13 +82,13 @@ class Main extends React.Component {
     // change in state fires re-render of components
     this.state = {
       // query data
-      products: products && parseProducts(products),
       reviewers: reviewers && parseReviewers(reviewers),
       entities: entities && parseEntities(entities),
       categories: categories && parseCategories(categories),
       concepts: concepts && parseConcepts(concepts),
       keywords: keywords && parseKeywords(keywords),
       entityTypes: entityTypes && parseEntityTypes(entityTypes),
+      productNames: productNames && parseProductNames(productNames),
       data: data,   // data should already be formatted
       numMatches: numMatches || 0,
       numPositive: numPositive || 0,
@@ -99,14 +99,14 @@ class Main extends React.Component {
       // original set of items that can be used in common and custom
       // queries and not be effected by limiting queries performed
       // on main dashboard.
-      origProducts: products && parseProducts(products),
       origCategories: categories && parseCategories(categories),
+      origProductNames: productNames && parseProductNames(productNames),
       origReviewers: reviewers && parseReviewers(reviewers),
       // query params
       searchQuery: searchQuery || '',
       sortOrder: sortOrder || utils.sortKeys[0].sortBy,
       sentimentFilter: sentimentFilter || 'ALL',
-      productIdFilter: productIdFilter || 'ALL',
+      productNameFilter: productNameFilter || 'ALL',
       reviewerIdFilter: reviewerIdFilter || 'ALL',
       // used by filters
       selectedEntities: selectedEntities || new Set(),
@@ -180,12 +180,12 @@ class Main extends React.Component {
   }
   
   /**
-   * applyProductIdFilter - (callback function)
+   * applyProductNameFilter - (callback function)
    * User has selected what product ID filter on.
    * This results in making a new qeury to the disco service.
    */
-  applyProductIdFilter(event, data) {
-    this.setState({ productIdFilter: data.value });
+  applyProductNameFilter(event, data) {
+    this.setState({ productNameFilter: data.value });
   }
 
   /**
@@ -202,9 +202,9 @@ class Main extends React.Component {
    * so perform a new disco search.
    */
   componentDidUpdate(prevProps, prevState) {
-    const { searchQuery, sentimentFilter, productIdFilter, reviewerIdFilter } = this.state;
+    const { searchQuery, sentimentFilter, productNameFilter, reviewerIdFilter } = this.state;
     if ((sentimentFilter != prevState.sentimentFilter) || 
-        (productIdFilter != prevState.productIdFilter) ||
+        (productNameFilter != prevState.productNameFilter) ||
         (reviewerIdFilter != prevState.reviewerIdFilter)) {
       // true = clear all filters for new search
       this.fetchData(searchQuery, true);
@@ -280,23 +280,22 @@ class Main extends React.Component {
       }
     }
 
-    // add any product ID filter, if selected
-    if (queryData.product.length > 1) {
-      if (queryData.product !== 'ALL') {
+    if (queryData.productName.length > 1) {
+      if (queryData.productName !== 'ALL') {
         if (filterString != '') {
           filterString = filterString + ',';
         }
-        filterString = filterString + 'ProductId::' + queryData.product;
+        filterString = filterString + 'enriched_text.entities.type::Product,enriched_text.entities.text::' + queryData.productName;
       }
     }
-    
+
     // add any reviewer ID filter, if selected
     if (queryData.reviewer.length > 1) {
       if (queryData.reviewer !== 'ALL') {
         if (filterString != '') {
           filterString = filterString + ',';
         }
-        filterString = filterString + 'UserId::' + queryData.reviewer;
+        filterString = filterString + 'UserId::' + queryData.reviewer;  // ex: 'A3PIHY8BD4AF7D'
       }
     }
     
@@ -304,7 +303,7 @@ class Main extends React.Component {
       query: queryData.query,
       queryType: 'natural_language_query',
       filters: filterString,
-      count: 10,
+      count: 1000,
       // don't sort so we get most relevant results first
       sort: ''
     });
@@ -320,11 +319,13 @@ class Main extends React.Component {
       })
       .then(json => {
         // const util = require('util');
-        console.log('+++ DISCO CUSTOM QUERY RESULTS +++');
+        console.log('+++ DISCO CUSTOM 1 QUERY RESULTS +++');
         // console.log(util.inspect(json.aggregations[0].results, false, null));
-        console.log('numMatches: ' + json.matching_results);
+        console.log('numMatches: ' + json.result.matching_results);
 
-        queryData.data = json;
+        let rawData = {};
+        rawData['rawResponse'] = json;
+        queryData.data = rawData;
         queryData.loading = false;
         queryData.error = null;
         this.setState({
@@ -337,7 +338,7 @@ class Main extends React.Component {
         queryData.error = (response.status === 429) ? 'Number of free queries per month exceeded' : 'Error fetching results';
         queryData.query = '';
         queryData.sentiment = 'ALL';
-        queryData.product = 'ALL';
+        queryData.productName = 'ALL';
         queryData.reviewer = 'ALL';
         queryData.placeHolder = 'Enter search string...';
         this.setState({
@@ -395,11 +396,13 @@ class Main extends React.Component {
       })
       .then(json => {
         // const util = require('util');
-        console.log('+++ DISCO COMMON QUERY RESULTS +++');
+        console.log('+++ DISCO COMMON 2 QUERY RESULTS +++');
         // console.log(util.inspect(json.aggregations[0].results, false, null));
-        console.log('numMatches: ' + json.matching_results);
+        console.log('numMatches: ' + json.result.matching_results);
 
-        queryData[queryType].data = json;
+        let rawData = {};
+        rawData['rawResponse'] = json;
+        queryData[queryType].data = rawData;
         queryData[queryType].loading = false;
         queryData[queryType].error = null;
         queryData[queryType].category = category;
@@ -495,13 +498,13 @@ class Main extends React.Component {
 
         this.setState({
           data: data,
-          products: parseProducts(json),
           reviewers: parseReviewers(json),
           entities: parseEntities(json),
           categories: parseCategories(json),
           concepts: parseConcepts(json),
           keywords: parseKeywords(json),
           entityTypes: parseEntityTypes(json),
+          productNames: parseProductNames(json),
           loading: false,
           numMatches: data.results.length,
           numPositive: totals.numPositive,
@@ -562,7 +565,7 @@ class Main extends React.Component {
       selectedKeywords,
       selectedEntityTypes,
       sentimentFilter,
-      productIdFilter,
+      productNameFilter,
       reviewerIdFilter
     } = this.state;
     var filterString = '';
@@ -602,16 +605,16 @@ class Main extends React.Component {
       }
     }
 
-    // add any product ID filter, if selected
-    if (typeof productIdFilter !== 'undefined' && productIdFilter.length > 1) {
-      if (productIdFilter !== 'ALL') {
+    // add any product name filter, if selected
+    if (typeof productNameFilter !== 'undefined' && productNameFilter.length > 1) {
+      if (productNameFilter !== 'ALL') {
         if (filterString != '') {
           filterString = filterString + ',';
         }
-        filterString = filterString + 'ProductId::' + productIdFilter;
+        filterString = filterString + 'enriched_text.entities.type::Product,enriched_text.entities.text::' + productNameFilter;
       }
     }
-    
+
     // add any reviewer ID filter, if selected
     if (typeof reviewerIdFilter !== 'undefined' && reviewerIdFilter.length > 1) {
       if (reviewerIdFilter !== 'ALL') {
@@ -693,31 +696,36 @@ class Main extends React.Component {
   }
 
   /**
-   * getProductFilter - return product IDs to be displayed in the product filter.
+   * getProductNameFilter - return product IDs to be displayed in the product filter.
    */
-  getProductFilter() {
-    const { products, productIdFilter } = this.state;
-    var showProductOptions = [
+  getProductNameFilter() {
+    const { productNames, productNameFilter } = this.state;
+    var showProductNameOptions = [
       { key: 'ALL', value: 'ALL', text: 'For All Products' }
     ];
 
-    products.results.forEach(function(entry) {
-      showProductOptions.push({
-        key: entry.key,
-        value: entry.key,
-        text: 'For Product: ' + entry.key + ' (' + entry.matching_results + ')'
-      });
+    // make sure we don't show obvious bad results from our query to pull out product names
+    const badValues = ['product', 'food', 'this', 'these', 'it'];
+
+    productNames.results.forEach(function(entry) {
+      if (! badValues.includes(entry.key)) {
+        showProductNameOptions.push({
+          key: entry.key,
+          value: entry.key,
+          text: 'For Product: ' + entry.key + ' (' + entry.matching_results + ')'
+        });
+      }
     });
 
     return (
       <Dropdown 
         className='top-filter-class'
-        defaultValue={ productIdFilter }
+        defaultValue={ productNameFilter }
         search
         selection
         scrolling
-        options={ showProductOptions }
-        onChange={ this.applyProductIdFilter.bind(this) }
+        options={ showProductNameOptions }
+        onChange={ this.applyProductNameFilter.bind(this) }
       />
     );
   }
@@ -857,7 +865,7 @@ class Main extends React.Component {
   render() {
     const { loading, data, error,
       entities, categories, concepts, keywords, entityTypes,
-      origCategories, origProducts, origReviewers,
+      origCategories, origProductNames, origReviewers,
       selectedEntities, selectedCategories, 
       selectedConcepts,selectedKeywords, selectedEntityTypes,
       numMatches, numPositive, numNeutral, numNegative,
@@ -894,7 +902,7 @@ class Main extends React.Component {
                 <Grid.Row className='selection-header' color={'blue'}>
                   <Grid.Column width={16} textAlign='center'>
                     { this.getSentimentFilter() }
-                    { this.getProductFilter() }
+                    { this.getProductNameFilter() }
                     { this.getReviewerFilter() }
                   </Grid.Column>
                 </Grid.Row>
@@ -1153,7 +1161,7 @@ class Main extends React.Component {
                   <Grid.Column  className='query-panel' width={16} textAlign='center'>
                     <CustomQueryPanel
                       queryData={customQueryData}
-                      products={origProducts}
+                      productNames={origProductNames}
                       reviewers={origReviewers}
                       onGetCustomQueryRequest={this.fetchCustomQueryData.bind(this)}
                     />
@@ -1178,19 +1186,11 @@ class Main extends React.Component {
 }
 
 /**
- * parseProducts - convert raw search results into collection of product IDs.
- */
-const parseProducts = data => ({
-  rawResponse: Object.assign({}, data),
-  results: data.aggregations[utils.PRODUCT_DATA_INDEX].results
-});
-
-/**
  * parseReviewers - convert raw search results into collection of reviewers.
  */
 const parseReviewers = data => ({
   rawResponse: Object.assign({}, data),
-  results: data.aggregations[utils.REVIEWER_DATA_INDEX].results
+  results: data.result.aggregations[utils.REVIEWER_DATA_INDEX].results
 });
 
 /**
@@ -1198,7 +1198,7 @@ const parseReviewers = data => ({
  */
 const parseEntities = data => ({
   rawResponse: Object.assign({}, data),
-  results: data.aggregations[utils.ENTITY_DATA_INDEX].results
+  results: data.result.aggregations[utils.ENTITY_DATA_INDEX].results
 });
 
 /**
@@ -1206,7 +1206,7 @@ const parseEntities = data => ({
  */
 const parseCategories = data => ({
   rawResponse: Object.assign({}, data),
-  results: data.aggregations[utils.CATEGORY_DATA_INDEX].results
+  results: data.result.aggregations[utils.CATEGORY_DATA_INDEX].results
 });
 
 /**
@@ -1214,7 +1214,7 @@ const parseCategories = data => ({
  */
 const parseConcepts = data => ({
   rawResponse: Object.assign({}, data),
-  results: data.aggregations[utils.CONCEPT_DATA_INDEX].results
+  results: data.result.aggregations[utils.CONCEPT_DATA_INDEX].results
 });
 
 /**
@@ -1222,7 +1222,7 @@ const parseConcepts = data => ({
  */
 const parseKeywords = data => ({
   rawResponse: Object.assign({}, data),
-  results: data.aggregations[utils.KEYWORD_DATA_INDEX].results
+  results: data.result.aggregations[utils.KEYWORD_DATA_INDEX].results
 });
 
 /**
@@ -1230,8 +1230,19 @@ const parseKeywords = data => ({
  */
 const parseEntityTypes = data => ({
   rawResponse: Object.assign({}, data),
-  results: data.aggregations[utils.ENTITY_TYPE_DATA_INDEX].results
+  results: data.result.aggregations[utils.ENTITY_TYPE_DATA_INDEX].results
 });
+
+/**
+ * parseProductName - convert raw search results into collection of product names.
+ * NOTE product names requires a multiple nested query to find:
+ * nested(enriched_text.entities).filter(enriched_text.entities.type:Product).term(enriched_text.entities.text)
+ */
+const parseProductNames = data => ({
+  rawResponse: Object.assign({}, data),
+  results: data.result.aggregations[utils.PRODUCT_NAME_INDEX].aggregations[0].aggregations[0].results
+});
+
 
 /**
  * scrollToMain - scroll window to show 'main' rendered object.
@@ -1248,16 +1259,16 @@ Main.propTypes = {
   data: PropTypes.object,
   sentiments: PropTypes.object,
   properties: PropTypes.object,
-  products: PropTypes.object,
   reviewers: PropTypes.object,
   entities: PropTypes.object,
   categories: PropTypes.object,
   concepts: PropTypes.object,
   keywords: PropTypes.object,
   entityTypes: PropTypes.object,
-  origProducts: PropTypes.object,
+  productNames: PropTypes.object,
   origCategories: PropTypes.object,
   origReviewers: PropTypes.object,
+  origProductNames: PropTypes.object,
   searchQuery: PropTypes.string,
   selectedSentiments: PropTypes.object,
   selectedProperties: PropTypes.object,
@@ -1274,7 +1285,7 @@ Main.propTypes = {
   currentPage: PropTypes.string,
   sortOrder: PropTypes.string,
   sentimentFilter: PropTypes.string,
-  productIdFilter: PropTypes.string,
+  productNameFilter: PropTypes.string,
   reviewerIdFilter: PropTypes.string,
   commonQueryData: PropTypes.array,
   currentCommonQueryCategory: PropTypes.string,

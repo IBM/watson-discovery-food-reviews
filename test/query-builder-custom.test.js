@@ -24,8 +24,8 @@ beforeEach(() => {
 describe('Custom query builder returns params for discovery service', () => {
   test('when opts are NOT passed', () => {
     expect(queryBuilderCustom.search()).toEqual({
-      environment_id: 'environment',
-      collection_id: 'collection',
+      environmentId: 'environment',
+      collectionId: 'collection',
       highlight: true,
       passages: false,
       aggregation: 
@@ -33,7 +33,9 @@ describe('Custom query builder returns params for discovery service', () => {
       'term(enriched_text.categories.label).term(enriched_text.sentiment.document.label),' +
       'term(enriched_text.concepts.text).term(enriched_text.sentiment.document.label),' +
       'term(enriched_text.keywords.text).term(enriched_text.sentiment.document.label),' +
-      'term(enriched_text.entities.type).term(enriched_text.sentiment.document.label)]'
+      'term(enriched_text.entities.type).term(enriched_text.sentiment.document.label),' +
+      'term(UserId,count:100),' +
+      'nested(enriched_text.entities).filter(enriched_text.entities.type:Product).term(enriched_text.entities.text)]'
     });
   });
 
@@ -43,8 +45,8 @@ describe('Custom query builder returns params for discovery service', () => {
       count: 500,
       query: 'enriched_text.categories.label::"test"',
     })).toEqual({
-      environment_id: 'environment',
-      collection_id: 'collection',
+      environmentId: 'environment',
+      collectionId: 'collection',
       highlight: true,
       passages: false,
       aggregation: 
@@ -52,7 +54,9 @@ describe('Custom query builder returns params for discovery service', () => {
       'term(enriched_text.categories.label).term(enriched_text.sentiment.document.label),' +
       'term(enriched_text.concepts.text).term(enriched_text.sentiment.document.label),' +
       'term(enriched_text.keywords.text).term(enriched_text.sentiment.document.label),' +
-      'term(enriched_text.entities.type).term(enriched_text.sentiment.document.label)]',
+      'term(enriched_text.entities.type).term(enriched_text.sentiment.document.label),' +
+      'term(UserId,count:100),' +
+      'nested(enriched_text.entities).filter(enriched_text.entities.type:Product).term(enriched_text.entities.text)]',
       query: 'enriched_text.categories.label::"test"',
       filter: 'enriched_text.categories.label::"test"',
       count: 500
