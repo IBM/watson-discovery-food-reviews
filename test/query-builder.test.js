@@ -24,15 +24,16 @@ beforeEach(() => {
 describe('Query builder returns params for discovery service', () => {
   test('when opts are NOT passed', () => {
     expect(queryBuilder.search()).toEqual({
-      environment_id: 'environment',
-      collection_id: 'collection',
+      environmentId: 'environment',
+      collectionId: 'collection',
       highlight: true,
       aggregation: '[term(enriched_text.entities.text).term(enriched_text.sentiment.document.label),' +
       'term(enriched_text.categories.label).term(enriched_text.sentiment.document.label),' +
       'term(enriched_text.concepts.text).term(enriched_text.sentiment.document.label),' +
       'term(enriched_text.keywords.text).term(enriched_text.sentiment.document.label),' +
       'term(enriched_text.entities.type).term(enriched_text.sentiment.document.label),' +
-      'term(ProductId,count:100).average(Score),term(UserId,count:100)]'
+      'term(UserId,count:100),' +
+      'nested(enriched_text.entities).filter(enriched_text.entities.type:Product).term(enriched_text.entities.text)]'
     });
   });
 
@@ -43,8 +44,8 @@ describe('Query builder returns params for discovery service', () => {
       natural_language_query: 'test',
       sort: 'enriched_text.sentiment.document.score'
     })).toEqual({
-      environment_id: 'environment',
-      collection_id: 'collection',
+      environmentId: 'environment',
+      collectionId: 'collection',
       highlight: true,
       aggregation: 
         '[term(enriched_text.entities.text).term(enriched_text.sentiment.document.label),' +
@@ -52,7 +53,8 @@ describe('Query builder returns params for discovery service', () => {
         'term(enriched_text.concepts.text).term(enriched_text.sentiment.document.label),' +
         'term(enriched_text.keywords.text).term(enriched_text.sentiment.document.label),' +
         'term(enriched_text.entities.type).term(enriched_text.sentiment.document.label),' +
-        'term(ProductId,count:100).average(Score),term(UserId,count:100)]',
+        'term(UserId,count:100),' +
+        'nested(enriched_text.entities).filter(enriched_text.entities.type:Product).term(enriched_text.entities.text)]',
       natural_language_query: 'test',
       filter: 'enriched_text.categories.label::"test"',
       count: 500,
