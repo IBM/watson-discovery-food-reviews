@@ -156,7 +156,7 @@ export default class CustomQueryPanel extends React.Component {
   getShowProductNameOptions() {
     const { productNames } = this.state;
     var showProductNameOptions = [
-      { key: 'ALL', value: 'ALL', text: 'For All Product Names' }
+      { key: 'ALL', value: 'ALL', text: 'For All Products' }
     ];
 
     // make sure we don't show obvious bad results from our query to pull out product names
@@ -167,7 +167,7 @@ export default class CustomQueryPanel extends React.Component {
         showProductNameOptions.push({
           key: entry.key,
           value: entry.key,
-          text: 'For Product Name: ' + entry.key + ' (' + entry.matching_results + ')'
+          text: 'For Product: ' + entry.key + ' (' + entry.matching_results + ')'
         });
       }
     });

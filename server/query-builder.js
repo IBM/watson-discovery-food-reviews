@@ -34,7 +34,7 @@ module.exports = {
         'term(enriched_text.concepts.text).term(enriched_text.sentiment.document.label),' +
         'term(enriched_text.keywords.text).term(enriched_text.sentiment.document.label),' +
         'term(enriched_text.entities.type).term(enriched_text.sentiment.document.label),' +
-        'term(ProductId,count:100).average(Score),term(UserId,count:100),' +
+        'term(UserId,count:100),' +
         'nested(enriched_text.entities).filter(enriched_text.entities.type:Product).term(enriched_text.entities.text)]'
     }, queryOpts);
 

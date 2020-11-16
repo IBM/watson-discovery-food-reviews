@@ -42,7 +42,6 @@ class Main extends React.Component {
     super(...props);
     const { 
       // query data
-      products,
       reviewers,
       entities, 
       categories, 
@@ -59,7 +58,7 @@ class Main extends React.Component {
       // query params
       searchQuery,
       sentimentFilter,
-      productIdFilter,
+      productNameFilter,
       reviewerIdFilter,
       sortOrder,
       // for filters
@@ -83,7 +82,6 @@ class Main extends React.Component {
     // change in state fires re-render of components
     this.state = {
       // query data
-      products: products && parseProducts(products),
       reviewers: reviewers && parseReviewers(reviewers),
       entities: entities && parseEntities(entities),
       categories: categories && parseCategories(categories),
@@ -101,7 +99,6 @@ class Main extends React.Component {
       // original set of items that can be used in common and custom
       // queries and not be effected by limiting queries performed
       // on main dashboard.
-      origProducts: products && parseProducts(products),
       origCategories: categories && parseCategories(categories),
       origProductNames: productNames && parseProductNames(productNames),
       origReviewers: reviewers && parseReviewers(reviewers),
@@ -109,7 +106,7 @@ class Main extends React.Component {
       searchQuery: searchQuery || '',
       sortOrder: sortOrder || utils.sortKeys[0].sortBy,
       sentimentFilter: sentimentFilter || 'ALL',
-      productIdFilter: productIdFilter || 'ALL',
+      productNameFilter: productNameFilter || 'ALL',
       reviewerIdFilter: reviewerIdFilter || 'ALL',
       // used by filters
       selectedEntities: selectedEntities || new Set(),
@@ -183,12 +180,12 @@ class Main extends React.Component {
   }
   
   /**
-   * applyProductIdFilter - (callback function)
+   * applyProductNameFilter - (callback function)
    * User has selected what product ID filter on.
    * This results in making a new qeury to the disco service.
    */
-  applyProductIdFilter(event, data) {
-    this.setState({ productIdFilter: data.value });
+  applyProductNameFilter(event, data) {
+    this.setState({ productNameFilter: data.value });
   }
 
   /**
@@ -205,9 +202,9 @@ class Main extends React.Component {
    * so perform a new disco search.
    */
   componentDidUpdate(prevProps, prevState) {
-    const { searchQuery, sentimentFilter, productIdFilter, reviewerIdFilter } = this.state;
+    const { searchQuery, sentimentFilter, productNameFilter, reviewerIdFilter } = this.state;
     if ((sentimentFilter != prevState.sentimentFilter) || 
-        (productIdFilter != prevState.productIdFilter) ||
+        (productNameFilter != prevState.productNameFilter) ||
         (reviewerIdFilter != prevState.reviewerIdFilter)) {
       // true = clear all filters for new search
       this.fetchData(searchQuery, true);
@@ -501,7 +498,6 @@ class Main extends React.Component {
 
         this.setState({
           data: data,
-          products: parseProducts(json),
           reviewers: parseReviewers(json),
           entities: parseEntities(json),
           categories: parseCategories(json),
@@ -569,7 +565,7 @@ class Main extends React.Component {
       selectedKeywords,
       selectedEntityTypes,
       sentimentFilter,
-      productIdFilter,
+      productNameFilter,
       reviewerIdFilter
     } = this.state;
     var filterString = '';
@@ -609,16 +605,16 @@ class Main extends React.Component {
       }
     }
 
-    // add any product ID filter, if selected
-    if (typeof productIdFilter !== 'undefined' && productIdFilter.length > 1) {
-      if (productIdFilter !== 'ALL') {
+    // add any product name filter, if selected
+    if (typeof productNameFilter !== 'undefined' && productNameFilter.length > 1) {
+      if (productNameFilter !== 'ALL') {
         if (filterString != '') {
           filterString = filterString + ',';
         }
-        filterString = filterString + 'ProductId::' + productIdFilter;
+        filterString = filterString + 'enriched_text.entities.type::Product,enriched_text.entities.text::' + productNameFilter;
       }
     }
-    
+
     // add any reviewer ID filter, if selected
     if (typeof reviewerIdFilter !== 'undefined' && reviewerIdFilter.length > 1) {
       if (reviewerIdFilter !== 'ALL') {
@@ -700,31 +696,36 @@ class Main extends React.Component {
   }
 
   /**
-   * getProductFilter - return product IDs to be displayed in the product filter.
+   * getProductNameFilter - return product IDs to be displayed in the product filter.
    */
-  getProductFilter() {
-    const { products, productIdFilter } = this.state;
-    var showProductOptions = [
+  getProductNameFilter() {
+    const { productNames, productNameFilter } = this.state;
+    var showProductNameOptions = [
       { key: 'ALL', value: 'ALL', text: 'For All Products' }
     ];
 
-    products.results.forEach(function(entry) {
-      showProductOptions.push({
-        key: entry.key,
-        value: entry.key,
-        text: 'For Product: ' + entry.key + ' (' + entry.matching_results + ')'
-      });
+    // make sure we don't show obvious bad results from our query to pull out product names
+    const badValues = ['product', 'food', 'this', 'these', 'it'];
+
+    productNames.results.forEach(function(entry) {
+      if (! badValues.includes(entry.key)) {
+        showProductNameOptions.push({
+          key: entry.key,
+          value: entry.key,
+          text: 'For Product: ' + entry.key + ' (' + entry.matching_results + ')'
+        });
+      }
     });
 
     return (
       <Dropdown 
         className='top-filter-class'
-        defaultValue={ productIdFilter }
+        defaultValue={ productNameFilter }
         search
         selection
         scrolling
-        options={ showProductOptions }
-        onChange={ this.applyProductIdFilter.bind(this) }
+        options={ showProductNameOptions }
+        onChange={ this.applyProductNameFilter.bind(this) }
       />
     );
   }
@@ -901,7 +902,7 @@ class Main extends React.Component {
                 <Grid.Row className='selection-header' color={'blue'}>
                   <Grid.Column width={16} textAlign='center'>
                     { this.getSentimentFilter() }
-                    { this.getProductFilter() }
+                    { this.getProductNameFilter() }
                     { this.getReviewerFilter() }
                   </Grid.Column>
                 </Grid.Row>
@@ -1185,14 +1186,6 @@ class Main extends React.Component {
 }
 
 /**
- * parseProducts - convert raw search results into collection of product IDs.
- */
-const parseProducts = data => ({
-  rawResponse: Object.assign({}, data),
-  results: data.result.aggregations[utils.PRODUCT_DATA_INDEX].results
-});
-
-/**
  * parseReviewers - convert raw search results into collection of reviewers.
  */
 const parseReviewers = data => ({
@@ -1266,7 +1259,6 @@ Main.propTypes = {
   data: PropTypes.object,
   sentiments: PropTypes.object,
   properties: PropTypes.object,
-  products: PropTypes.object,
   reviewers: PropTypes.object,
   entities: PropTypes.object,
   categories: PropTypes.object,
@@ -1274,7 +1266,6 @@ Main.propTypes = {
   keywords: PropTypes.object,
   entityTypes: PropTypes.object,
   productNames: PropTypes.object,
-  origProducts: PropTypes.object,
   origCategories: PropTypes.object,
   origReviewers: PropTypes.object,
   origProductNames: PropTypes.object,
@@ -1294,7 +1285,7 @@ Main.propTypes = {
   currentPage: PropTypes.string,
   sortOrder: PropTypes.string,
   sentimentFilter: PropTypes.string,
-  productIdFilter: PropTypes.string,
+  productNameFilter: PropTypes.string,
   reviewerIdFilter: PropTypes.string,
   commonQueryData: PropTypes.array,
   currentCommonQueryCategory: PropTypes.string,

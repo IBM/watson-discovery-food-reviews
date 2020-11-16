@@ -226,7 +226,6 @@ function createServer() {
         res.render('index',
           {
             data: matches,
-            products: json,
             reviewers: json,
             entities: json,
             categories: json,
@@ -298,7 +297,6 @@ function createServer() {
 
           res.render('index', {
             data: matches,
-            products: results,
             reviewers: results,
             entities: results,
             categories: results,
